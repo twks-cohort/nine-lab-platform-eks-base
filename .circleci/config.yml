@@ -1,0 +1,69 @@
+---
+version: 2.1
+
+orbs:
+  terraform: feedyard/terraform@0.3.0
+
+# git push: plan, release, test nonprod account changes
+on-push-master: &on-push-master
+  branches:
+    only: /master/
+  tags:
+    ignore: /.*/
+
+# git tag: plan, release, test prod account changes
+on-tag-master: &on-tag-master
+  branches:
+    ignore: /.*/
+  tags:
+    only: /.*/
+
+workflows:
+  version: 2
+  lab-platform-eks-pipeline:
+
+    jobs:
+      - terraform/plan:
+          name: sandbox-change-plan
+          context: ZTW
+          shell: secrethub run -- /bin/sh -eo pipefail
+          workspace: sandbox
+          before-terraform:
+            - run:
+                name: generate environmental configuration and credentials from templates
+                command: |
+                  secrethub inject -i tpl/terraformrc.tpl -o ~/.terraformrc
+                  secrethub inject -i tpl/sandbox.auto.tfvars.json.tpl -o sandbox.auto.tfvars.json
+          filters: *on-push-master
+
+      - approve-sandbox-changes:
+          type: approval
+          requires:
+            - sandbox-change-plan
+          filters: *on-push-master
+
+      - terraform/apply:
+          name: sandbox-change-apply
+          context: ZTW
+          shell: secrethub run -- /bin/sh -eo pipefail
+          workspace: sandbox
+          before-terraform:
+            - run:
+                name: generate environmental configuration and credentials from templates
+                command: |
+                  secrethub inject -i tpl/terraformrc.tpl -o ~/.terraformrc
+                  secrethub inject -i tpl/sandbox.auto.tfvars.json.tpl -o sandbox.auto.tfvars.json
+                  secrethub inject -i tpl/nonprod.test.sh.tpl -o nonprod.test.sh
+          after-terraform:
+            - run:
+                name: test sandbox account changes
+                environment:
+                  TEST_ENV: sandbox
+                command: bash nonprod.test.sh sandbox
+            - run:
+                name: write kubeconfig 
+                command: cat kubeconfig_sandbox | secrethub write twdps/di/platform/teams/ztw/nonprod/svc/kubeconfig/sandbox
+          requires:
+            - approve-sandbox-changes
+          filters: *on-push-master
+        #aws eks update-kubeconfig --kubeconfig sandbox_config --verbose --name sandbox --role arn:aws:iam::090950721693:role/DPSTerraformRole  
