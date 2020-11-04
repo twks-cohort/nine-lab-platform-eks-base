@@ -19,6 +19,7 @@ module "iam_assumable_role_admin" {
   provider_url                  = replace(module.eks.cluster_oidc_issuer_url, "https://", "")
   role_policy_arns              = [aws_iam_policy.cluster_autoscaler.arn]
   oidc_fully_qualified_subjects = ["system:serviceaccount:${local.k8s_cluster_autoscaler_namespace}:${local.k8s_cluster_autoscaler_service_account_name}"]
+  number_of_role_policy_arns    = 1
 }
 
 resource "aws_iam_policy" "cluster_autoscaler" {
@@ -79,6 +80,7 @@ module "iam_assumable_role_cloudwatch" {
   provider_url                  = replace(module.eks.cluster_oidc_issuer_url, "https://", "")
   role_policy_arns              = [aws_iam_policy.cloud_watch.arn]
   oidc_fully_qualified_subjects = ["system:serviceaccount:${local.k8s_cloud_watch_agents_account_namespace}:${local.k8s_cloud_watch_agents_service_account_name}"]
+  number_of_role_policy_arns    = 1
 }
 
 resource "aws_iam_policy" "cloud_watch" {
@@ -128,6 +130,7 @@ module "iam_assumable_role_external_dns" {
   provider_url                  = replace(module.eks.cluster_oidc_issuer_url, "https://", "")
   role_policy_arns              = [aws_iam_policy.external_dns.arn]
   oidc_fully_qualified_subjects = ["system:serviceaccount:${local.k8s_external_dns_account_namespace}:${local.k8s_external_dns_service_account_name}"]
+  number_of_role_policy_arns    = 1
 }
 
 resource "aws_iam_policy" "external_dns" {
