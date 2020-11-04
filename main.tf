@@ -49,15 +49,6 @@ resource "aws_route53_zone" "cluster_subdomain_zone" {
   }
 }
 
-# resource "aws_route53_record" "cluster_subdomain_zone_ns" {
-#   # this zone ID is in dps-1
-#   zone_id = "Z1ORQX4RPIG2YA"
-#   name    = "${var.cluster_name}.${var.domain}"
-#   type    = "NS"
-#   ttl     = "30"
-#   records = aws_route53_zone.cluster_subdomain_zone.name_servers
-# }
-
 resource "aws_kms_key" "cluster_encyption_key" {
   description = "Encryption key for kubernetes-secrets envelope encryption"
   enable_key_rotation = true
