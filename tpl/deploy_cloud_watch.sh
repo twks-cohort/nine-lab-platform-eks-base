@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-
-export AWS_ACCOUNT_ID=${3}
-export AWS_DEFAULT_REGION=${2}
+export CLUSTER=$1
+export AWS_ACCOUNT_ID=$(cat $CLUSTER.auto.tfvars.json | jq -r .account_id)
+export AWS_DEFAULT_REGION=$(cat $CLUSTER.auto.tfvars.json | jq -r .aws_region)
 
 # container-insights deployment files
 cat <<EOF > container-insights-daemonset.yaml
@@ -9,10 +9,10 @@ cat <<EOF > container-insights-daemonset.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: ${1}-cloudwatch-agent
+  name: ${CLUSTER}-cloudwatch-agent
   namespace: amazon-cloudwatch
   annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::${AWS_ACCOUNT_ID}:role/${1}-cloudwatch-agent
+    eks.amazonaws.com/role-arn: arn:aws:iam::${AWS_ACCOUNT_ID}:role/${CLUSTER}-cloudwatch-agent
 
 ---
 apiVersion: apps/v1
@@ -98,7 +98,7 @@ spec:
           hostPath:
             path: /dev/disk/
       terminationGracePeriodSeconds: 60
-      serviceAccountName: ${1}-cloudwatch-agent
+      serviceAccountName: ${CLUSTER}-cloudwatch-agent
 
 ---
 kind: ClusterRole
@@ -133,7 +133,7 @@ metadata:
   name: cloudwatch-agent-role-binding
 subjects:
   - kind: ServiceAccount
-    name: ${1}-cloudwatch-agent
+    name: ${CLUSTER}-cloudwatch-agent
     namespace: amazon-cloudwatch
 roleRef:
   kind: ClusterRole
@@ -157,7 +157,7 @@ spec:
       annotations:
         configHash: 8915de4cf9c3551a8dc74c0137a3e83569d28c71044b0359c2578d2e0461825
     spec:
-      serviceAccountName: ${1}-cloudwatch-agent
+      serviceAccountName: ${CLUSTER}-cloudwatch-agent
       terminationGracePeriodSeconds: 30
       # Because the image's entrypoint requires to write on /fluentd/etc but we mount configmap there which is read-only,
       # this initContainers workaround or other is needed.
@@ -244,7 +244,7 @@ data:
       "logs": {
         "metrics_collected": {
           "kubernetes": {
-            "cluster_name": "${1}",
+            "cluster_name": "${CLUSTER}",
             "metrics_collection_interval": 20
           }
         },
@@ -585,8 +585,8 @@ metadata:
   name: cluster-info
   namespace: amazon-cloudwatch
 data:
-  cluster.name: ${1}
-  logs.region: ${2}
+  cluster.name: ${CLUSTER}
+  logs.region: ${AWS_DEFAULT_REGION}
 
 EOF
 

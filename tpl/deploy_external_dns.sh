@@ -1,17 +1,25 @@
 #!/usr/bin/env bash
+export CLUSTER=$1
+export AWS_ACCOUNT_ID=$(cat $CLUSTER.auto.tfvars.json | jq -r .account_id)
+export AWS_DEFAULT_REGION=$(cat $CLUSTER.auto.tfvars.json | jq -r .aws_region)
 
-export AWS_ACCOUNT_ID=${2}
-export HOSTED_ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name "${1}.twdps.io" | jq -r '.HostedZones[].Id')
+aws sts assume-role --output json --role-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/DPSTerraformRole --role-session-name deploy-external-dns > credentials
+
+export AWS_ACCESS_KEY_ID=$(cat credentials | jq -r ".Credentials.AccessKeyId")
+export AWS_SECRET_ACCESS_KEY=$(cat credentials | jq -r ".Credentials.SecretAccessKey")
+export AWS_SESSION_TOKEN=$(cat credentials | jq -r ".Credentials.SessionToken")
+
+export HOSTED_ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name "$CLUSTER.twdps.io" | jq -r '.HostedZones[].Id')
 
 # external-dns deployment files
 cat <<EOF > external-dns-deployment.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: ${1}-external-dns
+  name: $CLUSTER-external-dns
   namespace: kube-system
   annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::${AWS_ACCOUNT_ID}:role/${1}-external-dns
+    eks.amazonaws.com/role-arn: arn:aws:iam::${AWS_ACCOUNT_ID}:role/${CLUSTER}-external-dns
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -42,7 +50,7 @@ roleRef:
   name: external-dns
 subjects:
 - kind: ServiceAccount
-  name: ${1}-external-dns
+  name: ${CLUSTER}-external-dns
   namespace: kube-system
 
 ---
@@ -62,7 +70,7 @@ spec:
       labels:
         app: external-dns
     spec:
-      serviceAccountName: ${1}-external-dns
+      serviceAccountName: $CLUSTER-external-dns
       containers:
       - name: external-dns
         image: k8s.gcr.io/external-dns/external-dns:v0.7.4
@@ -71,7 +79,7 @@ spec:
         - --source=ingress
         - --source=istio-gateway
         - --source=istio-virtualservice
-        - --domain-filter=${1}.twdps.io
+        - --domain-filter=${CLUSTER}.twdps.io
         - --provider=aws
         # - --policy=upsert-only # would prevent ExternalDNS from deleting any records, omit to enable full synchronization
         - --aws-zone-type=public # only look at public hosted zones (valid values are public, private or no value for both)
@@ -80,6 +88,7 @@ spec:
       securityContext:
         fsGroup: 65534 # For ExternalDNS to be able to read Kubernetes and AWS token files
 EOF
+
 kubectl apply -f external-dns-deployment.yaml
 
 sleep 10
