@@ -113,13 +113,13 @@ workflows:
                 command: |
                   secrethub inject -i tpl/terraformrc.tpl -o ~/.terraformrc
                   secrethub inject -i tpl/preview.auto.tfvars.json.tpl -o preview.auto.tfvars.json
-          filters: *on-push-master
+          filters: *on-tag-master
 
       - approve-preview-changes:
           type: approval
           requires:
             - preview-change-plan
-          filters: *on-push-master
+          filters: *on-tag-master
 
       - terraform/apply:
           name: preview-change-apply
@@ -144,5 +144,5 @@ workflows:
                 cluster: preview
           requires:
             - approve-preview-changes
-          filters: *on-push-master
+          filters: *on-tag-master
         
