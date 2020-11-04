@@ -1,7 +1,7 @@
 terraform {
-  required_version = "~> 0.12.28"
+  required_version = "= 0.13.5"
   required_providers {
-    aws = "~> 2.69"
+    aws = "= 3.13.0"
   }
 
   backend "remote" {
@@ -14,11 +14,11 @@ terraform {
 }
 
 provider "aws" {
-  version = "~> 2.0"
+  version = "= 3.13.0"
   region  = var.aws_region
   assume_role {
     role_arn     = "arn:aws:iam::${var.account_id}:role/${var.assume_role}"
-    session_name = "lab-platform-eks-sandbox"
+    session_name = "lab-platform-eks"
   }
 }
 
@@ -27,7 +27,7 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
   token                  = data.aws_eks_cluster_auth.cluster.token
   load_config_file       = false
-  version                = "~> 1.11"
+  version                = "= 1.13.3"
 }
 
 variable "aws_region" {}
@@ -36,6 +36,7 @@ variable "assume_role" {}
 
 variable "cluster_name" {}
 variable "cluster_version" {}
+variable "domain" {}
 variable "cluster_enabled_log_types" {
   default = ["api", "audit", "authenticator"]
 }
@@ -45,8 +46,3 @@ variable "node_group_a_max_capacity" {}
 variable "node_group_a_min_capacity" {}
 variable "node_group_a_disk_size" {}
 variable "node_group_a_instance_type" {}
-
-locals {
-  k8s_service_account_namespace = "kube-system"
-  k8s_service_account_name      = "cluster-autoscaler-aws-cluster-autoscaler"
-}

@@ -18,6 +18,48 @@ on-tag-master: &on-tag-master
   tags:
     only: /.*/
 
+commands:
+  cluster-base-configure:
+    parameters:
+      cluster:
+        description: cluster name to use for configuration
+        type: string
+        default: ""
+      aws-account:
+        description: aws account to target
+        type: string
+        default: ""
+    steps:
+      - run:
+          name: pull kubeconfig
+          shell: secrethub run -- /bin/sh -eo pipefail
+          command: |
+            mkdir ~/.kube
+            SECRETHUB_VAR_ENV=<< parameters.cluster >> secrethub inject -i tpl/kubeconfig.tpl -o ~/.kube/config
+      - run:
+          name: deploy external-dns
+          command: bash tpl/deploy_external_dns.sh sandbox << parameters.aws-account >>
+      - run:
+          name: deploy cluster-autoscaler
+          command: bash tpl/deploy_cluster_autoscaler.sh << parameters.cluster >> $(cat << parameters.cluster >>.auto.tfvars.json | jq -r '.aws_region') << parameters.aws-account >>
+      - run:
+          name: deploy metrics-apis
+          command: kubectl apply -f metrics-apis --recursive
+      - run:
+          name: deploy containter-insights
+          command: bash tpl/deploy_cloud_watch.sh << parameters.cluster >> $(cat << parameters.cluster >>.auto.tfvars.json | jq -r '.aws_region') << parameters.aws-account >>1
+      - run:
+          name: create environment namespace
+          command: kubectl apply -f namespace_environments.yaml 
+      - run:
+          name: validate pod status for cluster-autoscaler and metrics api deployments
+          command: |
+            secrethub inject -i tpl/cluster_deployments_test.sh.tpl -o cluster_deployments_test.sh
+            bash cluster_deployments_test.sh << parameters.cluster >> << parameters.aws-account >>
+      - run:
+          name: cis benchmarks
+          command: bash tpl/kube_bench.sh
+
 workflows:
   version: 2
   lab-platform-eks-pipeline:
@@ -25,7 +67,7 @@ workflows:
     jobs:
       - terraform/plan:
           name: sandbox-change-plan
-          context: ZTW
+          context: twdpds-di
           shell: secrethub run -- /bin/sh -eo pipefail
           workspace: sandbox
           before-terraform:
@@ -44,7 +86,7 @@ workflows:
 
       - terraform/apply:
           name: sandbox-change-apply
-          context: ZTW
+          context: twdpds-di
           shell: secrethub run -- /bin/sh -eo pipefail
           workspace: sandbox
           before-terraform:
@@ -59,11 +101,60 @@ workflows:
                 name: test sandbox account changes
                 environment:
                   TEST_ENV: sandbox
-                command: bash nonprod.test.sh sandbox
-            - run:
-                name: write kubeconfig 
-                command: cat kubeconfig_sandbox | secrethub write twdps/di/platform/teams/ztw/nonprod/svc/kubeconfig/sandbox
+                command: |
+                  secrethub run -- bash cluster_test.sh sandbox $(secrethub read twdps/di/svc/aws/dps-2/aws-account-id)
+                  secrethub run -- bash tpl/write_cluster_credentials.sh sandbox $(secrethub read twdps/di/svc/aws/dps-2/aws-account-id)
+            - cluster-base-configure:
+                cluster: sandbox
+                aws-account: $(secrethub read twdps/di/svc/aws/dps-2/aws-account-id)
           requires:
             - approve-sandbox-changes
           filters: *on-push-master
-        #aws eks update-kubeconfig --kubeconfig sandbox_config --verbose --name sandbox --role arn:aws:iam::090950721693:role/DPSTerraformRole  
+    
+      # git tag to release
+      - terraform/plan:
+          name: preview-change-plan
+          context: twdpds-di
+          shell: secrethub run -- /bin/sh -eo pipefail
+          workspace: sandbox
+          before-terraform:
+            - run:
+                name: generate environmental configuration and credentials from templates
+                command: |
+                  secrethub inject -i tpl/terraformrc.tpl -o ~/.terraformrc
+                  secrethub inject -i tpl/preview.auto.tfvars.json.tpl -o preview.auto.tfvars.json
+          filters: *on-push-master
+
+      - approve-preview-changes:
+          type: approval
+          requires:
+            - preview-change-plan
+          filters: *on-push-master
+
+      - terraform/apply:
+          name: preview-change-apply
+          context: twdpds-di
+          shell: secrethub run -- /bin/sh -eo pipefail
+          workspace: preview
+          before-terraform:
+            - run:
+                name: generate environmental configuration and credentials from templates
+                command: |
+                  secrethub inject -i tpl/terraformrc.tpl -o ~/.terraformrc
+                  secrethub inject -i tpl/preview.auto.tfvars.json.tpl -o preview.auto.tfvars.json
+                  secrethub inject -i tpl/cluster_test.sh.tpl -o cluster_test.sh
+          after-terraform:
+            - run:
+                name: test preview account changes
+                environment:
+                  TEST_ENV: preview
+                command: |
+                  secrethub run -- bash cluster_test.sh preview $(secrethub read twdps/di/svc/aws/dps-2/aws-account-id)
+                  secrethub run -- bash tpl/write_cluster_credentials.sh preview $(secrethub read twdps/di/svc/aws/dps-2/aws-account-id)
+            - cluster-base-configure:
+                cluster: preview
+                aws-account: $(secrethub read twdps/di/svc/aws/dps-2/aws-account-id)
+          requires:
+            - approve-preview-changes
+          filters: *on-push-master
+        

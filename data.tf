@@ -1,6 +1,6 @@
 data "aws_vpc" "cluster_vpc" {
   tags = {
-    cluster = "${var.cluster_name}"
+    cluster = var.cluster_name
   }
 }
 
@@ -24,3 +24,7 @@ data "aws_eks_cluster" "cluster" {
 data "aws_eks_cluster_auth" "cluster" {
   name = module.eks.cluster_id
 }
+
+# data "aws_route53_zone" "top_level_domain" {
+#   name = var.domain
+# }

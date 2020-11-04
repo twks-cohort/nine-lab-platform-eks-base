@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-export AWS_ACCOUNT_ID=$(secrethub read vapoc/platform/svc/aws/aws-account-id)
-export HOSTED_ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name "${1}.devportal.name" | jq -r '.HostedZones[].Id')
+export AWS_ACCOUNT_ID=${2}
+export HOSTED_ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name "${1}.twdps.io" | jq -r '.HostedZones[].Id')
 
 # external-dns deployment files
 cat <<EOF > external-dns-deployment.yaml
@@ -71,7 +71,7 @@ spec:
         - --source=ingress
         - --source=istio-gateway
         - --source=istio-virtualservice
-        - --domain-filter=${1}.devportal.name
+        - --domain-filter=${1}.twdps.io
         - --provider=aws
         # - --policy=upsert-only # would prevent ExternalDNS from deleting any records, omit to enable full synchronization
         - --aws-zone-type=public # only look at public hosted zones (valid values are public, private or no value for both)

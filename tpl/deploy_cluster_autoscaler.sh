@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-export AWS_ACCOUNT_ID=$(secrethub read vapoc/platform/svc/aws/aws-account-id)
+export AWS_ACCOUNT_ID=${3}
 export AWS_DEFAULT_REGION=${2}
 
 # write cluster-autoscaler-chart-values.yaml

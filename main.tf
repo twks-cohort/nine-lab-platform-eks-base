@@ -1,5 +1,6 @@
 module "eks" {
   source       = "terraform-aws-modules/eks/aws"
+  version      = "13.1.0"
 
   cluster_name = var.cluster_name
   cluster_version = var.cluster_version
@@ -35,8 +36,27 @@ module "eks" {
       }
     }
   }
+  kubeconfig_aws_authenticator_command = "aws"
   wait_for_cluster_cmd = "until curl -k -s $ENDPOINT/healthz >/dev/null; do sleep 4; done"
 }
+
+resource "aws_route53_zone" "cluster_subdomain_zone" {
+  name = "${var.cluster_name}.${var.domain}"
+  tags = {
+    cluster     = var.cluster_name
+    cluster_domain   = "${var.cluster_name}.${var.domain}"
+    pipeline    = "lab-platform-eks"
+  }
+}
+
+# resource "aws_route53_record" "cluster_subdomain_zone_ns" {
+#   # this zone ID is in dps-1
+#   zone_id = "Z1ORQX4RPIG2YA"
+#   name    = "${var.cluster_name}.${var.domain}"
+#   type    = "NS"
+#   ttl     = "30"
+#   records = aws_route53_zone.cluster_subdomain_zone.name_servers
+# }
 
 resource "aws_kms_key" "cluster_encyption_key" {
   description = "Encryption key for kubernetes-secrets envelope encryption"

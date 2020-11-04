@@ -1,3 +1,3 @@
 credentials "app.terraform.io" {
-  token = "{{ vapoc/platform/svc/terraform-cloud/team-api-token }}"
+  token = "{{ twdps/di/svc/terraform-cloud/team-api-token }}"
 }

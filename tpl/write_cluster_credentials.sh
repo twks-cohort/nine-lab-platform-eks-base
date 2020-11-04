@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-export AWS_ACCOUNT_ID=$(secrethub read vapoc/platform/svc/aws/aws-account-id)
+export AWS_ACCOUNT_ID=${2}
 
 # write cluster kubeconfig
 sed -n '/users/q;p' kubeconfig_${1} > kubeconfig_context.tpl
@@ -21,4 +21,4 @@ users:
 
 EOF
 cat kubeconfig_context.tpl kubeconfig_token.tpl > kubeconfig
-cat kubeconfig | secrethub write vapoc/platform/env/${1}/cluster/kubeconfig
+cat kubeconfig | secrethub write twdps/di/platform/env/${1}/cluster/kubeconfig

@@ -1,10 +1,10 @@
 {
     "aws_region": "us-west-2",
     "assume_role": "DPSTerraformRole",
-    "account_id": "{{ vapoc/platform/svc/aws/aws-account-id }}",
+    "account_id": "{{ twdps/di/svc/aws/dps-2/aws-account-id }}",
 
     "cluster_name": "sandbox",
-    "domain": "devportal.name",
+    "domain": "twdps.io",
     "cluster_version": "1.18",
     "node_group_a_desired_capacity": "1",
     "node_group_a_max_capacity": "3",
