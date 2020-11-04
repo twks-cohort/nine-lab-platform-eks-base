@@ -26,7 +26,7 @@ cat <<EOF > subdomain.json
   "Comment": "Create a subdomain NS record in the twdps.io domain",
   "Changes": [
     {
-      "Action": "CREATE",
+      "Action": "UPSERT",
       "ResourceRecordSet": {
         "Name": "$CLUSTER.twdps.io",
         "Type": "NS",
