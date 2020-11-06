@@ -37,6 +37,9 @@ rules:
 - apiGroups: [""]
   resources: ["nodes"]
   verbs: ["list","watch"]
+- apiGroups: ["networking.istio.io"]
+  resources: ["gateways", "virtualservices"]
+  verbs: ["get","watch","list"]
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -84,7 +87,7 @@ spec:
         # - --policy=upsert-only # would prevent ExternalDNS from deleting any records, omit to enable full synchronization
         - --aws-zone-type=public # only look at public hosted zones (valid values are public, private or no value for both)
         - --registry=txt
-        - --txt-owner-id=/hostedzone/${HOSTED_ZONE_ID}
+        - --txt-owner-id=${HOSTED_ZONE_ID}
       securityContext:
         fsGroup: 65534 # For ExternalDNS to be able to read Kubernetes and AWS token files
 EOF
