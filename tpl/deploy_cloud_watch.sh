@@ -590,7 +590,7 @@ data:
 
 EOF
 
-kubectl apply -f cloudwatch-namespace.yaml
+kubectl apply -f container-insights-monitoring/cloudwatch-namespace.yaml
 kubectl apply -f container-insights-daemonset.yaml
 
 # fluentd takes a few seconds to get to a ready state
