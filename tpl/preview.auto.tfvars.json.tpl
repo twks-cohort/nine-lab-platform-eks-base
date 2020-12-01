@@ -10,5 +10,6 @@
     "node_group_a_max_capacity": "5",
     "node_group_a_min_capacity": "3",
     "node_group_a_disk_size": "80",
-    "node_group_a_instance_type": "m5.xlarge"
+    "node_group_a_instance_type": "m5.xlarge",
+    "psql_group_name": "aurora_postgress_preview"
   }

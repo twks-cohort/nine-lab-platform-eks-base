@@ -12,4 +12,4 @@
     "node_group_a_min_capacity": "1",
     "node_group_a_disk_size": "80",
     "node_group_a_instance_type": "m5.xlarge"
-  }
+}
