@@ -63,6 +63,7 @@ module "aurora" {
   name                  = var.cluster_name
   engine                = "aurora-postgresql"
   engine_mode           = "serverless"
+  engine_version        = "10.4"
   replica_scale_enabled = false
   replica_count         = 0
 
@@ -75,8 +76,8 @@ module "aurora" {
   apply_immediately               = true
   skip_final_snapshot             = true
   storage_encrypted               = true
-  db_parameter_group_name         = aws_db_parameter_group.aurora_db_postgres96_parameter_group.id
-  db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.aurora_cluster_postgres96_parameter_group.id
+  db_parameter_group_name         = aws_db_parameter_group.aurora_db_postgresql10parameter_group.id
+  db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.aurora_cluster_postgresql10parameter_group.id
 
   scaling_configuration = {
     auto_pause               = true
@@ -87,25 +88,16 @@ module "aurora" {
   }
 }
 
-resource "aws_db_parameter_group" "aurora_db_postgres96_parameter_group" {
-  name        = "test-aurora56-parameter-group"
-  family      = "aurora5.6"
-  description = "test-aurora56-parameter-group"
+resource "aws_db_parameter_group" "aurora_db_postgresql10parameter_group" {
+  name        = "${var.cluster_name}-aurora1012-parameter-group"
+  family      = "aurora-postgresql10"
+  description = "${var.cluster_name}-aurora-postgresql10-parameter-group"
 }
 
-resource "aws_rds_cluster_parameter_group" "aurora_cluster_postgres96_parameter_group" {
-  name        = "test-aurora56-cluster-parameter-group"
-  family      = "aurora5.6"
-  description = "test-aurora56-cluster-parameter-group"
-}
-
-############################
-# Example of security group
-############################
-resource "aws_security_group" "app_servers" {
-  name        = "app-servers"
-  description = "For application servers"
-  vpc_id      = data.aws_vpc.cluster_vpc.id
+resource "aws_rds_cluster_parameter_group" "aurora_cluster_postgresql10parameter_group" {
+  name        = "${var.cluster_name}-1012-cluster-parameter-group"
+  family      = "aurora-postgresql10"
+  description = "${var.cluster_name}-aurora-postgresql10-cluster-parameter-group"
 }
 
 resource "aws_security_group_rule" "allow_access" {
@@ -113,6 +105,6 @@ resource "aws_security_group_rule" "allow_access" {
   from_port                = 5432
   to_port                  = 5432
   protocol                 = "tcp"
-  source_security_group_id = aws_security_group.app_servers.id
+  source_security_group_id = module.eks.cluster_security_group_id
   security_group_id        = module.aurora.this_security_group_id
 }
