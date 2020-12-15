@@ -105,6 +105,6 @@ resource "aws_security_group_rule" "allow_access" {
   from_port                = 5432
   to_port                  = 5432
   protocol                 = "tcp"
-  source_security_group_id = module.eks.cluster_security_group_id
+  source_security_group_id = module.eks.cluster_primary_security_group_id
   security_group_id        = module.aurora.this_security_group_id
 }
