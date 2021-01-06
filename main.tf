@@ -63,10 +63,10 @@ module "aurora" {
   name                  = var.cluster_name
   engine                = "aurora-postgresql"
   engine_mode           = "serverless"
-  engine_version        = "10.4"
+  engine_version        = "10.12"
   replica_scale_enabled = false
   replica_count         = 0
-
+  database_name         = "root"
   backtrack_window = 10 # ignored in serverless
 
   subnets                         = data.aws_subnet_ids.private.ids

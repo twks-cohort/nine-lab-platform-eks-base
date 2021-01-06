@@ -1,5 +1,5 @@
 terraform {
-  required_version = "= 0.14.0"
+  required_version = "= 0.14.2"
   required_providers {
     aws = "= 3.13.0"
   }
@@ -14,7 +14,6 @@ terraform {
 }
 
 provider "aws" {
-  version = "= 3.13.0"
   region  = var.aws_region
   assume_role {
     role_arn     = "arn:aws:iam::${var.account_id}:role/${var.assume_role}"
