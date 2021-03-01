@@ -18,7 +18,7 @@ export AWS_ACCESS_KEY_ID=$(cat credentials | jq -r ".Credentials.AccessKeyId")
 export AWS_SECRET_ACCESS_KEY=$(cat credentials | jq -r ".Credentials.SecretAccessKey")
 export AWS_SESSION_TOKEN=$(cat credentials | jq -r ".Credentials.SessionToken")
 
-export PARENT_ZONE_ID=$(aws route53 list-hosted-zones | jq -r '.HostedZones[] | select(.Name=="$DOMAIN.") | .Id')
+export PARENT_ZONE_ID=$(aws route53 list-hosted-zones | jq -r  --arg DOMAIN="$DOMAIN." '.HostedZones[] | select(.Name==$DOMAIN) | .Id')
 echo $PARENT_ZONE_ID
 echo "Creating NS records for $CLUSTER.$DOMAIN in parent zone"
 

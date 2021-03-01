@@ -92,9 +92,6 @@ workflows:
                   secrethub run -- bash tpl/delegate_hosted_zone.sh sandbox
                   secrethub run -- bash tpl/cluster_test.sh sandbox
                   secrethub run -- bash tpl/write_cluster_credentials.sh sandbox
-                  terraform output -raw psql_secret | secrethub write twdps/di/svc/aurora/psql/password
-                  terraform output -raw psql_master_username | secrethub write twdps/di/svc/aurora/psql/username
-                  terraform output -raw psql_endpoint | secrethub write twdps/di/svc/aurora/psql/endpoint
             - cluster-base-configure:
                 cluster: sandbox
           requires:
@@ -138,6 +135,7 @@ workflows:
                 environment:
                   TEST_ENV: preview
                 command: |
+                  secrethub run -- bash tpl/delegate_hosted_zone.sh preview
                   secrethub run -- bash tpl/cluster_test.sh preview
                   secrethub run -- bash tpl/write_cluster_credentials.sh preview
             - cluster-base-configure:
