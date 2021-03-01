@@ -1,17 +1,13 @@
 # lab-platform-eks
 
-
-NOTE: several updates not yet brought over from poc-platform-eks
-
-
 ## current configuration
 
-- Uses EKS latest k8s version (1.18)
+- Uses EKS latest k8s version (1.19)
 - Control plane logging default = "api", "audit", "authenticator"
 - Control plan internals (data, secrets, etc) encrypted using generated kms key
 - Uses managed node_groups for worker pools
 - baseline config includes cluster-autoscaler, metrics-server, kube-state-metrics, and AWS container-insights (aggregation)
-- OIDC for service accounts (irsa) is configured and used for cluster-autoscaler, cloud-watch
+- OIDC for service accounts (irsa) is configured and used for cluster-autoscaler, cloud-watch, external-dns
 - Not configured to support "stateful" applications backed by EBS volumes
 
 
@@ -23,8 +19,7 @@ aws-vault exec <role> bats test
 
 # NEED TODO
 
-- deploy [External-DNS](https://github.com/kubernetes-sigs/external-dns/blob/master/docs/tutorials/aws.md)
-
+- run sonobuoy conformance tests
 
 # not yet
 
