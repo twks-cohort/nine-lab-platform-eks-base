@@ -85,11 +85,13 @@ workflows:
                   secrethub inject -i tpl/sandbox.auto.tfvars.json.tpl -o sandbox.auto.tfvars.json
           after-terraform:
             - run:
+                name: create route53 zone configuration for cluster.domain
+                command: secrethub run -- bash tpl/delegate_hosted_zone.sh sandbox
+            - run:
                 name: test sandbox account changes
                 environment:
                   TEST_ENV: sandbox
                 command: |
-                  secrethub run -- bash tpl/delegate_hosted_zone.sh sandbox
                   secrethub run -- bash tpl/cluster_test.sh sandbox
                   secrethub run -- bash tpl/write_cluster_credentials.sh sandbox
             - cluster-base-configure:
@@ -131,11 +133,13 @@ workflows:
                   secrethub inject -i tpl/preview.auto.tfvars.json.tpl -o preview.auto.tfvars.json
           after-terraform:
             - run:
+                name: create route53 zone configuration for cluster.domain
+                command: secrethub run -- bash tpl/delegate_hosted_zone.sh preview
+            - run:
                 name: test preview account changes
                 environment:
                   TEST_ENV: preview
                 command: |
-                  secrethub run -- bash tpl/delegate_hosted_zone.sh preview
                   secrethub run -- bash tpl/cluster_test.sh preview
                   secrethub run -- bash tpl/write_cluster_credentials.sh preview
             - cluster-base-configure:
