@@ -5,8 +5,10 @@ locals {
   k8s_cluster_autoscaler_namespace            = "kube-system"
   k8s_cluster_autoscaler_service_account_name = "${var.cluster_name}-aws-cluster-autoscaler"
 
-  k8s_cloud_watch_agents_account_namespace    = "amazon-cloudwatch"
-  k8s_cloud_watch_agents_service_account_name = "${var.cluster_name}-cloudwatch-agent"
+  k8s_cloud_watch_agents_account_namespace     = "amazon-cloudwatch"
+  k8s_cloud_watch_agents_service_account_name  = "${var.cluster_name}-cloudwatch-agent"
+
+  # oidc_issuer = data.aws_eks_cluster.cluster.identity.0.oidc.0.issuer
 }
 
 # cluster-autoscaler
