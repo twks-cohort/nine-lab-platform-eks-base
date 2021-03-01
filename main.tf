@@ -1,9 +1,9 @@
 module "eks" {
-  source       = "terraform-aws-modules/eks/aws"
-  version      = "13.1.0"
+  source  = "terraform-aws-modules/eks/aws"
+  version = "14.0.0"
 
-  cluster_name = var.cluster_name
-  cluster_version = var.cluster_version
+  cluster_name              = var.cluster_name
+  cluster_version           = var.cluster_version
   cluster_enabled_log_types = var.cluster_enabled_log_types
   cluster_encryption_config = [
     {
@@ -11,11 +11,11 @@ module "eks" {
       resources        = ["secrets"]
     }
   ]
-  
-  enable_irsa  = true
-  vpc_id       = data.aws_vpc.cluster_vpc.id
-  subnets      = data.aws_subnet_ids.private.ids
-  
+
+  enable_irsa = true
+  vpc_id      = data.aws_vpc.cluster_vpc.id
+  subnets     = data.aws_subnet_ids.private.ids
+
   node_groups_defaults = {
     ami_type  = "AL2_x86_64"
     disk_size = 80
@@ -31,26 +31,26 @@ module "eks" {
         Environment = var.cluster_name
       }
       additional_tags = {
-        "cluster" = var.cluster_name
+        "cluster"  = var.cluster_name
         "pipeline" = "lab-platform-eks"
       }
     }
   }
   kubeconfig_aws_authenticator_command = "aws"
-  wait_for_cluster_cmd = "until curl -k -s $ENDPOINT/healthz >/dev/null; do sleep 4; done"
+  wait_for_cluster_cmd                 = "until curl -k -s $ENDPOINT/healthz >/dev/null; do sleep 4; done"
 }
 
 resource "aws_route53_zone" "cluster_subdomain_zone" {
   name = "${var.cluster_name}.${var.domain}"
   tags = {
-    cluster     = var.cluster_name
-    cluster_domain   = "${var.cluster_name}.${var.domain}"
-    pipeline    = "lab-platform-eks"
+    cluster        = var.cluster_name
+    cluster_domain = "${var.cluster_name}.${var.domain}"
+    pipeline       = "lab-platform-eks"
   }
 }
 
 resource "aws_kms_key" "cluster_encyption_key" {
-  description = "Encryption key for kubernetes-secrets envelope encryption"
-  enable_key_rotation = true
+  description             = "Encryption key for kubernetes-secrets envelope encryption"
+  enable_key_rotation     = true
   deletion_window_in_days = 7
 }

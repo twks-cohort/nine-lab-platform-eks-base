@@ -100,13 +100,13 @@ workflows:
           requires:
             - approve-sandbox-changes
           filters: *on-push-master
-    
+
       # git tag to release
       - terraform/plan:
           name: preview-change-plan
           context: twdps-di
           shell: secrethub run -- /bin/sh -eo pipefail
-          workspace: sandbox
+          workspace: preview
           before-terraform:
             - run:
                 name: generate environmental configuration and credentials from templates
@@ -145,7 +145,7 @@ workflows:
           requires:
             - approve-preview-changes
           filters: *on-tag-master
-      
+
       # repeat tag release sections for each desired environment
       #
       # typical DI pipeline is: sandbox > preview > nonprod > prod > management

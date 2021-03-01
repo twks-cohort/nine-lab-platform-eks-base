@@ -2,6 +2,7 @@
 export CLUSTER=$1
 export AWS_ACCOUNT_ID=$(cat $CLUSTER.auto.tfvars.json | jq -r .account_id)
 export AWS_DEFAULT_REGION=$(cat $CLUSTER.auto.tfvars.json | jq -r .aws_region)
+export DOMAIN=$(cat $CLUSTER.auto.tfvars.json | jq -r .domain)
 
 aws sts assume-role --output json --role-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/DPSTerraformRole --role-session-name deploy-external-dns > credentials
 
@@ -9,7 +10,7 @@ export AWS_ACCESS_KEY_ID=$(cat credentials | jq -r ".Credentials.AccessKeyId")
 export AWS_SECRET_ACCESS_KEY=$(cat credentials | jq -r ".Credentials.SecretAccessKey")
 export AWS_SESSION_TOKEN=$(cat credentials | jq -r ".Credentials.SessionToken")
 
-export HOSTED_ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name "$CLUSTER.twdps.io" | jq -r '.HostedZones[].Id')
+export HOSTED_ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name "$CLUSTER.$DOMAIN" | jq -r '.HostedZones[].Id')
 
 # external-dns deployment files
 cat <<EOF > external-dns-deployment.yaml
@@ -76,13 +77,13 @@ spec:
       serviceAccountName: $CLUSTER-external-dns
       containers:
       - name: external-dns
-        image: k8s.gcr.io/external-dns/external-dns:v0.7.4
+        image: k8s.gcr.io/external-dns/external-dns:v0.7.6
         args:
         - --source=service
         - --source=ingress
         - --source=istio-gateway
         - --source=istio-virtualservice
-        - --domain-filter=${CLUSTER}.twdps.io
+        - --domain-filter=${CLUSTER}.${DOMAIN}
         - --provider=aws
         # - --policy=upsert-only # would prevent ExternalDNS from deleting any records, omit to enable full synchronization
         - --aws-zone-type=public # only look at public hosted zones (valid values are public, private or no value for both)

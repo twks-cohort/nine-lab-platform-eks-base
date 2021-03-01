@@ -18,11 +18,11 @@ output "config_map_aws_auth" {
   value       = module.eks.config_map_aws_auth
 }
 
-output "node_groups" {
+output "cluster_node_groups" {
   description = "Outputs from node groups"
   value       = module.eks.node_groups
 }
 
-output "test" {
+output "cluster_private_subnet_ids" {
   value = data.aws_subnet_ids.private
 }

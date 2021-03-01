@@ -1,18 +1,18 @@
 locals {
-  k8s_external_dns_account_namespace     = "kube-system"
-  k8s_external_dns_service_account_name  = "${var.cluster_name}-external-dns"
+  k8s_external_dns_account_namespace    = "kube-system"
+  k8s_external_dns_service_account_name = "${var.cluster_name}-external-dns"
 
-  k8s_cluster_autoscaler_namespace             = "kube-system"
-  k8s_cluster_autoscaler_service_account_name  = "${var.cluster_name}-aws-cluster-autoscaler"
+  k8s_cluster_autoscaler_namespace            = "kube-system"
+  k8s_cluster_autoscaler_service_account_name = "${var.cluster_name}-aws-cluster-autoscaler"
 
-  k8s_cloud_watch_agents_account_namespace     = "amazon-cloudwatch"
-  k8s_cloud_watch_agents_service_account_name  = "${var.cluster_name}-cloudwatch-agent"
+  k8s_cloud_watch_agents_account_namespace    = "amazon-cloudwatch"
+  k8s_cloud_watch_agents_service_account_name = "${var.cluster_name}-cloudwatch-agent"
 }
 
 # cluster-autoscaler
 module "iam_assumable_role_admin" {
-  source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
-  version                       = "3.3.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
+  version = "3.6.0"
 
   create_role                   = true
   role_name                     = "${var.cluster_name}-cluster-autoscaler"
@@ -72,8 +72,8 @@ data "aws_iam_policy_document" "cluster_autoscaler" {
 
 #cloudwatch-agents
 module "iam_assumable_role_cloudwatch" {
-  source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
-  version                       = "3.3.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
+  version = "3.6.0"
 
   create_role                   = true
   role_name                     = "${var.cluster_name}-cloudwatch-agent"
@@ -122,8 +122,8 @@ data "aws_iam_policy_document" "cloud_watch" {
 
 # External-DNS
 module "iam_assumable_role_external_dns" {
-  source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
-  version                       = "3.3.0"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
+  version = "3.6.0"
 
   create_role                   = true
   role_name                     = "${var.cluster_name}-external-dns"
