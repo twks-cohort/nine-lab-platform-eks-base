@@ -594,4 +594,4 @@ kubectl apply -f container-insights-monitoring/cloudwatch-namespace.yaml
 kubectl apply -f container-insights-daemonset.yaml
 
 # fluentd takes a few seconds to get to a ready state
-sleep 15
+sleep 25
