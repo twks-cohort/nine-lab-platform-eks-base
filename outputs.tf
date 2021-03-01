@@ -18,12 +18,6 @@ output "kubectl_config" {
   sensitive   = true
 }
 
-output "config_map_aws_auth" {
-  description = "A kubernetes configuration to authenticate to this EKS cluster."
-  value       = module.eks.config_map_aws_auth
-  sensitive   = true
-}
-
 output "cluster_node_groups" {
   description = "Outputs from node groups"
   value       = module.eks.node_groups
