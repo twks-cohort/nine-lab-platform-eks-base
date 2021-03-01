@@ -176,7 +176,7 @@ spec:
           command: ['sh','-c','']
       containers:
         - name: fluentd-cloudwatch
-          image: fluent/fluentd-kubernetes-daemonset:v1.11.4-debian-cloudwatch-1.1
+          image: fluent/fluentd-kubernetes-daemonset:v1.12.0-debian-cloudwatch-1.1
           env:
             - name: REGION
               valueFrom:
@@ -194,7 +194,7 @@ spec:
                   name: cluster-info
                   key: cluster.name
             - name: CI_VERSION
-              value: "k8s/1.2.1"
+              value: "k8s/1.3.4"
           resources:
             limits:
               memory: 400Mi
