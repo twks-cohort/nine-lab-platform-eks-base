@@ -44,9 +44,15 @@ commands:
       - run:
           name: validate pod status for cluster-autoscaler and metrics api deployments
           command: bash tpl/cluster_deployments_test.sh << parameters.cluster >>
-      - run:
-          name: cis benchmarks
-          command: bash tpl/kube_bench.sh
+      # - run:
+      #     name: deploy cert-manager
+      #     command: bash tpl/deploy_cert_manager.sh << parameters.cluster >>
+      # - run:
+      #     name: deploy default cluster certificates
+      #     command: bash tpl/deploy_default_certificates.sh << parameters.cluster >>
+      # - run:
+      #     name: cis benchmarks
+      #     command: bash tpl/kube_bench.sh
 
 workflows:
   version: 2

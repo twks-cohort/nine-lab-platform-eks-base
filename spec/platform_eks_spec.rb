@@ -10,3 +10,18 @@ describe eks(tfvars["cluster_name"]) do
   its(:version) { should eq tfvars['cluster_version'] }
 end
 
+describe iam_role(tfvars["cluster_name"] + '-cluster-autoscaler') do
+  it { should exist }
+end
+
+describe iam_role(tfvars["cluster_name"] + '-external-dns') do
+  it { should exist }
+end
+
+describe iam_role(tfvars["cluster_name"] + '-cloudwatch-agent') do
+  it { should exist }
+end
+
+describe iam_role(tfvars["cluster_name"] + '-cert-manager') do
+  it { should exist }
+end
