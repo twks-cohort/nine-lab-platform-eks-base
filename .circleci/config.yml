@@ -2,7 +2,7 @@
 version: 2.1
 
 orbs:
-  terraform: feedyard/terraform@0.3.0
+  terraform: feedyard/terraform@0.4.0
 
 # git push: plan, release, test sandbox
 on-push-master: &on-push-master
