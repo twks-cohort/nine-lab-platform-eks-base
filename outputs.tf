@@ -32,3 +32,7 @@ output "cluster_node_groups" {
 output "cluster_private_subnet_ids" {
   value = data.aws_subnet_ids.private
 }
+
+output "cluster_hosted_zone_id" {
+  value = aws_route53_zone.cluster_subdomain_zone.zone_id
+}

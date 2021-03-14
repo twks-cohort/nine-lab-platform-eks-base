@@ -93,6 +93,9 @@ workflows:
             - run:
                 name: create route53 zone configuration for cluster.domain
                 command: secrethub run -- bash tpl/delegate_hosted_zone.sh sandbox
+            # - run:
+            #     name: fetch hosted zone id
+            #     command: terraform output cluster_hosted_zone_id
             - run:
                 name: test sandbox account changes
                 environment:

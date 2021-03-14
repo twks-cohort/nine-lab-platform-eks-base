@@ -12,39 +12,50 @@ metadata:
   name: cert-manager
 EOF
 
-export AWS_ACCOUNT_ID=$(cat tpl/${CLUSTER}.json | jq -r '.account_id')
-export DOMAIN=$(cat tpl/${CLUSTER}.json | jq -r '.domain')
-export CERT_MANAGER_VERSION=$(cat tpl/${CLUSTER}.json | jq -r '.cert_manager_version')
-export EMAIL=$(cat tpl/${CLUSTER}.json | jq -r '.cert_manager_issuer_email')
-export AWS_DEFAULT_REGION=$(cat tpl/${CLUSTER}.json | jq -r '.aws_region')
-export ISSUER_ENDPOINT=$(cat tpl/${CLUSTER}.json | jq -r '.issuerEndpoint')
+export AWS_ACCOUNT_ID=$(cat ${CLUSTER}.auto.tfvars.json | jq -r '.account_id')
+export DOMAIN=$(cat ${CLUSTER}.auto.tfvars.json | jq -r '.domain')
+export CERT_MANAGER_VERSION=$(cat ${CLUSTER}.auto.tfvars.json | jq -r '.cert_manager_version')
+export EMAIL=$(cat ${CLUSTER}.auto.tfvars.json | jq -r '.cert_manager_issuer_email')
+export AWS_DEFAULT_REGION=$(cat ${CLUSTER}.auto.tfvars.json | jq -r '.aws_region')
+export ISSUER_ENDPOINT=$(cat ${CLUSTER}.auto.tfvars.json | jq -r '.cert_manager_issuer_endpoint')
 
 kubectl apply -f cert-manager-namespace.yaml
 
 helm repo add jetstack https://charts.jetstack.io
 helm repo update
-helm upgrade --wait -i cert-manager jetstack/cert-manager --namespace cert-manager --version v${CERT_MANAGER_VERSION} --set installCRDs=true --set serviceAccount.annotations."eks\.amazonaws\.com/role-arn"=arn:aws:iam::${AWS_ACCOUNT_ID}:role/${CLUSTER}-cert-manager -f tpl/values.cert_manager.yaml
+helm upgrade --wait -i cert-manager jetstack/cert-manager --namespace cert-manager --version v${CERT_MANAGER_VERSION} --set installCRDs=true --set securityContext.enabled=true --set securityContext.fsGroup=1001 --set serviceAccount.annotations."eks\.amazonaws\.com/role-arn"=arn:aws:iam::${AWS_ACCOUNT_ID}:role/${CLUSTER}-cert-manager
 sleep 15
 
-cat <<EOF > cluster_domain_certificate_issuer.yaml
-apiVersion: cert-manager.io/v1
-kind: ClusterIssuer
-metadata:
-  name: letsencrypt-$CLUSTER-issuer
-  namespace: cert-manager
-spec:
-  acme:
-    server: $ISSUER_ENDPOINT
-    email: $EMAIL
-    privateKeySecretRef:
-      name: letsencrypt-$CLUSTER
-    solvers:
-    - selector:
-        dnsZones:
-          - "$CLUSTER.$DOMAIN"
-      dns01:
-        route53:
-          region: $AWS_DEFAULT_REGION
-          # hostedZoneID: DIKER8JEXAMPLE # optional, see policy above
-          # role: arn:aws:iam::$AWS_ACCOUNT_ID:role/$CLUSTER-cert-manager
-EOF
+# helm upgrade --wait -i cert-manager jetstack/cert-manager --namespace cert-manager --version v1.2.0 --set installCRDs=true --set securityContext.enabled=true --set securityContext.fsGroup=1001 --set serviceAccount.annotations."eks\.amazonaws\.com/role-arn"=arn:aws:iam::090950721693:role/sandbox-cert-manager
+
+# helm upgrade --wait -i cert-manager jetstack/cert-manager --namespace cert-manager --version v${CERT_MANAGER_VERSION} --set installCRDs=true --set serviceAccount.annotations."eks\.amazonaws\.com/role-arn"=arn:aws:iam::${AWS_ACCOUNT_ID}:role/${CLUSTER}-cert-manager -f tpl/values.cert_manager.yaml
+# aws sts assume-role --output json --role-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/DPSTerraformRole --role-session-name deploy-cert-manager-session > credentials
+# export AWS_ACCESS_KEY_ID=$(cat credentials | jq -r ".Credentials.AccessKeyId")
+# export AWS_SECRET_ACCESS_KEY=$(cat credentials | jq -r ".Credentials.SecretAccessKey")
+# export AWS_SESSION_TOKEN=$(cat credentials | jq -r ".Credentials.SessionToken")
+# export HOSTED_ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name $CLUSTER.$DOMAIN | jq -r --arg DNS $CLUSTER.$DOMAIN '.HostedZones[] | select( .Name | startswith($DNS)) | .Id')
+
+# cat <<EOF > cluster_domain_certificate_issuer.yaml
+# apiVersion: cert-manager.io/v1
+# kind: ClusterIssuer
+# metadata:
+#   name: letsencrypt-$CLUSTER-issuer
+#   namespace: cert-manager
+# spec:
+#   acme:
+#     server: $ISSUER_ENDPOINT
+#     email: $EMAIL
+#     privateKeySecretRef:
+#       name: letsencrypt-$CLUSTER
+#     solvers:
+#     - selector:
+#         dnsZones:
+#           - "$CLUSTER.$DOMAIN"
+#       dns01:
+#         route53:
+#           region: $AWS_DEFAULT_REGION
+#           hostedZoneID: $HOSTED_ZONE_ID
+#           # role: arn:aws:iam::$AWS_ACCOUNT_ID:role/$CLUSTER-cert-manager
+# EOF
+
+# kubectl apply -f cluster_domain_certificate_issuer.yaml
