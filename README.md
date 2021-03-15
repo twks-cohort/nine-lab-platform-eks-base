@@ -39,12 +39,25 @@ Ex:
 
 AWS releases multiple eks-optimized aws linux 2 version updates. This is for all the usual reasons - upgrade and refinements to al2, security patches, kublet updates, etc. To update to the latest ami release for the k8s version of a cluster:
 
+Exploring options for the best way to operationalize.
+
+__option 1__
+Define a pipeline ENV variable in the CircleCI GUI called TAINT = True, and run the last successful build.
+
+There is a pipeline step that runs after `terraform init` that will apply the taints to the managed node_groups.
+
+After the successful completion of the update, remove the ENV var.
+
+__options 2__
+
+With the appropriate credentials. From the command line, select the desired workspace (env) and apply the taint directly.
 ```bash
+$ terraform init
+$ terraform workspace select sandbox
 $ terraform taint "module.eks.module.node_groups.random_pet.node_groups[\"side_a\"]"
 $ terraform taint "module.eks.module.node_groups.aws_eks_node_group.workers[\"side_a\"]"
 ```
-
-
+and run the last successful build.
 
 # NEED TODO
 

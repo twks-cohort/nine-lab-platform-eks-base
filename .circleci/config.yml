@@ -44,9 +44,9 @@ commands:
       - run:
           name: validate pod status for cluster-autoscaler and metrics api deployments
           command: bash tpl/cluster_deployments_test.sh << parameters.cluster >>
-      # - run:
-      #     name: deploy cert-manager
-      #     command: bash tpl/deploy_cert_manager.sh << parameters.cluster >>
+      - run:
+          name: deploy cert-manager
+          command: bash tpl/deploy_cert_manager.sh << parameters.cluster >>
       # - run:
       #     name: deploy default cluster certificates
       #     command: bash tpl/deploy_default_certificates.sh << parameters.cluster >>
@@ -70,6 +70,14 @@ workflows:
                 command: |
                   secrethub inject -i tpl/terraformrc.tpl -o ~/.terraformrc
                   secrethub inject -i tpl/sandbox.auto.tfvars.json.tpl -o sandbox.auto.tfvars.json
+          # after-terraform-init:
+          #   - run:
+          #       name: update nodes if TAINT env variable is specified
+          #       command: |
+          #         if [[ ]]; then
+          #           terraform taint "module.eks.module.node_groups.random_pet.node_groups[\"side_a\"]"
+          #           terraform taint "module.eks.module.node_groups.aws_eks_node_group.workers[\"side_a\"]"
+          #         fi
           filters: *on-push-master
 
       - approve-sandbox-changes:
