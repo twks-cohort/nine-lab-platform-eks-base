@@ -28,7 +28,6 @@ commands:
     steps:
       - run:
           name: pull kubeconfig
-          # shell: secrethub run -- /bin/sh -eo pipefail
           command: |
             mkdir ~/.kube
             SECRETHUB_VAR_ENV=<< parameters.cluster >> secrethub inject -i tpl/kubeconfig.tpl -o ~/.kube/config
@@ -41,18 +40,23 @@ commands:
       - run:
           name: deploy containter-insights
           command: bash scripts/deploy_cloud_watch.sh << parameters.cluster >>
-      # - run:
-      #     name: deploy cert-manager
-      #     command: bash scripts/deploy_cert_manager.sh << parameters.cluster >>
-      # - run:
-      #     name: deploy default cluster certificates
-      #     command: bash tpl/deploy_default_certificates.sh << parameters.cluster >>
+      - run:
+          name: deploy external-dns
+          command: |
+            bash scripts/delegate_hosted_zone.sh << parameters.cluster >>
+            bash scripts/deploy_external_dns << parameters.cluster >>
+      - run:
+          name: deploy cert-manager
+          command: bash scripts/deploy_cert_manager.sh << parameters.cluster >>
+      - run:
+          name: deploy default cluster certificates
+          command: bash scripts/deploy_default_certificates.sh << parameters.cluster >>
       - run:
           name: validate pod status for cluster-bae-configure deployments
           command: bash scripts/cluster_deployments_test.sh << parameters.cluster >>
-      # - run:
-      #     name: cis benchmarks
-      #     command: bash tpl/kube_bench.sh
+      - run:
+          name: cis benchmarks
+          command: bash scripts/kube_bench.sh
 
 workflows:
   version: 2
@@ -74,7 +78,6 @@ workflows:
           after-terraform-init:
             - run:
                 name: schedule taint for node_groups if environment variable TAINT is set
-                # secrethub run -- bash scripts/taint_node_groups.sh sandbox plan
                 command: bash scripts/taint_node_groups.sh sandbox plan
           filters: *on-push-master
 
@@ -99,23 +102,13 @@ workflows:
           after-terraform-init:
             - run:
                 name: schedule taint for node_groups if environment variable TAINT is set
-                # secrethub run -- bash scripts/taint_node_groups.sh sandbox plan
                 command: bash scripts/taint_node_groups.sh sandbox plan
           after-terraform:
-            - run:
-                name: create route53 zone configuration for cluster.domain
-                # secrethub run -- bash scripts/delegate_hosted_zone.sh sandbox
-                command: bash scripts/delegate_hosted_zone.sh sandbox
-            # - run:
-            #     name: fetch hosted zone id
-            #     command: terraform output cluster_hosted_zone_id
             - run:
                 name: test sandbox account changes
                 environment:
                   TEST_ENV: sandbox
                 command: |
-                  # secrethub run -- bash scripts/cluster_test.sh sandbox
-                  # secrethub run -- bash scripts/write_cluster_credentials.sh sandbox
                   bash scripts/cluster_test.sh sandbox
                   bash scripts/write_cluster_credentials.sh sandbox
             - cluster-base-configure:

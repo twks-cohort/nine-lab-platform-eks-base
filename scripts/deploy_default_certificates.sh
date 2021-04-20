@@ -5,12 +5,7 @@ set -e
 # $1 = cluster config to use
 export CLUSTER=${1}
 
-# export AWS_ACCOUNT_ID=$(cat tpl/${CLUSTER}.json | jq -r '.account_id')
 export DOMAIN=$(cat ${CLUSTER}.auto.tfvars.json | jq -r '.domain')
-# export CERT_MANAGER_VERSION=$(cat tpl/${CLUSTER}.json | jq -r '.cert_manager_version')
-# export EMAIL=$(cat tpl/${CLUSTER}.json | jq -r '.cert_manager_issuer_email')
-# export AWS_DEFAULT_REGION=$(cat tpl/${CLUSTER}.json | jq -r '.aws_region')
-# export ISSUER_ENDPOINT=$(cat tpl/${CLUSTER}.json | jq -r '.issuerEndpoint')
 
 cat <<EOF > cluster_default_certificates.yaml
 apiVersion: cert-manager.io/v1
