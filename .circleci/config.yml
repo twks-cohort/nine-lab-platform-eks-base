@@ -2,7 +2,7 @@
 version: 2.1
 
 orbs:
-  terraform: feedyard/terraform@0.4.0
+  terraform: feedyard/terraform@dev:latest
 
 # git push: plan, release, test sandbox
 on-push-master: &on-push-master
@@ -64,8 +64,7 @@ workflows:
 
     jobs:
       - terraform/plan:
-          docker:
-            - image: twdps/di-circleci-infra-image:1.20.0
+          tag: "1.20.0"
           name: sandbox-change-plan
           context: twdps-di
           shell: secrethub run -- /bin/sh -eo pipefail
