@@ -2,7 +2,7 @@
 export NODE_GROUP=$1
 export TERRAFORM_STEP=$2
 
-if [[ -v $TAINT ]]; then
+if [[ -z $TAINT ]]; then
   case $TERRAFORM_STEP in
     plan)
       echo -n "node_group ${NODE_GROUP} scheduled for taint"
