@@ -16,7 +16,7 @@ EOF
 
 export AWS_ACCOUNT_ID=$(cat ${CLUSTER}.auto.tfvars.json | jq -r '.account_id')
 export AWS_DEFAULT_REGION=$(cat ${CLUSTER}.auto.tfvars.json | jq -r '.aws_region')
-export AWS_ASSUME_ROLE=$(cat $CLUSTER.auto.tfvars.json | jq -r .aws_region)
+export AWS_ASSUME_ROLE=$(cat $CLUSTER.auto.tfvars.json | jq -r .assume_role)
 export DOMAIN=$(cat ${CLUSTER}.auto.tfvars.json | jq -r '.domain')
 
 export CERT_MANAGER_VERSION=$(cat ${CLUSTER}.certmanager.json | jq -r '.cert_manager_version')

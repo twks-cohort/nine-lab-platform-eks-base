@@ -2,7 +2,7 @@
 export CLUSTER=$1
 export AWS_ACCOUNT=$(cat $CLUSTER.auto.tfvars.json | jq -r .account_id)
 export AWS_DEFAULT_REGION=$(cat $CLUSTER.auto.tfvars.json | jq -r .aws_region)
-export AWS_ASSUME_ROLE=$(cat $CLUSTER.auto.tfvars.json | jq -r .aws_region)
+export AWS_ASSUME_ROLE=$(cat $CLUSTER.auto.tfvars.json | jq -r .assume_role)
 export AWS_DOMAIN_ACCOUNT=$(cat $CLUSTER.auto.tfvars.json | jq -r .domain_account)
 export DOMAIN=$(cat $CLUSTER.auto.tfvars.json | jq -r .domain)
 
