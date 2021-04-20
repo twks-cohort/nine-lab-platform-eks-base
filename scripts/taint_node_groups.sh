@@ -10,8 +10,9 @@ if [[ -v $TAINT ]]; then
 
     Apply)
       echo -n "Apply taint to node_group ${NODE_GROUP}"
-      terraform taint "module.eks.module.node_groups.random_pet.node_groups[\"${NODE_GROUP}\"]"
-      terraform taint "module.eks.module.node_groups.aws_eks_node_group.workers[\"${NODE_GROUP}\"]"
+      #terraform taint "module.eks.module.node_groups.random_pet.node_groups[\"${NODE_GROUP}\"]"
+      #terraform taint "module.eks.module.node_groups.aws_eks_node_group.workers[\"${NODE_GROUP}\"]"
+      curl -u ${CIRCLECI_TOKEN}: --request DELETE --url https://circleci.com/api/v2/project/gh/ThoughtWorks-DPS/lab-platform-eks/envvar/TAINT
       ;;
 
     *)
@@ -22,5 +23,3 @@ if [[ -v $TAINT ]]; then
 else
   echo -n "node_group ${NODE_GROUP} NOT scheduled for taint"
 fi
-
-# use circleci api to clear TAINT
