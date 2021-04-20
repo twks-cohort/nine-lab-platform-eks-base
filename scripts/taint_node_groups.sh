@@ -7,7 +7,7 @@ echo "TERRAFORM_STEP = ${TERRAFORM_STEP}"
 echo "TAINT = ${TAINT}"
 
 
-if [[ -v "$TAINT" ]]; then
+if [[ $TAINT == "true" ]]; then
   case $TERRAFORM_STEP in
     plan)
       echo -n "node_group ${NODE_GROUP} scheduled for taint"
