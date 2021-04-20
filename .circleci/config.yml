@@ -102,7 +102,7 @@ workflows:
           after-terraform-init:
             - run:
                 name: schedule taint for node_groups if environment variable TAINT is set
-                command: bash scripts/taint_node_groups.sh sandbox plan
+                command: bash scripts/taint_node_groups.sh sandbox apply
           after-terraform:
             - run:
                 name: test sandbox account changes

@@ -4,11 +4,11 @@ export TERRAFORM_STEP=$2
 
 if [[ -v $TAINT ]]; then
   case $TERRAFORM_STEP in
-    Plan)
+    plan)
       echo -n "node_group ${NODE_GROUP} scheduled for taint"
       ;;
 
-    Apply)
+    apply)
       echo -n "Apply taint to node_group ${NODE_GROUP}"
       #terraform taint "module.eks.module.node_groups.random_pet.node_groups[\"${NODE_GROUP}\"]"
       #terraform taint "module.eks.module.node_groups.aws_eks_node_group.workers[\"${NODE_GROUP}\"]"
