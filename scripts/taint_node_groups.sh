@@ -19,6 +19,8 @@ if [[ -v $TAINT ]]; then
       exit 1
       ;;
   esac
+else
+  echo -n "node_group ${NODE_GROUP} NOT scheduled for taint"
 fi
 
 # use circleci api to clear TAINT
