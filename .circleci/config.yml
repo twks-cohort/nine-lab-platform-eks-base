@@ -44,7 +44,7 @@ commands:
           name: deploy external-dns
           command: |
             bash scripts/delegate_hosted_zone.sh << parameters.cluster >>
-            bash scripts/deploy_external_dns << parameters.cluster >>
+            bash scripts/deploy_external_dns.sh << parameters.cluster >>
       - run:
           name: deploy cert-manager
           command: bash scripts/deploy_cert_manager.sh << parameters.cluster >>
