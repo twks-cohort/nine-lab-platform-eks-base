@@ -2,6 +2,11 @@
 export NODE_GROUP=$1
 export TERRAFORM_STEP=$2
 
+echo "NODE_GROUP = ${NODE_GROUP}"
+echo "TERRAFORM_STEP = ${TERRAFORM_STEP}"
+echo "TAINT = ${TAINT}"
+
+
 if [[ -z $TAINT ]]; then
   case $TERRAFORM_STEP in
     plan)
