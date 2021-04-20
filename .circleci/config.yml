@@ -70,10 +70,11 @@ workflows:
                 command: |
                   secrethub inject -i tpl/terraformrc.tpl -o ~/.terraformrc
                   secrethub inject -i tpl/sandbox.auto.tfvars.json.tpl -o sandbox.auto.tfvars.json
+                  secrethub inject -i tpl/sandbox.certmanager.json.tpl -o sandbox.certmanager.json
           after-terraform-init:
             - run:
-                name: update nodes if TAINT env variable is defined
-                command: secrethub run -- bash tpl/taint_node_groups.sh sandbox
+                name: schedule taint for node_groups is environment variable TAINT is set
+                command: secrethub run -- bash scripts/taint_node_groups.sh sandbox plan
           filters: *on-push-master
 
       - approve-sandbox-changes:
