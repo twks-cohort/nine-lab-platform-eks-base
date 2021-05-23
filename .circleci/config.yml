@@ -49,7 +49,7 @@ commands:
       - run:
           name: deploy metrics apis
           command: kubectl apply -f metrics-apis --recursive
-      - run:
+      # - run:
       #     name: deploy cluster-autoscaler
       #     command: bash scripts/deploy_cluster_autoscaler.sh << parameters.cluster >>
       # - run:
