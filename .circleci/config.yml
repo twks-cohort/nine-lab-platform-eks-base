@@ -115,7 +115,7 @@ workflows:
           workspace: sandbox
           before-terraform:
             - set-environment:
-                env: sandbox
+                cluster: sandbox
             # - run:
             #     name: generate environmental configuration and credentials from templates
             #     command: |
@@ -141,7 +141,7 @@ workflows:
           workspace: sandbox
           before-terraform:
             - set-environment:
-                env: sandbox
+                cluster: sandbox
             # - run:
             #     name: generate environmental configuration and credentials from templates
             #     command: |
