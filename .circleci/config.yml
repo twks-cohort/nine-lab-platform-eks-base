@@ -68,7 +68,7 @@ commands:
       #     command: bash scripts/deploy_default_certificates.sh << parameters.cluster >>
       - run:
           name: validate pod status for core services
-          command: bash scripts/core_services_health_check.sh << parameters.cluster >>
+          command: bats test # bash scripts/core_services_health_check.sh << parameters.cluster >>
       # - run:
       #     name: cis benchmarks
       #     command: bash scripts/kube_bench.sh
