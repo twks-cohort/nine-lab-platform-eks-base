@@ -34,7 +34,7 @@ commands:
           name: set << parameters.cluster >> environment variables
           command: secrethub inject -i environments/<< parameters.cluster >>.auto.tfvars.json.tpl -o << parameters.cluster >>.auto.tfvars.json
 
-  cluster-base-deployments:
+  deploy-core-services:
     parameters:
       cluster:
         description: cluster name to use for configuration
@@ -42,36 +42,36 @@ commands:
         default: ""
     steps:
       - run:
-          name: pull kubeconfig
+          name: setup kubeconfig
           command: |
             mkdir ~/.kube
             SECRETHUB_VAR_ENV=<< parameters.cluster >> secrethub inject -i tpl/kubeconfig.tpl -o ~/.kube/config
       - run:
-          name: deploy metrics-apis
+          name: deploy metrics apis
           command: kubectl apply -f metrics-apis --recursive
       - run:
-          name: deploy cluster-autoscaler
-          command: bash scripts/deploy_cluster_autoscaler.sh << parameters.cluster >>
+      #     name: deploy cluster-autoscaler
+      #     command: bash scripts/deploy_cluster_autoscaler.sh << parameters.cluster >>
+      # - run:
+      #     name: deploy containter-insights
+      #     command: bash scripts/deploy_cloud_watch.sh << parameters.cluster >>
+      # - run:
+      #     name: deploy external-dns
+      #     command: |
+      #       bash scripts/delegate_hosted_zone.sh << parameters.cluster >>
+      #       bash scripts/deploy_external_dns.sh << parameters.cluster >>
+      # - run:
+      #     name: deploy cert-manager
+      #     command: bash scripts/deploy_cert_manager.sh << parameters.cluster >>
+      # - run:
+      #     name: deploy default cluster certificates
+      #     command: bash scripts/deploy_default_certificates.sh << parameters.cluster >>
       - run:
-          name: deploy containter-insights
-          command: bash scripts/deploy_cloud_watch.sh << parameters.cluster >>
-      - run:
-          name: deploy external-dns
-          command: |
-            bash scripts/delegate_hosted_zone.sh << parameters.cluster >>
-            bash scripts/deploy_external_dns.sh << parameters.cluster >>
-      - run:
-          name: deploy cert-manager
-          command: bash scripts/deploy_cert_manager.sh << parameters.cluster >>
-      - run:
-          name: deploy default cluster certificates
-          command: bash scripts/deploy_default_certificates.sh << parameters.cluster >>
-      - run:
-          name: validate pod status for cluster-bae-configure deployments
-          command: bash scripts/cluster_deployments_test.sh << parameters.cluster >>
-      - run:
-          name: cis benchmarks
-          command: bash scripts/kube_bench.sh
+          name: validate pod status for core services
+          command: bash scripts/core_services_health_check.sh << parameters.cluster >>
+      # - run:
+      #     name: cis benchmarks
+      #     command: bash scripts/kube_bench.sh
 
   check-taint:
     description: evaluate and apply node taint for updates
@@ -155,8 +155,8 @@ workflows:
           after-terraform:
             - test-cluster:
                 cluster: sandbox
-            # - cluster-base-deployments:
-            #     cluster: sandbox
+            - deploy-core-services:
+                cluster: sandbox
           requires:
             - approve-sandbox-changes
           filters: *on-push-master
