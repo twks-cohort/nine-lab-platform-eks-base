@@ -80,7 +80,7 @@ commands:
         type: string
         default: ''
       plan-or-apply:
-        name: is this a terraform plan or apply phase?
+        description: is this a terraform plan or apply phase?
         type: string
         default: 'plan'
     steps:
