@@ -10,10 +10,10 @@
   [[ "${output}" =~ "Running" ]]
 }
 
-# @test "evaluate cluster-autoscaler status" {
-#   run bash -c "kubectl get po -n kube-system -o wide | grep 'cluster-autoscaler'"
-#   [[ "${output}" =~ "Running" ]]
-# }
+@test "evaluate cluster-autoscaler status" {
+  run bash -c "kubectl get po -n kube-system -o wide | grep 'cluster-autoscaler'"
+  [[ "${output}" =~ "Running" ]]
+}
 
 # @test "evaluate cloudwatch-agent status" {
 #   run bash -c "kubectl get po -n amazon-cloudwatch -o wide | grep 'cloudwatch-agent'"

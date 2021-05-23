@@ -42,16 +42,16 @@ commands:
         default: ""
     steps:
       - run:
-          name: setup kubeconfig
+          name: setup kubeconfig and deploy core services
           command: |
             mkdir ~/.kube
             SECRETHUB_VAR_ENV=<< parameters.cluster >> secrethub inject -i tpl/kubeconfig.tpl -o ~/.kube/config
       - run:
           name: deploy metrics apis
           command: kubectl apply -f metrics-apis --recursive
-      # - run:
-      #     name: deploy cluster-autoscaler
-      #     command: bash scripts/deploy_cluster_autoscaler.sh << parameters.cluster >>
+      - run:
+          name: deploy cluster-autoscaler
+          command: bash scripts/deploy_cluster_autoscaler.sh << parameters.cluster >>
       # - run:
       #     name: deploy containter-insights
       #     command: bash scripts/deploy_cloud_watch.sh << parameters.cluster >>
