@@ -1,18 +1,28 @@
-# lab-platform-eks
+<div align="center">
+	<p>
+		<img alt="CircleCI Logo" src="https://github.com/ThoughtWorks-DPS/lab-documentation/blob/master/doc/img/dps-lab.png?sanitize=true" width="75" />
+	</p>
+  <h3>ThoughtWorks DPS Lab</h3>
+  <h5>lab-platform-eks</h5>
+</div>
+<br />
 
 ## current configuration
 
-- Uses EKS latest k8s version (1.19)
-- Control plane logging default = "api", "audit", "authenticator"
-- Control plan internals encrypted using generated kms key
-- Uses managed node_groups for worker pools
-- OIDC for service accounts (irsa) is configured and used for cluster-autoscaler, cloud-watch, external-dns
-- baseline config includes
-- - metrics-server
-- - kube-state-metrics
-- - cluster-autoscaler
-- - AWS container-insights (log/metrics aggregation)
-- Not configured to support "stateful" applications backed by EBS volumes
+* OIDC for service accounts (irsa) installed and used by core services
+* Control plane logging default = "api", "audit", "authenticator"
+* Control plan internals encrypted using generated kms key
+* Uses managed node_groups for worker pools
+  * _note._ managed node groups do not currently permit the docker bridge network to be accessible. If you will be doing CI (running self-managed executors) use ordinary worker_groups.
+* core cluster services installed:
+  * metrics-server
+  * kube-state-metrics
+  * cluster-autoscaler
+  * AWS container-insights (log/metrics aggregation)
+  * External-DNS
+  * Certificate-Manager
+* EKS default storage class (EBS)
+* See [CHANGELOG.md](./CHANGELOG.md) for current release versions
 
 
 ## Run bats test

@@ -4,14 +4,14 @@ version: 2.1
 orbs:
   terraform: feedyard/terraform@0.5.0
 
-# git push: plan, release, test sandbox
+# git push: deploy sandbox
 on-push-master: &on-push-master
   branches:
     only: /master/
   tags:
     ignore: /.*/
 
-# git tag: plan, release, test continuous to production
+# git tag: release - preview -
 on-tag-master: &on-tag-master
   branches:
     ignore: /.*/
@@ -19,7 +19,22 @@ on-tag-master: &on-tag-master
     only: /.*/
 
 commands:
-  cluster-base-configure:
+
+  set-environment:
+    description: generate environment credentials and configuration from templates
+    parameters:
+      cluster:
+        type: string
+        default: ''
+    steps:
+      - run:
+          name: set ~/.terraformrc
+          command: secrethub inject -i tpl/terraformrc.tpl -o ~/.terraformrc
+      - run:
+          name: set << parameters.cluster >> environment variables
+          command: secrethub inject -i environments/<< parameters.cluster >>.auto.tfvars.json.tpl -o << parameters.cluster >>.auto.tfvars.json
+
+  cluster-base-deployments:
     parameters:
       cluster:
         description: cluster name to use for configuration
@@ -32,11 +47,11 @@ commands:
             mkdir ~/.kube
             SECRETHUB_VAR_ENV=<< parameters.cluster >> secrethub inject -i tpl/kubeconfig.tpl -o ~/.kube/config
       - run:
-          name: deploy cluster-autoscaler
-          command: bash scripts/deploy_cluster_autoscaler.sh << parameters.cluster >>
-      - run:
           name: deploy metrics-apis
           command: kubectl apply -f metrics-apis --recursive
+      - run:
+          name: deploy cluster-autoscaler
+          command: bash scripts/deploy_cluster_autoscaler.sh << parameters.cluster >>
       - run:
           name: deploy containter-insights
           command: bash scripts/deploy_cloud_watch.sh << parameters.cluster >>
@@ -58,28 +73,59 @@ commands:
           name: cis benchmarks
           command: bash scripts/kube_bench.sh
 
+  check-taint:
+    description: evaluate and apply node taint for updates
+    parameters:
+      cluster:
+        type: string
+        default: ''
+      plan-or-apply:
+        name: is this a terraform plan or apply phase?
+        type: string
+        default: 'plan'
+    steps:
+      - run:
+          name: taint managed node groups if environment variable TAINT is set
+          command: bash scripts/taint_node_groups.sh << parameters.cluster >> << parameters,plan-or-apply >>
+
+  test-cluster:
+    parameters:
+      cluster:
+        type: string
+        default: ''
+    steps:
+      - run:
+          name: test eks configuration
+          environment:
+            TEST_ENV: << parameters.cluster >>
+          command: bash scripts/cluster_configuration_tests.sh << parameters.cluster >>
+      - run:
+          name: write cluster oidc-assume-role kubeconfig
+          command: bash scripts/write_cluster_credentials.sh << parameters.cluster >>
+
 workflows:
   version: 2
   lab-platform-eks-pipeline:
 
     jobs:
       - terraform/plan:
-          tag: "1.20.0"
           name: sandbox-change-plan
-          context: twdps-di
-          shell: secrethub run -- /bin/sh -eo pipefail
+          context: twdps-core-labs-team
+          shell: secrethub run --env-file secrethub.nonprod.env -- /bin/sh -eo pipefail
           workspace: sandbox
           before-terraform:
-            - run:
-                name: generate environmental configuration and credentials from templates
-                command: |
-                  secrethub inject -i tpl/terraformrc.tpl -o ~/.terraformrc
-                  secrethub inject -i tpl/sandbox.auto.tfvars.json.tpl -o sandbox.auto.tfvars.json
-                  secrethub inject -i tpl/sandbox.certmanager.json.tpl -o sandbox.certmanager.json
+            - set-environment:
+                env: sandbox
+            # - run:
+            #     name: generate environmental configuration and credentials from templates
+            #     command: |
+            #       secrethub inject -i tpl/terraformrc.tpl -o ~/.terraformrc
+            #       secrethub inject -i tpl/sandbox.auto.tfvars.json.tpl -o sandbox.auto.tfvars.json
+            #       secrethub inject -i tpl/sandbox.certmanager.json.tpl -o sandbox.certmanager.json
           after-terraform-init:
-            - run:
-                name: schedule taint for node_groups if environment variable TAINT is set
-                command: bash scripts/taint_node_groups.sh sandbox plan
+            - check-taint:
+                cluster: sandbox
+                plan-or-apply: plan
           filters: *on-push-master
 
       - approve-sandbox-changes:
@@ -91,122 +137,119 @@ workflows:
       - terraform/apply:
           name: sandbox-change-apply
           context: twdps-di
-          shell: secrethub run -- /bin/sh -eo pipefail
+          shell: secrethub run --env-file secrethub.nonprod.env -- /bin/sh -eo pipefail
           workspace: sandbox
           before-terraform:
-            - run:
-                name: generate environmental configuration and credentials from templates
-                command: |
-                  secrethub inject -i tpl/terraformrc.tpl -o ~/.terraformrc
-                  secrethub inject -i tpl/sandbox.auto.tfvars.json.tpl -o sandbox.auto.tfvars.json
-                  secrethub inject -i tpl/sandbox.certmanager.json.tpl -o sandbox.certmanager.json
+            - set-environment:
+                env: sandbox
+            # - run:
+            #     name: generate environmental configuration and credentials from templates
+            #     command: |
+            #       secrethub inject -i tpl/terraformrc.tpl -o ~/.terraformrc
+            #       secrethub inject -i tpl/sandbox.auto.tfvars.json.tpl -o sandbox.auto.tfvars.json
+            #       secrethub inject -i tpl/sandbox.certmanager.json.tpl -o sandbox.certmanager.json
           after-terraform-init:
-            - run:
-                name: schedule taint for node_groups if environment variable TAINT is set
-                command: bash scripts/taint_node_groups.sh sandbox apply
-          after-terraform:
-            - run:
-                name: test sandbox account changes
-                environment:
-                  TEST_ENV: sandbox
-                command: |
-                  bash scripts/cluster_test.sh sandbox
-                  bash scripts/write_cluster_credentials.sh sandbox
-            - cluster-base-configure:
+            - check-taint:
                 cluster: sandbox
+                plan-or-apply: plan
+          after-terraform:
+            - test-cluster:
+                cluster: sandbox
+            # - cluster-base-deployments:
+            #     cluster: sandbox
           requires:
             - approve-sandbox-changes
           filters: *on-push-master
 
-      # git tag to release
-      - terraform/plan:
-          name: preview-change-plan
-          context: twdps-di
-          shell: secrethub run -- /bin/sh -eo pipefail
-          workspace: preview
-          before-terraform:
-            - run:
-                name: generate environmental configuration and credentials from templates
-                command: |
-                  secrethub inject -i tpl/terraformrc.tpl -o ~/.terraformrc
-                  secrethub inject -i tpl/preview.auto.tfvars.json.tpl -o preview.auto.tfvars.json
-          filters: *on-tag-master
+      # release
+      # - terraform/plan:
+      #     name: preview-change-plan
+      #     context: twdps-di
+      #     shell: secrethub run --env-file secrethub.nonprod.env -- /bin/sh -eo pipefail
+      #     workspace: preview
+      #     before-terraform:
+      #       - run:
+      #           name: generate environmental configuration and credentials from templates
+      #           command: |
+      #             secrethub inject -i tpl/terraformrc.tpl -o ~/.terraformrc
+      #             secrethub inject -i tpl/preview.auto.tfvars.json.tpl -o preview.auto.tfvars.json
+      #     filters: *on-tag-master
 
-      - approve-preview-changes:
-          type: approval
-          requires:
-            - preview-change-plan
-          filters: *on-tag-master
+      # - approve-preview-changes:
+      #     type: approval
+      #     requires:
+      #       - preview-change-plan
+      #     filters: *on-tag-master
 
-      - terraform/apply:
-          name: preview-change-apply
-          context: twdps-di
-          shell: secrethub run -- /bin/sh -eo pipefail
-          workspace: preview
-          before-terraform:
-            - run:
-                name: generate environmental configuration and credentials from templates
-                command: |
-                  secrethub inject -i tpl/terraformrc.tpl -o ~/.terraformrc
-                  secrethub inject -i tpl/preview.auto.tfvars.json.tpl -o preview.auto.tfvars.json
-          after-terraform:
-            - run:
-                name: create route53 zone configuration for cluster.domain
-                command: secrethub run -- bash tpl/delegate_hosted_zone.sh preview
-            - run:
-                name: test preview account changes
-                environment:
-                  TEST_ENV: preview
-                command: |
-                  secrethub run -- bash tpl/cluster_test.sh preview
-                  secrethub run -- bash tpl/write_cluster_credentials.sh preview
-            - cluster-base-configure:
-                cluster: preview
-          requires:
-            - approve-preview-changes
-          filters: *on-tag-master
+      # - terraform/apply:
+      #     name: preview-change-apply
+      #     context: twdps-di
+      #     shell: secrethub run --env-file secrethub.nonprod.env -- /bin/sh -eo pipefail
+      #     workspace: preview
+      #     before-terraform:
+      #       - run:
+      #           name: generate environmental configuration and credentials from templates
+      #           command: |
+      #             secrethub inject -i tpl/terraformrc.tpl -o ~/.terraformrc
+      #             secrethub inject -i tpl/preview.auto.tfvars.json.tpl -o preview.auto.tfvars.json
+      #     after-terraform:
+      #       - run:
+      #           name: create route53 zone configuration for cluster.domain
+      #           command: secrethub run -- bash tpl/delegate_hosted_zone.sh preview
+      #       - run:
+      #           name: test preview account changes
+      #           environment:
+      #             TEST_ENV: preview
+      #           command: |
+      #             secrethub run -- bash tpl/cluster_test.sh preview
+      #             secrethub run -- bash tpl/write_cluster_credentials.sh preview
+      #       - cluster-base-configure:
+      #           cluster: preview
+      #     requires:
+      #       - approve-preview-changes
+      #     filters: *on-tag-master
 
       # repeat tag release sections for each desired environment
       #
       # typical DI pipeline is: sandbox > preview > nonprod > prod > management
 
 
-      - tear-down-lab-eks:
-          type: approval
-          filters: *on-push-master
+      # - tear-down-lab-eks:
+      #     type: approval
+      #     filters: *on-push-master
 
-      - approve-teardown-eks:
-          type: approval
-          requires:
-            - tear-down-lab-eks
-          filters: *on-push-master
+      # - approve-teardown-eks:
+      #     type: approval
+      #     requires:
+      #       - tear-down-lab-eks
+      #     filters: *on-push-master
 
-      - terraform/destroy:
-          name: sandbox lab eks teardown
-          context: twdps-di
-          shell: secrethub run -- /bin/sh -eo pipefail
-          workspace: sandbox
-          before-terraform:
-            - run:
-                name: generate environmental configuration and credentials from templates
-                command: |
-                  secrethub inject -i tpl/terraformrc.tpl -o ~/.terraformrc
-                  secrethub inject -i tpl/sandbox.auto.tfvars.json.tpl -o sandbox.auto.tfvars.json
-          requires:
-            - approve-teardown-eks
-          filters: *on-push-master
+      # - terraform/destroy:
+      #     name: sandbox lab eks teardown
+      #     context: twdps-di
+      #     shell: secrethub run -- /bin/sh -eo pipefail
+      #     workspace: sandbox
+      #     before-terraform:
+      #       - run:
+      #           name: generate environmental configuration and credentials from templates
+      #           command: |
+      #             secrethub inject -i tpl/terraformrc.tpl -o ~/.terraformrc
+      #             secrethub inject -i tpl/sandbox.auto.tfvars.json.tpl -o sandbox.auto.tfvars.json
+      #     requires:
+      #       - approve-teardown-eks
+      #     filters: *on-push-master
 
-      - terraform/destroy:
-          name: preview lab eks teardown
-          context: twdps-di
-          shell: secrethub run -- /bin/sh -eo pipefail
-          workspace: preview
-          before-terraform:
-            - run:
-                name: generate environmental configuration and credentials from templates
-                command: |
-                  secrethub inject -i tpl/terraformrc.tpl -o ~/.terraformrc
-                  secrethub inject -i tpl/preview.auto.tfvars.json.tpl -o preview.auto.tfvars.json
-          requires:
-            - approve-teardown-eks
-          filters: *on-push-master
+      # - terraform/destroy:
+      #     name: preview lab eks teardown
+      #     context: twdps-di
+      #     shell: secrethub run -- /bin/sh -eo pipefail
+      #     workspace: preview
+      #     before-terraform:
+      #       - run:
+      #           name: generate environmental configuration and credentials from templates
+      #           command: |
+      #             secrethub inject -i tpl/terraformrc.tpl -o ~/.terraformrc
+      #             secrethub inject -i tpl/preview.auto.tfvars.json.tpl -o preview.auto.tfvars.json
+      #     requires:
+      #       - approve-teardown-eks
+      #     filters: *on-push-master
