@@ -15,15 +15,15 @@
   [[ "${output}" =~ "Running" ]]
 }
 
-# @test "evaluate cloudwatch-agent status" {
-#   run bash -c "kubectl get po -n amazon-cloudwatch -o wide | grep 'cloudwatch-agent'"
-#   [[ "${output}" =~ "Running" ]]
-# }
+@test "evaluate cloudwatch-agent status" {
+  run bash -c "kubectl get po -n amazon-cloudwatch -o wide | grep 'cloudwatch-agent'"
+  [[ "${output}" =~ "Running" ]]
+}
 
-# @test "evaluate fluentd status" {
-#   run bash -c "kubectl get po -n amazon-cloudwatch -o wide | grep 'fluentd'"
-#   [[ "${output}" =~ "Running" ]]
-# }
+@test "evaluate fluentd status" {
+  run bash -c "kubectl get po -n amazon-cloudwatch -o wide | grep 'fluentd'"
+  [[ "${output}" =~ "Running" ]]
+}
 
 # @test "evaluate cert-manager status" {
 #   run bash -c "kubectl get po --selector=app=cert-manager -n cert-manager -o wide | grep 'cert-manager'"

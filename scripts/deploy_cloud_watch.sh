@@ -4,7 +4,7 @@ export AWS_ACCOUNT_ID=$(cat $CLUSTER.auto.tfvars.json | jq -r .account_id)
 export AWS_DEFAULT_REGION=$(cat $CLUSTER.auto.tfvars.json | jq -r .aws_region)
 
 # container-insights deployment files
-cat <<EOF > container-insights-daemonset.yaml
+cat <<EOF > container-insights-monitoring/container-insights-daemonset.yaml
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
         - name: cloudwatch-agent
-          image: amazon/cloudwatch-agent:1.247347.4b250525
+          image: amazon/cloudwatch-agent:1.247347.6b250880
           ports:
            - containerPort: 8125
              hostPort: 8125
@@ -176,7 +176,7 @@ spec:
           command: ['sh','-c','']
       containers:
         - name: fluentd-cloudwatch
-          image: fluent/fluentd-kubernetes-daemonset:v1.12.0-debian-cloudwatch-1.1
+          image: fluent/fluentd-kubernetes-daemonset:v1.12.3-debian-cloudwatch-1.3
           env:
             - name: REGION
               valueFrom:
@@ -591,7 +591,7 @@ data:
 EOF
 
 kubectl apply -f container-insights-monitoring/cloudwatch-namespace.yaml
-kubectl apply -f container-insights-daemonset.yaml
+kubectl apply -f container-insights-monitoring/container-insights-daemonset.yaml
 
 # fluentd takes a few seconds to get to a ready state
 sleep 25

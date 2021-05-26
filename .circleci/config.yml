@@ -52,9 +52,9 @@ commands:
       - run:
           name: deploy cluster-autoscaler
           command: bash scripts/deploy_cluster_autoscaler.sh << parameters.cluster >>
-      # - run:
-      #     name: deploy containter-insights
-      #     command: bash scripts/deploy_cloud_watch.sh << parameters.cluster >>
+      - run:
+          name: deploy containter-insights
+          command: bash scripts/deploy_cloud_watch.sh << parameters.cluster >>
       # - run:
       #     name: deploy external-dns
       #     command: |
