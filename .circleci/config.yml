@@ -116,12 +116,6 @@ workflows:
           before-terraform:
             - set-environment:
                 cluster: sandbox
-            # - run:
-            #     name: generate environmental configuration and credentials from templates
-            #     command: |
-            #       secrethub inject -i tpl/terraformrc.tpl -o ~/.terraformrc
-            #       secrethub inject -i tpl/sandbox.auto.tfvars.json.tpl -o sandbox.auto.tfvars.json
-            #       secrethub inject -i tpl/sandbox.certmanager.json.tpl -o sandbox.certmanager.json
           after-terraform-init:
             - check-taint:
                 cluster: sandbox

@@ -5,7 +5,7 @@ export AWS_DEFAULT_REGION=$(cat $CLUSTER.auto.tfvars.json | jq -r .aws_region)
 
 # write cluster-autoscaler-chart-values.yaml
 cat <<EOF > cluster-autoscaler-chart-values.yaml
-nameOverride: "aws-cluster-autoscaler"
+nameOverride: "cluster-autoscaler"
 
 awsRegion: ${AWS_DEFAULT_REGION}
 
@@ -19,6 +19,9 @@ autoDiscovery:
   clusterName: ${CLUSTER}
   enabled: true
 
+podAnnotations:
+  cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+
 extraArgs:
   skip-nodes-with-local-storage: false
   expander: least-waste
@@ -28,5 +31,5 @@ extraArgs:
 EOF
 
 helm repo add autoscaler https://kubernetes.github.io/autoscaler
-helm template $CLUSTER autoscaler/cluster-autoscaler-chart --namespace kube-system  --values=cluster-autoscaler-chart-values.yaml > cluster-autoscaler-deployment.yaml
+helm template $CLUSTER autoscaler/cluster-autoscaler --namespace kube-system  --values=cluster-autoscaler-chart-values.yaml > cluster-autoscaler-deployment.yaml
 kubectl apply -n kube-system -f cluster-autoscaler-deployment.yaml

@@ -24,24 +24,17 @@
 * EKS default storage class (EBS)
 * See [CHANGELOG.md](./CHANGELOG.md) for current release versions
 
-
-## Run bats test
-```sh
-brew install bats
-aws-vault exec <role> bats test
-```
-
 ## upgrade How-tos
 
 **upgrade kubernetes version**
 
-EKS performs minor version upgrade automatically in this labs configuration. To before major version upgrades, edit k8s version as specified in tfvars file. Must upgrade to each major version as release; don't skip over a version.
+EKS performs minor version upgrade automatically in this labs configuration. To perform major version upgrades, edit k8s version as specified in tfvars file. Must upgrade to each major version as release; don't skip over a version.
 
 Ex:
 ```bash
 {
   ...
-  "cluster_version": "1.18",  # <= upgrade to next version by changing to "1.19"
+  "cluster_version": "1.20",  # <= upgrade to next version by changing to "1.21"
 }
 ```
 
