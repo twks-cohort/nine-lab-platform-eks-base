@@ -1,6 +1,6 @@
 locals {
-  k8s_cloud_watch_agents_account_namespace     = "amazon-cloudwatch"
-  k8s_cloud_watch_agents_service_account_name  = "${var.cluster_name}-cloudwatch-agent"
+  cloud_watch_agents_account_namespace     = "amazon-cloudwatch"
+  cloud_watch_agents_service_account_name  = "${var.cluster_name}-cloudwatch-agent"
 }
 
 #cloudwatch-agents
@@ -12,7 +12,7 @@ module "iam_assumable_role_cloudwatch" {
   role_name                     = "${var.cluster_name}-cloudwatch-agent"
   provider_url                  = replace(module.eks.cluster_oidc_issuer_url, "https://", "")
   role_policy_arns              = [aws_iam_policy.cloud_watch.arn]
-  oidc_fully_qualified_subjects = ["system:serviceaccount:${local.k8s_cloud_watch_agents_account_namespace}:${local.k8s_cloud_watch_agents_service_account_name}"]
+  oidc_fully_qualified_subjects = ["system:serviceaccount:${local.loud_watch_agents_account_namespace}:${local.cloud_watch_agents_service_account_name}"]
   number_of_role_policy_arns    = 1
 }
 

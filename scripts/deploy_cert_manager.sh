@@ -5,15 +5,6 @@ set -e
 # $1 = cluster config to use
 export CLUSTER=${1}
 
-cat <<EOF > cert-manager-namespace.yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: cert-manager
-  labels:
-    cert-manager.io/disable-validation: "true"
-EOF
-
 export AWS_ACCOUNT_ID=$(cat ${CLUSTER}.auto.tfvars.json | jq -r '.account_id')
 export AWS_DEFAULT_REGION=$(cat ${CLUSTER}.auto.tfvars.json | jq -r '.aws_region')
 export AWS_ASSUME_ROLE=$(cat $CLUSTER.auto.tfvars.json | jq -r .assume_role)
@@ -23,8 +14,7 @@ export CERT_MANAGER_VERSION=$(cat ${CLUSTER}.certmanager.json | jq -r '.cert_man
 export EMAIL=$(cat ${CLUSTER}.certmanager.json | jq -r '.cert_manager_issuer_email')
 export ISSUER_ENDPOINT=$(cat ${CLUSTER}.certmanager.json | jq -r '.cert_manager_issuer_endpoint')
 
-
-kubectl apply -f cert-manager-namespace.yaml
+kubectl apply -f cert-manager/cert-manager-namespace.yaml
 
 helm repo add jetstack https://charts.jetstack.io
 helm repo update
@@ -59,4 +49,4 @@ spec:
           hostedZoneID: $HOSTED_ZONE_ID
 EOF
 
-kubectl apply -f cluster_domain_certificate_issuer.yaml
+kubectl apply -f cert-manager/cluster_domain_certificate_issuer.yaml

@@ -7,7 +7,7 @@ export CLUSTER=${1}
 
 export DOMAIN=$(cat ${CLUSTER}.auto.tfvars.json | jq -r '.domain')
 
-cat <<EOF > cluster_default_certificates.yaml
+cat <<EOF > cert-manager/cluster_default_certificates.yaml
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -24,4 +24,4 @@ spec:
   - '*.$CLUSTER.$DOMAIN'
 EOF
 
-kubectl apply -f cluster_default_certificates.yaml
+kubectl apply -f cert-manager/cluster_default_certificates.yaml

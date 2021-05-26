@@ -32,7 +32,9 @@ commands:
           command: secrethub inject -i tpl/terraformrc.tpl -o ~/.terraformrc
       - run:
           name: set << parameters.cluster >> environment variables
-          command: secrethub inject -i environments/<< parameters.cluster >>.auto.tfvars.json.tpl -o << parameters.cluster >>.auto.tfvars.json
+          command: |
+            secrethub inject -i environments/<< parameters.cluster >>.auto.tfvars.json.tpl -o << parameters.cluster >>.auto.tfvars.json
+            secrethub inject -i environments/sandbox.certmanager.json.tpl -o sandbox.certmanager.json
 
   deploy-core-services:
     parameters:
@@ -58,19 +60,18 @@ commands:
       - run:
           name: deploy external-dns
           command: bash scripts/deploy_external_dns.sh << parameters.cluster >>
-
-      # - run:
-      #     name: deploy cert-manager
-      #     command: bash scripts/deploy_cert_manager.sh << parameters.cluster >>
-      # - run:
-      #     name: deploy default cluster certificates
-      #     command: bash scripts/deploy_default_certificates.sh << parameters.cluster >>
+      - run:
+          name: deploy cert-manager
+          command: bash scripts/deploy_cert_manager.sh << parameters.cluster >>
+      - run:
+          name: deploy default cluster certificates
+          command: bash scripts/deploy_default_certificates.sh << parameters.cluster >>
       - run:
           name: validate pod status for core services
-          command: bats test # bash scripts/core_services_health_check.sh << parameters.cluster >>
-      # - run:
-      #     name: cis benchmarks
-      #     command: bash scripts/kube_bench.sh
+          command: bats test
+      - run:
+          name: cis benchmarks
+          command: bash scripts/kube_bench.sh
 
   check-taint:
     description: evaluate and apply node taint for updates
@@ -144,12 +145,6 @@ workflows:
           before-terraform:
             - set-environment:
                 cluster: sandbox
-            # - run:
-            #     name: generate environmental configuration and credentials from templates
-            #     command: |
-            #       secrethub inject -i tpl/terraformrc.tpl -o ~/.terraformrc
-            #       secrethub inject -i tpl/sandbox.auto.tfvars.json.tpl -o sandbox.auto.tfvars.json
-            #       secrethub inject -i tpl/sandbox.certmanager.json.tpl -o sandbox.certmanager.json
           after-terraform-init:
             - check-taint:
                 cluster: sandbox
