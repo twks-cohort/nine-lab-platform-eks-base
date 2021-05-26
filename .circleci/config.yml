@@ -64,9 +64,6 @@ commands:
           name: deploy cert-manager
           command: bash scripts/deploy_cert_manager.sh << parameters.cluster >>
       - run:
-          name: deploy default cluster certificates
-          command: bash scripts/deploy_default_certificates.sh << parameters.cluster >>
-      - run:
           name: validate pod status for core services
           command: bats test
       - run:
