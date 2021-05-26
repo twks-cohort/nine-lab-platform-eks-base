@@ -27,7 +27,7 @@ export AWS_SECRET_ACCESS_KEY=$(cat credentials | jq -r ".Credentials.SecretAcces
 export AWS_SESSION_TOKEN=$(cat credentials | jq -r ".Credentials.SessionToken")
 export HOSTED_ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name $CLUSTER.$DOMAIN | jq -r --arg DNS $CLUSTER.$DOMAIN '.HostedZones[] | select( .Name | startswith($DNS)) | .Id')
 
-cat <<EOF > cluster_domain_certificate_issuer.yaml
+cat <<EOF > cert-manager/cluster_domain_certificate_issuer.yaml
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
