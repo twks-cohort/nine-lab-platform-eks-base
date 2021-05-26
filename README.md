@@ -58,6 +58,6 @@ Add the variable again and trigger the release-tag preview pipeline to update th
 
 Standard tests not inclued in pipeline:
 
-- test to confirm aws container-insight aggregation is occuring
 - test cluster-autoscaler response to load
+- test to confirm aws container-insight aggregation is occuring
 - no operational monitors defined

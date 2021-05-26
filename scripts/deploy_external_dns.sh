@@ -78,7 +78,7 @@ spec:
       serviceAccountName: $CLUSTER-external-dns
       containers:
       - name: external-dns
-        image: k8s.gcr.io/external-dns/external-dns:v0.7.6
+        image: k8s.gcr.io/external-dns/external-dns:v0.8.0
         args:
         - --source=service
         - --source=ingress

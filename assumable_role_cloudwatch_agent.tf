@@ -6,7 +6,7 @@ locals {
 #cloudwatch-agents
 module "iam_assumable_role_cloudwatch" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
-  version = "3.6.0"
+  version = "4.1.0"
 
   create_role                   = true
   role_name                     = "${var.cluster_name}-cloudwatch-agent"
