@@ -42,25 +42,11 @@ Ex:
 
 AWS releases multiple eks-optimized aws linux 2 version updates. This is for all the usual reasons - upgrade and refinements to al2, security patches, kublet updates, etc. To update to the latest ami release for the k8s version of a cluster:
 
-Exploring options for the best way to operationalize.
+In the circleci GUI, go to the Project Settings for the lab-platform-eks pipeline and define an Environment Variable { TAINT = True }.
 
-__option 1__
-Define a pipeline ENV variable in the CircleCI GUI called TAINT = True, and run the last successful build.
+Re-run the last sandbox release.
 
-There is a pipeline step that runs after `terraform init` that will apply the taints to the managed node_groups.
-
-After the successful completion of the update, remove the ENV var.
-
-__options 2__
-
-With the appropriate credentials. From the command line, select the desired workspace (env) and apply the taint directly.
-```bash
-$ terraform init
-$ terraform workspace select sandbox
-$ terraform taint "module.eks.module.node_groups.random_pet.node_groups[\"side_a\"]"
-$ terraform taint "module.eks.module.node_groups.aws_eks_node_group.workers[\"side_a\"]"
-```
-and run the last successful build.
+Add the variable again and trigger the release-tag preview pipeline to update the preview cluster.
 
 # NEED TODO
 
@@ -68,10 +54,10 @@ and run the last successful build.
 
 # not yet
 
-- not forwarding kube-state-metrics to container-insights, probably not necessary for poc
+- not forwarding kube-state-metrics to container-insights
 
-Given poc, limited configuration testing to the basics. operational deployment would require:
+Standard tests not inclued in pipeline:
 
-- test metrics-server and kube-state-metrics for actual outputs and test aggregation for presence of the metrics
-- test aws container-insight aggregation for results
+- test to confirm aws container-insight aggregation is occuring
 - test cluster-autoscaler response to load
+- no operational monitors defined
