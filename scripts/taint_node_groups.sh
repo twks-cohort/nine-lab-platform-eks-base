@@ -24,4 +24,6 @@ if [[ ${TAINT} == "true" ]]; then
       exit 1
       ;;
   esac
+else
+  echo -n "no TAINT scheduled"
 fi
