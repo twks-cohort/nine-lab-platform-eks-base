@@ -81,20 +81,9 @@ commands:
         type: string
         default: 'plan'
     steps:
-      - when:
-          condition: $TAINT
-          steps:
-            - run:
-                name: TAINT is set, schedule managed node_groups for refresh
-                command: |
-                  echo "TAINT=${TAINT}"
-                  bash scripts/taint_node_groups.sh << parameters.node-group >> << parameters.plan-or-apply >>
-      - unless:
-          condition: $TAINT
-          steps:
-            - run:
-                name: TAINT is NOT set, no managed node_groups scheduled for refresh
-                command: echo 'no TAINT set'
+      - run:
+          name: Schedule for terraform taint if ENV var set
+          command: bash scripts/taint_node_groups.sh << parameters.node-group >> << parameters.plan-or-apply >>
 
   test-cluster:
     parameters:
