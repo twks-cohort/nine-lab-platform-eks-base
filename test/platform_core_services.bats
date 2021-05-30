@@ -25,11 +25,6 @@
   [[ "${output}" =~ "Running" ]]
 }
 
-@test "evaluate external-dns status" {
-  run bash -c "kubectl get po -n kube-system -o wide | grep 'external-dns'"
-  [[ "${output}" =~ "Running" ]]
-}
-
 @test "evaluate cert-manager status" {
   run bash -c "kubectl get po --selector=app=cert-manager -n cert-manager -o wide | grep 'cert-manager'"
   [[ "${output}" =~ "Running" ]]
