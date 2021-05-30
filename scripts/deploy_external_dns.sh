@@ -15,6 +15,7 @@ export HOSTED_ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name "$CLUST
 
 # external-dns deployment files
 cat <<EOF > external-dns-deployment.yaml
+
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -78,7 +79,7 @@ spec:
       serviceAccountName: $CLUSTER-external-dns
       containers:
       - name: external-dns
-        image: k8s.gcr.io/external-dns/external-dns:v0.8.0
+        image: k8s.gcr.io/external-dns/external-dns:v0.7.6
         args:
         - --source=service
         - --source=ingress
