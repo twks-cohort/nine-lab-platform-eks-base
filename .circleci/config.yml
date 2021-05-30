@@ -159,7 +159,7 @@ workflows:
             - check-taint:
                 node-group: group_a
                 plan-or-apply: plan
-          filters: *on-push-master
+          filters: *on-tag-master
 
       - approve-preview-changes:
           type: approval
@@ -186,4 +186,4 @@ workflows:
                 cluster: preview
           requires:
             - approve-preview-changes
-          filters: *on-push-master
+          filters: *on-tag-master
