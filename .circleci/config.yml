@@ -58,9 +58,6 @@ commands:
           name: deploy containter-insights
           command: bash scripts/deploy_cloud_watch.sh << parameters.cluster >>
       - run:
-          name: deploy external-dns
-          command: bash scripts/deploy_external_dns.sh << parameters.cluster >>
-      - run:
           name: deploy cert-manager
           command: bash scripts/deploy_cert_manager.sh << parameters.cluster >>
       - run:
