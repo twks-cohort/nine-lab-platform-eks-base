@@ -86,13 +86,15 @@ commands:
           steps:
             - run:
                 name: TAINT is set, schedule managed node_groups for refresh
-                command: bash scripts/taint_node_groups.sh << parameters.node-group >> << parameters.plan-or-apply >>
+                command: |
+                  echo "TAINT=${TAINT}"
+                  bash scripts/taint_node_groups.sh << parameters.node-group >> << parameters.plan-or-apply >>
       - unless:
           condition: $TAINT
           steps:
             - run:
                 name: TAINT is NOT set, no managed node_groups scheduled for refresh
-                command: bash scripts/taint_node_groups.sh << parameters.node-group >> << parameters.plan-or-apply >>
+                command: echo 'no TAINT set'
 
   test-cluster:
     parameters:
