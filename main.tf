@@ -4,7 +4,7 @@ locals {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "16.0.0"
+  version = "17.0.3"
 
   cluster_name    = var.cluster_name
   cluster_version = var.cluster_version
@@ -38,6 +38,7 @@ module "eks" {
       min_capacity     = var.node_group_a_min_capacity
       disk_size        = var.node_group_a_disk_size
       instance_types   = var.node_group_a_instance_types
+      key_name         = ""
       k8s_labels = {
         env = var.cluster_name
       }

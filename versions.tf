@@ -1,14 +1,7 @@
 terraform {
-  required_version = "~> 0.15.4"
+  required_version = "~> 0.15"
   required_providers {
-    aws        = ">= 3.40"
-    local      = ">= 1.4"
-    random     = ">= 2.1"
-    kubernetes = ">= 1.11"
-    http = {
-      source  = "terraform-aws-modules/http"
-      version = ">= 2.3"
-    }
+    aws        = ">= 3.42"
   }
 
   backend "remote" {

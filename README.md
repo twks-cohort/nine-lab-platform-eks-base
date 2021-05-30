@@ -19,10 +19,14 @@
   * kube-state-metrics
   * cluster-autoscaler
   * AWS container-insights (log/metrics aggregation)
-  * External-DNS
+  * External-DNS (assumes istio for ingress)
   * Certificate-Manager
 * EKS default storage class (EBS)
 * See [CHANGELOG.md](./CHANGELOG.md) for current release versions
+
+## CloudWatch Container Insights
+
+Refer to the ContainerInsights tab on Cloudwatch for metrics and logging aggregation.
 
 ## upgrade How-tos
 

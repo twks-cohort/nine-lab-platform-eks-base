@@ -73,7 +73,7 @@ commands:
   check-taint:
     description: evaluate and apply node taint for updates
     parameters:
-      cluster:
+      node-group:
         type: string
         default: ''
       plan-or-apply:
@@ -86,13 +86,13 @@ commands:
           steps:
             - run:
                 name: TAINT is set, schedule managed node_groups for refresh
-                command: bash scripts/taint_node_groups.sh << parameters.cluster >> << parameters.plan-or-apply >>
+                command: bash scripts/taint_node_groups.sh << parameters.node-group >> << parameters.plan-or-apply >>
       - unless:
           condition: $TAINT
           steps:
             - run:
                 name: TAINT is NOT set, no managed node_groups scheduled for refresh
-                command: bash scripts/taint_node_groups.sh << parameters.cluster >> << parameters.plan-or-apply >>
+                command: bash scripts/taint_node_groups.sh << parameters.node-group >> << parameters.plan-or-apply >>
 
   test-cluster:
     parameters:
@@ -124,7 +124,7 @@ workflows:
                 cluster: sandbox
           after-terraform-init:
             - check-taint:
-                cluster: sandbox
+                node-group: group_a
                 plan-or-apply: plan
           filters: *on-push-master
 
@@ -144,8 +144,8 @@ workflows:
                 cluster: sandbox
           after-terraform-init:
             - check-taint:
-                cluster: sandbox
-                plan-or-apply: plan
+                node-group: group_a
+                plan-or-apply: apply
           after-terraform:
             - test-cluster:
                 cluster: sandbox
