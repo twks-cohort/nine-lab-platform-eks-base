@@ -34,7 +34,6 @@ commands:
           name: set << parameters.cluster >> environment variables
           command: |
             secrethub inject -i environments/<< parameters.cluster >>.auto.tfvars.json.tpl -o << parameters.cluster >>.auto.tfvars.json
-            secrethub inject -i environments/sandbox.certmanager.json.tpl -o sandbox.certmanager.json
 
   deploy-core-services:
     parameters:
