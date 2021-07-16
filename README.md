@@ -1,11 +1,14 @@
 <div align="center">
 	<p>
-		<img alt="CircleCI Logo" src="https://github.com/ThoughtWorks-DPS/lab-documentation/blob/master/doc/img/dps-lab.png?sanitize=true" width="75" />
+		<img alt="Thoughtworks Logo" src="https://raw.githubusercontent.com/ThoughtWorks-DPS/static/master/thoughtworks_flamingo_wave.png?sanitize=true" width=200 />
+    <br />
+		<img alt="DPS Title" src="https://raw.githubusercontent.com/ThoughtWorks-DPS/static/master/dps_lab_title.png?sanitize=true" width=350/>
 	</p>
   <h3>ThoughtWorks DPS Lab</h3>
-  <h5>lab-platform-eks</h5>
+  <h1>lab-platform-eks</h1>
 </div>
 <br />
+
 
 ## current configuration
 
@@ -19,8 +22,6 @@
   * kube-state-metrics
   * cluster-autoscaler
   * AWS container-insights (log/metrics aggregation)
-  * External-DNS (assumes istio for ingress)
-  * Certificate-Manager
 * EKS default storage class (EBS)
 * See [CHANGELOG.md](./CHANGELOG.md) for current release versions
 
@@ -44,13 +45,9 @@ Ex:
 
 **upgrade managed node_groups**
 
-AWS releases multiple eks-optimized aws linux 2 version updates. This is for all the usual reasons - upgrade and refinements to al2, security patches, kublet updates, etc. To update to the latest ami release for the k8s version of a cluster:
+AWS releases multiple eks-optimized aws linux 2 version updates. This is for all the usual reasons - upgrade and refinements to al2, security patches, kublet updates, etc. To update to the latest ami release for the current k8s version of a cluster:
 
-In the circleci GUI, go to the Project Settings for the lab-platform-eks pipeline and define an Environment Variable { TAINT = True }.
-
-Re-run the last sandbox release.
-
-Add the variable again and trigger the release-tag preview pipeline to update the preview cluster.
+Include `-taint` in the release tag to trigger a deployment, starting from sandbox, that will taint the managed node groups prior to performing the terraform apply.
 
 # NEED TODO
 

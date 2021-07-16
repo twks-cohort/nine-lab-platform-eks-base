@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
         - name: cloudwatch-agent
-          image: amazon/cloudwatch-agent:1.247347.6b250880
+          image: amazon/cloudwatch-agent:1.247348.0b251302
           ports:
            - containerPort: 8125
              hostPort: 8125
@@ -176,7 +176,7 @@ spec:
           command: ['sh','-c','']
       containers:
         - name: fluentd-cloudwatch
-          image: fluent/fluentd-kubernetes-daemonset:v1.12.3-debian-cloudwatch-1.3
+          image: fluent/fluentd-kubernetes-daemonset:v1.13.2-debian-cloudwatch-1.0
           env:
             - name: REGION
               valueFrom:
