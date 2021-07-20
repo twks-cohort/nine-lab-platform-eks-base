@@ -96,7 +96,7 @@ commands:
           command: bash scripts/kube_bench.sh << parameters.cluster >>
       - run:
           name: conformance smoke-test
-          command: bash scripts/sonobuoy_conformance_test.sh << parameters.sonobuoy-mode >>
+          command: bash scripts/sonobuoy_conformance_test.sh << parameters.cluster >> << parameters.sonobuoy-mode >>
 
   check-taint:
     description: evaluate and apply node taint for updates

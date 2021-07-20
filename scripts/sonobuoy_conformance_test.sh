@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-SONOBUOY_MODE=$1
+export CLUSTER=$1
+export SONOBUOY_MODE=$2
+export KUBECONFIG=kubeconfig_$CLUSTER
+
 CLUSTER_VERSION=$(kubectl version -o json | jq -r .serverVersion.gitVersion | cut -d- -f 1)
 
 sonobuoy run --mode=${SONOBUOY_MODE} \
