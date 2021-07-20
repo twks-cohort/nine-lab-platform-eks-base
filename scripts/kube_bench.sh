@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+export CLUSTER=$1
+export KUBECONFIG=kubeconfig_$CLUSTER
+
 cat << EOF > kube-bench.yaml
 ---
 apiVersion: batch/v1

@@ -7,13 +7,6 @@ echo "TAG = ${CIRCLE_TAG}"
 echo "NODE_GROUPS = ${NODE_GROUPS}"
 echo "TERRAFORM_STEP = ${TERRAFORM_STEP}"
 
-
-STR='GNU/Linux is an operating system'
-SUB='Linux'
-if [[ "$STR" == *"$SUB"* ]]; then
-  echo "It's there."
-fi
-
 if [[ "$CIRCLE_TAG" == *"taint"* ]]; then
   case $TERRAFORM_STEP in
     plan)

@@ -93,7 +93,7 @@ commands:
           command: bash scripts/cluster_configuration_tests.sh << parameters.cluster >>
       - run:
           name: cis benchmarks
-          command: bash scripts/kube_bench.sh
+          command: bash scripts/kube_bench.sh << parameters.cluster >>
       - run:
           name: conformance smoke-test
           command: bash scripts/sonobuoy_conformance_test.sh << parameters.sonobuoy-mode >>
