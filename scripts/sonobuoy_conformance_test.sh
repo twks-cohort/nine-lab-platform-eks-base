@@ -5,9 +5,7 @@ export KUBECONFIG=kubeconfig_$CLUSTER
 
 CLUSTER_VERSION=$(kubectl version -o json | jq -r .serverVersion.gitVersion | cut -d- -f 1)
 
-sonobuoy run --mode=${SONOBUOY_MODE} \
-  --wait \
-  --kube-conformance-image-version ${CLUSTER_VERSION} &
+sonobuoy run --mode=$SONOBUOY_MODE --wait --kubernetes-version $CLUSTER_VERSION &
 
 PROCESS_ID=$!
 
