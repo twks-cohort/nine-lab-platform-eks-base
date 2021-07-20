@@ -24,3 +24,8 @@
   run bash -c "kubectl get po -n amazon-cloudwatch -o wide | grep 'fluentd'"
   [[ "${output}" =~ "Running" ]]
 }
+
+@test "evaluate standard namespaces" {
+  run bash -c "kubectl get ns"
+  [[ "${output}" =~ "lab-system" ]]
+}

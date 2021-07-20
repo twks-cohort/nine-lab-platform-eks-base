@@ -48,6 +48,9 @@ commands:
             mkdir ~/.kube
             SECRETHUB_VAR_ENV=<< parameters.cluster >> secrethub inject -i tpl/kubeconfig.tpl -o ~/.kube/config
       - run:
+          name: deploy standard, non-istio administrative namespaces
+          command: kubectl apply -f standard-namespaces.yaml
+      - run:
           name: deploy metrics apis
           command: kubectl apply -f metrics-apis --recursive
       - run:
@@ -57,11 +60,43 @@ commands:
           name: deploy containter-insights
           command: bash scripts/deploy_cloud_watch.sh << parameters.cluster >>
       - run:
-          name: validate pod status for core services
+          name: validate deploy-core-services health
           command: bats test
       - run:
           name: cis benchmarks
           command: bash scripts/kube_bench.sh
+
+  validate-core-services:
+    parameters:
+      cluster:
+        description: cluster name to use for configuration
+        type: string
+        default: ""
+    steps:
+      - run:
+          name: validate deploy-core-services health
+          command: bats test
+
+  validate-eks:
+    parameters:
+      cluster:
+        type: string
+        default: ''
+      sonobuoy-mode:
+        type: string
+        default: quick
+    steps:
+      - run:
+          name: test eks configuration
+          environment:
+            TEST_ENV: << parameters.cluster >>
+          command: bash scripts/cluster_configuration_tests.sh << parameters.cluster >>
+      - run:
+          name: cis benchmarks
+          command: bash scripts/kube_bench.sh
+      - run:
+          name: conformance smoke-test
+          command: bash scripts/sonobuoy_conformance_test.sh << parameters.sonobuoy-mode >>
 
   check-taint:
     description: evaluate and apply node taint for updates
@@ -78,20 +113,37 @@ commands:
           name: Schedule for terraform taint if ENV var set
           command: bash scripts/taint_node_groups.sh << parameters.node-group >> << parameters.plan-or-apply >>
 
-  test-cluster:
+  store-system-credentials:
     parameters:
       cluster:
         type: string
         default: ''
     steps:
       - run:
-          name: test eks configuration
-          environment:
-            TEST_ENV: << parameters.cluster >>
-          command: bash scripts/cluster_configuration_tests.sh << parameters.cluster >>
-      - run:
           name: write cluster oidc-assume-role kubeconfig
           command: bash scripts/write_cluster_credentials.sh << parameters.cluster >>
+
+  validate-and-configure-cluster:
+    parameters:
+      cluster:
+        description: cluster being validated
+        type: string
+        default: ""
+      sonobuoy-mode:
+        description: sonobuoy test mode
+        type: string
+        default: quick
+    steps:
+      - validate-eks:
+          cluster: << parameters.cluster >>
+          sonobuoy-mode: << parameters.sonobuoy-mode >>
+      - store-system-credentials:
+          cluster: << parameters.cluster >>
+      - deploy-core-services:
+          cluster: << parameters.cluster >>
+      - validate-core-services:
+          cluster: << parameters.cluster >>
+
 
 workflows:
   version: 2
@@ -131,9 +183,7 @@ workflows:
                 node-group: group_a
                 plan-or-apply: apply
           after-terraform:
-            - test-cluster:
-                cluster: sandbox
-            - deploy-core-services:
+            - validate-and-configure-cluster:
                 cluster: sandbox
           requires:
             - approve-sandbox-changes
@@ -173,9 +223,7 @@ workflows:
                 node-group: group_a
                 plan-or-apply: apply
           after-terraform:
-            - test-cluster:
-                cluster: preview
-            - deploy-core-services:
+            - validate-and-configure-cluster:
                 cluster: preview
           requires:
             - approve-preview-changes
