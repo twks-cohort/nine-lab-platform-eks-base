@@ -45,7 +45,7 @@ commands:
       - run:
           name: setup kubeconfig and deploy core services
           command: |
-            mkdir ~/.kube
+            mkdir -p ~/.kube
             SECRETHUB_VAR_ENV=<< parameters.cluster >> secrethub inject -i tpl/kubeconfig.tpl -o ~/.kube/config
       - run:
           name: deploy standard, non-istio administrative namespaces

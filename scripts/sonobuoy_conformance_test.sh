@@ -21,8 +21,6 @@ if ! sonobuoy status | grep -q -E ' +e2e +complete +passed +'; then
     TEST_EXIT_CODE=1
 fi
 
-mkdir sonobuoy_artifacts/
-cd sonobuoy_artifacts
 results=$(sonobuoy retrieve)
 sonobuoy delete --wait
 sonobuoy results $results
