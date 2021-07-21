@@ -6,6 +6,10 @@ export AWS_ASSUME_ROLE=$(cat $CLUSTER.auto.tfvars.json | jq -r .assume_role)
 export AWS_DOMAIN_ACCOUNT=$(cat $CLUSTER.auto.tfvars.json | jq -r .domain_account)
 export DOMAIN=$(cat $CLUSTER.auto.tfvars.json | jq -r .domain)
 
+export SERVICE_ACCOUNT_AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+export SERVICE_ACCOUNT_AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+
+# assume
 aws sts assume-role --output json --role-arn arn:aws:iam::$AWS_ACCOUNT:role/$AWS_ASSUME_ROLE --role-session-name delegate-zone > credentials
 export AWS_ACCESS_KEY_ID=$(cat credentials | jq -r ".Credentials.AccessKeyId")
 export AWS_SECRET_ACCESS_KEY=$(cat credentials | jq -r ".Credentials.SecretAccessKey")
@@ -13,6 +17,9 @@ export AWS_SESSION_TOKEN=$(cat credentials | jq -r ".Credentials.SessionToken")
 
 export SUBDOMAIN_ZONE_ID=$(aws route53 list-hosted-zones | jq -r --arg SUBDOMAIN "$CLUSTER.$DOMAIN." '.HostedZones[] | select(.Name==$SUBDOMAIN) | .Id')
 export NAME_SERVERS=$(aws route53 get-hosted-zone --id $SUBDOMAIN_ZONE_ID | jq .DelegationSet.NameServers)
+
+export AWS_ACCESS_KEY_ID=$SERVICE_ACCOUNT_AWS_ACCESS_KEY_ID
+export AWS_SECRET_ACCESS_KEY=$SERVICE_ACCOUNT_AWS_SECRET_ACCESS_KEY
 
 aws sts assume-role --output json --role-arn arn:aws:iam::$AWS_DOMAIN_ACCOUNT:role/$AWS_ASSUME_ROLE --role-session-name delegate-zone > credentials
 export AWS_ACCESS_KEY_ID=$(cat credentials | jq -r ".Credentials.AccessKeyId")
