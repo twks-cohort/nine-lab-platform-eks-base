@@ -67,20 +67,23 @@ commands:
       - run:
           name: deploy containter-insights
           command: bash scripts/deploy_cloud_watch.sh << parameters.cluster >>
-      - run:
-          name: validate deploy-core-services health
-          command: bats test
-      - run:
-          name: cis benchmarks
-          command: bash scripts/kube_bench.sh
 
-  validate-core-services:
+  validate-cluster:
     parameters:
       cluster:
         description: cluster name to use for configuration
         type: string
         default: ""
+      sonobuoy-mode:
+        type: string
+        default: quick
     steps:
+      - run:
+          name: cis benchmarks
+          command: bash scripts/kube_bench.sh << parameters.cluster >>
+      - run:
+          name: conformance smoke-test
+          command: bash scripts/sonobuoy_conformance_test.sh << parameters.cluster >> << parameters.sonobuoy-mode >>
       - run:
           name: validate deploy-core-services health
           command: bats test
@@ -95,16 +98,14 @@ commands:
         default: quick
     steps:
       - run:
+          name:
+            mkdir -p ~/.kube
+            cp kubeconfig_<< parameters.cluster >> ~/.kube/config
+      - run:
           name: test eks configuration
           environment:
             TEST_ENV: << parameters.cluster >>
           command: bash scripts/cluster_configuration_tests.sh << parameters.cluster >>
-      - run:
-          name: cis benchmarks
-          command: bash scripts/kube_bench.sh << parameters.cluster >>
-      - run:
-          name: conformance smoke-test
-          command: bash scripts/sonobuoy_conformance_test.sh << parameters.cluster >> << parameters.sonobuoy-mode >>
 
   check-taint:
     description: evaluate and apply node taint for updates
@@ -144,15 +145,13 @@ commands:
     steps:
       - validate-eks:
           cluster: << parameters.cluster >>
-          sonobuoy-mode: << parameters.sonobuoy-mode >>
       - store-system-credentials:
-          cluster: << parameters.cluster >>
-      - set-kubeconfig:
           cluster: << parameters.cluster >>
       - deploy-core-services:
           cluster: << parameters.cluster >>
-      - validate-core-services:
+      - validate-cluster:
           cluster: << parameters.cluster >>
+          sonobuoy-mode: << parameters.sonobuoy-mode >>
 
 
 workflows:
@@ -195,6 +194,7 @@ workflows:
           after-terraform:
             - validate-and-configure-cluster:
                 cluster: sandbox
+                sonobuoy_mode: quick
           requires:
             - approve-sandbox-changes
           filters: *on-push-master
@@ -235,6 +235,7 @@ workflows:
           after-terraform:
             - validate-and-configure-cluster:
                 cluster: preview
+                sonobuoy_mode: quick
           requires:
             - approve-preview-changes
           filters: *on-tag-master
