@@ -35,7 +35,7 @@ commands:
           command: |
             secrethub inject -i environments/<< parameters.cluster >>.auto.tfvars.json.tpl -o << parameters.cluster >>.auto.tfvars.json
 
-  deploy-core-services:
+  set-kubeconfig:
     parameters:
       cluster:
         description: cluster name to use for configuration
@@ -47,6 +47,14 @@ commands:
           command: |
             mkdir -p ~/.kube
             SECRETHUB_VAR_ENV=<< parameters.cluster >> secrethub inject -i tpl/kubeconfig.tpl -o ~/.kube/config
+
+  deploy-core-services:
+    parameters:
+      cluster:
+        description: cluster name to use for configuration
+        type: string
+        default: ""
+    steps:
       - run:
           name: deploy standard, non-istio administrative namespaces
           command: kubectl apply -f standard-namespaces.yaml
@@ -138,6 +146,8 @@ commands:
           cluster: << parameters.cluster >>
           sonobuoy-mode: << parameters.sonobuoy-mode >>
       - store-system-credentials:
+          cluster: << parameters.cluster >>
+      - set-kubeconfig:
           cluster: << parameters.cluster >>
       - deploy-core-services:
           cluster: << parameters.cluster >>

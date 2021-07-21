@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 export CLUSTER=$1
 export SONOBUOY_MODE=$2
-export KUBECONFIG=kubeconfig_$CLUSTER
+#export KUBECONFIG=kubeconfig_$CLUSTER
 
 CLUSTER_VERSION=$(kubectl version -o json | jq -r .serverVersion.gitVersion | cut -d- -f 1)
 
