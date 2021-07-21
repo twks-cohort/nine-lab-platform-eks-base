@@ -20,7 +20,7 @@ export NAME_SERVERS=$(aws route53 get-hosted-zone --id $SUBDOMAIN_ZONE_ID | jq .
 
 export AWS_ACCESS_KEY_ID=$SERVICE_ACCOUNT_AWS_ACCESS_KEY_ID
 export AWS_SECRET_ACCESS_KEY=$SERVICE_ACCOUNT_AWS_SECRET_ACCESS_KEY
-
+unset AWS_SESSION_TOKEN
 aws sts assume-role --output json --role-arn arn:aws:iam::$AWS_DOMAIN_ACCOUNT:role/$AWS_ASSUME_ROLE --role-session-name delegate-zone > credentials
 export AWS_ACCESS_KEY_ID=$(cat credentials | jq -r ".Credentials.AccessKeyId")
 export AWS_SECRET_ACCESS_KEY=$(cat credentials | jq -r ".Credentials.SecretAccessKey")
