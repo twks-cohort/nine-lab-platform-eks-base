@@ -98,7 +98,8 @@ commands:
         default: quick
     steps:
       - run:
-          name:
+          name: use kubeconfig just written by tf apply
+          command: |
             mkdir -p ~/.kube
             cp kubeconfig_<< parameters.cluster >> ~/.kube/config
       - run:
