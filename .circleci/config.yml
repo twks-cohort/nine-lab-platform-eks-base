@@ -93,9 +93,6 @@ commands:
       cluster:
         type: string
         default: ''
-      sonobuoy-mode:
-        type: string
-        default: quick
     steps:
       - run:
           name: use kubeconfig just written by tf apply
@@ -195,7 +192,7 @@ workflows:
           after-terraform:
             - validate-and-configure-cluster:
                 cluster: sandbox
-                sonobuoy_mode: quick
+                sonobuoy-mode: quick
           requires:
             - approve-sandbox-changes
           filters: *on-push-master
@@ -236,7 +233,7 @@ workflows:
           after-terraform:
             - validate-and-configure-cluster:
                 cluster: preview
-                sonobuoy_mode: quick
+                sonobuoy-mode: quick
           requires:
             - approve-preview-changes
           filters: *on-tag-master
