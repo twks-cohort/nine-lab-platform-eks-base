@@ -57,7 +57,7 @@ commands:
     steps:
       - run:
           name: configure subdomain NS in domain
-          command: bash scripts/delegate_hosted_zone.sh
+          command: bash scripts/delegate_hosted_zone.sh << parameters.cluster >>
       - run:
           name: deploy standard, non-istio administrative namespaces
           command: kubectl apply -f standard-namespaces.yaml
