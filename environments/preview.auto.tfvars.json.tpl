@@ -4,7 +4,7 @@
     "account_id": "{{ twdps/di/svc/aws/dps-2/aws-account-id }}",
 
     "cluster_name": "preview",
-    "cluster_version": "1.20",
+    "cluster_version": "1.21",
     "domain": "twdps.io",
     "domain_account": "{{ twdps/di/svc/aws/dps-1/aws-account-id }}",
 

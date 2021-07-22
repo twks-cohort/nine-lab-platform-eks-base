@@ -120,7 +120,7 @@ commands:
         default: 'plan'
     steps:
       - run:
-          name: Schedule for terraform taint if ENV var set
+          name: Schedule for terraform taint if -taint in tag
           command: bash scripts/taint_node_groups.sh << parameters.node-group >> << parameters.plan-or-apply >>
 
   store-system-credentials:
