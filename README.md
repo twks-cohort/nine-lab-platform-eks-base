@@ -51,10 +51,6 @@ Include `-taint` in the release tag to trigger a deployment, starting from sandb
 
 # NEED TODO
 
-- run sonobuoy conformance tests
-
-# not yet
-
 - not forwarding kube-state-metrics to container-insights
 
 Standard tests not inclued in pipeline:
