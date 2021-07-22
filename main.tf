@@ -55,12 +55,3 @@ resource "aws_kms_key" "cluster_encyption_key" {
   enable_key_rotation     = true
   deletion_window_in_days = 7
 }
-
-resource "aws_route53_zone" "cluster_subdomain_zone" {
-  name = "${var.cluster_name}.${var.domain}"
-  tags = {
-    cluster     = var.cluster_name
-    cluster_domain   = "${var.cluster_name}.${var.domain}"
-    pipeline    = "lab-platform-eks"
-  }
-}
