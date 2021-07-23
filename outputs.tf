@@ -19,3 +19,7 @@ output "kubectl_config" {
   value       = module.eks.kubeconfig
   sensitive   = true
 }
+
+output "eks_cluster_oidc_issuer_url" {
+  value = module.eks.cluster_oidc_issuer_url
+}
