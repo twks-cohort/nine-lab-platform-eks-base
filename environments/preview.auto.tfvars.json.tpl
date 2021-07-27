@@ -5,8 +5,6 @@
 
     "cluster_name": "preview",
     "cluster_version": "1.21",
-    "domain": "twdps.io",
-    "domain_account": "{{ twdps/di/svc/aws/dps-1/aws-account-id }}",
 
     "node_group_a_desired_capacity": "3",
     "node_group_a_capacity_type": "ON_DEMAND",

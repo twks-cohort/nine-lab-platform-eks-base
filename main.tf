@@ -4,7 +4,7 @@ locals {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "17.0.3"
+  version = "17.1.0"
 
   cluster_name    = var.cluster_name
   cluster_version = var.cluster_version
@@ -38,6 +38,7 @@ module "eks" {
       min_capacity     = var.node_group_a_min_capacity
       disk_size        = var.node_group_a_disk_size
       instance_types   = var.node_group_a_instance_types
+      # set key_name to empty string to disable remote access to workers
       key_name         = ""
       k8s_labels = {
         env = var.cluster_name

@@ -11,6 +11,7 @@
 
 ## current configuration
 
+* Current configuration has twdps.digital as the DPS-2 domain
 * OIDC for service accounts (irsa) installed and used by core services
 * Control plane logging default = "api", "audit", "authenticator"
 * Control plan internals encrypted using generated kms key
