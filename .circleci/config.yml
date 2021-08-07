@@ -68,7 +68,7 @@ commands:
           name: deploy containter-insights
           command: bash scripts/deploy_cloud_watch.sh << parameters.cluster >>
 
-  validate-cluster:
+  validate-core-services:
     parameters:
       cluster:
         description: cluster name to use for configuration
@@ -147,7 +147,7 @@ commands:
           cluster: << parameters.cluster >>
       - deploy-core-services:
           cluster: << parameters.cluster >>
-      - validate-cluster:
+      - validate-core-services:
           cluster: << parameters.cluster >>
           sonobuoy-mode: << parameters.sonobuoy-mode >>
 
@@ -157,6 +157,7 @@ workflows:
   lab-platform-eks-pipeline:
 
     jobs:
+      # dev build
       - terraform/plan:
           name: sandbox-change-plan
           context: twdps-core-labs-team
@@ -197,7 +198,7 @@ workflows:
             - approve-sandbox-changes
           filters: *on-push-master
 
-      # release
+      # release preview
       - terraform/plan:
           name: preview-change-plan
           context: twdps-core-labs-team

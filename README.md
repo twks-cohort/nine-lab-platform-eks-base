@@ -11,18 +11,18 @@
 
 ## current configuration
 
-* Current configuration has twdps.digital as the DPS-2 domain
+* see lab-platform-servicemesh for automated ingress domains
 * OIDC for service accounts (irsa) installed and used by core services
-* Control plane logging default = "api", "audit", "authenticator"
-* Control plan internals encrypted using generated kms key
-* Uses managed node_groups for worker pools
-  * _note._ managed node groups do not currently permit the docker bridge network to be accessible. If you will be doing CI (running self-managed executors) use ordinary worker_groups.
+* control plane logging default = "api", "audit", "authenticator"
+* control plan internals encrypted using generated kms key
+* Managed node_groups for worker pools
+  * _note._ managed node groups do not currently permit the docker bridge network to be accessible.
 * core cluster services installed:
   * metrics-server
   * kube-state-metrics
   * cluster-autoscaler
   * AWS container-insights (log/metrics aggregation)
-* EKS default storage class (EBS)
+* default EKS storage class (EBS)
 * See [CHANGELOG.md](./CHANGELOG.md) for current release versions
 
 ## CloudWatch Container Insights
