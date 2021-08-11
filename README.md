@@ -8,6 +8,12 @@
 </div>
 <br />
 
+<div align="center">
+	<p>
+		<img alt="Thoughtworks Logo" src="https://raw.githubusercontent.com/ThoughtWorks-DPS/lab-platform-eks/master/pipeline.png?sanitize=true" width=400 />
+	</p>
+</div>
+<br />
 
 ## current configuration
 
@@ -39,7 +45,7 @@ Ex:
 ```bash
 {
   ...
-  "cluster_version": "1.20",  # <= upgrade to next version by changing to "1.21"
+  "cluster_version": "1.21",  # <= upgrade to next version by changing to "1.22"
 }
 ```
 
