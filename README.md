@@ -10,14 +10,13 @@
 
 <div align="center">
 	<p>
-		<img alt="Thoughtworks Logo" src="https://raw.githubusercontent.com/ThoughtWorks-DPS/lab-platform-eks/master/pipeline.png?sanitize=true" width=800 />
+		<img alt="Thoughtworks Logo" src="https://raw.githubusercontent.com/ThoughtWorks-DPS/lab-platform-eks/main/pipeline.png?sanitize=true" width=800 />
 	</p>
 </div>
 <br />
 
 ## current configuration
 
-* see lab-platform-servicemesh for automated ingress domains
 * OIDC for service accounts (irsa) installed and used by core services
 * control plane logging default = "api", "audit", "authenticator"
 * control plan internals encrypted using generated kms key
@@ -27,8 +26,10 @@
   * metrics-server
   * kube-state-metrics
   * cluster-autoscaler
-  * AWS container-insights (log/metrics aggregation)
+  * AWS container-insights (basic log/metrics aggregation)
 * default EKS storage class (EBS)
+* see lab-platform-hosted-zones for domain configuration
+* see lab-platform-servicemesh for ingress configuration
 * See [CHANGELOG.md](./CHANGELOG.md) for current release versions
 
 ## CloudWatch Container Insights
@@ -57,7 +58,7 @@ Include `-taint` in the release tag to trigger a deployment, starting from sandb
 
 # NEED TODO
 
-- not forwarding kube-state-metrics to container-insights
+- convert to datadog as soon as funding in place
 
 Standard tests not inclued in pipeline:
 

@@ -2,17 +2,34 @@
 version: 2.1
 
 orbs:
-  terraform: feedyard/terraform@0.6.0
+  terraform: twdps/terraform@0.4.0
+  kube: twdps/kube-ops@dev:latest
+
+# ==== global pipeline parameters
+
+parameters:
+  terraform-version:
+    description: terraform version for all jobs
+    type: string
+    default: "1.0.6"
+  context:
+    description: circleci context for all jobs
+    type: string
+    default: twdps-core-labs-team
+  shell-options:
+    description: shell options for all jobs
+    type: string
+    default: secrethub run --env-file secrethub.nonprod.env -- /bin/sh -eo pipefail
 
 # git push: deploy sandbox, also run sandbox deploy on taint-tag
-on-push-master: &on-push-master
+on-push-main: &on-push-main
   branches:
-    only: /master/
+    only: /main/
   tags:
     only: /.*-taint$/
 
 # git tag: release to preview cluster
-on-tag-master: &on-tag-master
+on-tag-main: &on-tag-main
   branches:
     ignore: /.*/
   tags:
@@ -25,7 +42,7 @@ commands:
     parameters:
       cluster:
         type: string
-        default: ''
+        default: ""
     steps:
       - run:
           name: set ~/.terraformrc
@@ -35,86 +52,29 @@ commands:
           command: |
             secrethub inject -i environments/<< parameters.cluster >>.auto.tfvars.json.tpl -o << parameters.cluster >>.auto.tfvars.json
 
-  set-kubeconfig:
-    parameters:
-      cluster:
-        description: cluster name to use for configuration
-        type: string
-        default: ""
-    steps:
-      - run:
-          name: setup kubeconfig and deploy core services
-          command: |
-            mkdir -p ~/.kube
-            SECRETHUB_VAR_ENV=<< parameters.cluster >> secrethub inject -i tpl/kubeconfig.tpl -o ~/.kube/config
-
-  deploy-core-services:
-    parameters:
-      cluster:
-        description: cluster name to use for configuration
-        type: string
-        default: ""
-    steps:
-      - run:
-          name: deploy standard, non-istio administrative namespaces
-          command: kubectl apply -f standard-namespaces.yaml
-      - run:
-          name: deploy metrics apis
-          command: kubectl apply -f metrics-apis --recursive
-      - run:
-          name: deploy cluster-autoscaler
-          command: bash scripts/deploy_cluster_autoscaler.sh << parameters.cluster >>
-      - run:
-          name: deploy containter-insights
-          command: bash scripts/deploy_cloud_watch.sh << parameters.cluster >>
-
-  validate-core-services:
-    parameters:
-      cluster:
-        description: cluster name to use for configuration
-        type: string
-        default: ""
-      sonobuoy-mode:
-        type: string
-        default: quick
-    steps:
-      - run:
-          name: cis benchmarks
-          command: bash scripts/kube_bench.sh << parameters.cluster >>
-      - run:
-          name: conformance smoke-test
-          command: bash scripts/sonobuoy_conformance_test.sh << parameters.cluster >> << parameters.sonobuoy-mode >>
-      - run:
-          name: validate deploy-core-services health
-          command: bats test
-
-  validate-eks:
-    parameters:
-      cluster:
-        type: string
-        default: ''
-    steps:
-      - run:
-          name: use kubeconfig just written by tf apply
-          command: |
-            mkdir -p ~/.kube
-            cp kubeconfig_<< parameters.cluster >> ~/.kube/config
-      - run:
-          name: test eks configuration
-          environment:
-            TEST_ENV: << parameters.cluster >>
-          command: bash scripts/cluster_configuration_tests.sh << parameters.cluster >>
+  # set-kubeconfig:
+  #   parameters:
+  #     cluster:
+  #       description: cluster name to use for configuration
+  #       type: string
+  #       default: ""
+  #   steps:
+  #     - run:
+  #         name: setup kubeconfig and deploy core services
+  #         command: |
+  #           mkdir -p ~/.kube
+  #           SECRETHUB_VAR_ENV=<< parameters.cluster >> secrethub inject -i tpl/kubeconfig.tpl -o ~/.kube/config
 
   check-taint:
     description: evaluate and apply node taint for updates
     parameters:
       node-group:
         type: string
-        default: ''
+        default: ""
       plan-or-apply:
         description: is this a terraform plan or apply phase?
         type: string
-        default: 'plan'
+        default: "plan"
     steps:
       - run:
           name: Schedule for terraform taint if -taint in tag
@@ -130,27 +90,76 @@ commands:
           name: write cluster oidc-assume-role kubeconfig
           command: bash scripts/write_cluster_credentials.sh << parameters.cluster >>
 
-  validate-and-configure-cluster:
+jobs:
+
+  validate-eks:
+    docker:
+      - image: twdps/circleci-infra-aws:alpine-1.0.2
+    shell: << pipeline.parameters.shell-options >>
     parameters:
       cluster:
         description: cluster being validated
         type: string
         default: ""
-      sonobuoy-mode:
-        description: sonobuoy test mode
-        type: string
-        default: quick
     steps:
-      - validate-eks:
+      - set-kubeconfig:
           cluster: << parameters.cluster >>
-      - store-system-credentials:
-          cluster: << parameters.cluster >>
-      - deploy-core-services:
-          cluster: << parameters.cluster >>
-      - validate-core-services:
-          cluster: << parameters.cluster >>
-          sonobuoy-mode: << parameters.sonobuoy-mode >>
+      - run:
+          name: test eks configuration
+          environment:
+            TEST_ENV: << parameters.cluster >>
+          command: bash scripts/cluster_configuration_tests.sh << parameters.cluster >>
 
+  # deploy-core-services:
+  #   docker:
+  #     - image: twdps/circleci-kube-ops:alpine-stable
+  #   shell: << pipeline.parameters.shell-options >>
+  #   parameters:
+  #     cluster:
+  #       description: cluster name to use for configuration
+  #       type: string
+  #       default: ""
+  #   steps:
+  #     - set-kubeconfig:
+  #         cluster: sandbox
+  #     - run:
+  #         name: deploy standard, non-istio administrative namespaces
+  #         command: kubectl apply -f standard-namespaces.yaml
+  #     - run:
+  #         name: deploy metrics apis
+  #         command: kubectl apply -f metrics-apis --recursive
+  #     - run:
+  #         name: deploy cluster-autoscaler
+  #         command: bash scripts/deploy_cluster_autoscaler.sh << parameters.cluster >>
+  #     - run:
+  #         name: deploy containter-insights
+  #         command: bash scripts/deploy_cloud_watch.sh << parameters.cluster >>
+
+  # validate-core-services:
+  #   docker:
+  #     - image: twdps/circleci-infra-aws:alpine-1.0.2
+  #   shell: << pipeline.parameters.shell-options >>
+  #   parameters:
+  #     cluster:
+  #       description: cluster being validated
+  #       type: string
+  #       default: ""
+  #     sonobuoy-mode:
+  #       description: sonobuoy test mode
+  #       type: string
+  #       default: quick
+  #   steps:
+  #     - set-kubeconfig:
+  #         cluster: sandbox
+  #     - run:
+  #         name: validate core service health
+  #         command: bats test
+  #     - run:
+  #         name: cis benchmarks
+  #         command: bash scripts/kube_bench.sh << parameters.cluster >>
+  #     - run:
+  #         name: conformance smoke-test
+  #         command: bash scripts/sonobuoy_conformance_test.sh << parameters.cluster >> << parameters.sonobuoy-mode >>
 
 workflows:
   version: 2
@@ -160,9 +169,10 @@ workflows:
       # dev build
       - terraform/plan:
           name: sandbox-change-plan
-          context: twdps-core-labs-team
-          shell: secrethub run --env-file secrethub.nonprod.env -- /bin/sh -eo pipefail
+          context: << pipeline.parameters.context >>
+          shell: << pipeline.parameters.shell-options >>
           workspace: sandbox
+          terraform-version: << pipeline.parameters.terraform-version >>
           before-terraform:
             - set-environment:
                 cluster: sandbox
@@ -170,19 +180,20 @@ workflows:
             - check-taint:
                 node-group: group_a
                 plan-or-apply: plan
-          filters: *on-push-master
+          filters: *on-push-main
 
       - approve-sandbox-changes:
           type: approval
           requires:
             - sandbox-change-plan
-          filters: *on-push-master
+          filters: *on-push-main
 
       - terraform/apply:
-          name: sandbox-change-apply
-          context: twdps-di
-          shell: secrethub run --env-file secrethub.nonprod.env -- /bin/sh -eo pipefail
+          name: apply-sandbox-changes
+          context: << pipeline.parameters.context >>
+          shell: << pipeline.parameters.shell-options >>
           workspace: sandbox
+          terraform-version: << pipeline.parameters.terraform-version >>
           before-terraform:
             - set-environment:
                 cluster: sandbox
@@ -191,50 +202,71 @@ workflows:
                 node-group: group_a
                 plan-or-apply: apply
           after-terraform:
-            - validate-and-configure-cluster:
+            - store-system-credentials:
                 cluster: sandbox
-                sonobuoy-mode: quick
           requires:
             - approve-sandbox-changes
-          filters: *on-push-master
+          filters: *on-push-main
 
-      # release preview
-      - terraform/plan:
-          name: preview-change-plan
-          context: twdps-core-labs-team
-          shell: secrethub run --env-file secrethub.nonprod.env -- /bin/sh -eo pipefail
-          workspace: preview
-          before-terraform:
-            - set-environment:
-                cluster: preview
-          after-terraform-init:
-            - check-taint:
-                node-group: group_a
-                plan-or-apply: plan
-          filters: *on-tag-master
-
-      - approve-preview-changes:
-          type: approval
+      - validate-eks:
+          name: validate-sandbox-cluster
+          cluster: << parameters.cluster >>
           requires:
-            - preview-change-plan
-          filters: *on-tag-master
+            - apply-sandbox-changes
+          filters: *on-push-main
 
-      - terraform/apply:
-          name: preview-change-apply
-          context: twdps-di
-          shell: secrethub run --env-file secrethub.nonprod.env -- /bin/sh -eo pipefail
-          workspace: preview
-          before-terraform:
-            - set-environment:
-                cluster: preview
-          after-terraform-init:
-            - check-taint:
-                node-group: group_a
-                plan-or-apply: apply
-          after-terraform:
-            - validate-and-configure-cluster:
-                cluster: preview
-                sonobuoy-mode: quick
-          requires:
-            - approve-preview-changes
-          filters: *on-tag-master
+      # - deploy-core-services:
+      #     name: deploy-sandbox-core-services
+      #     cluster: sandbox
+      #     requires:
+      #       - validate-sandbox-cluster
+      #     filters: *on-push-main
+
+      # - validate-core-services:
+      #     name: validate-sandbox-core-services
+      #     cluster: sandbox
+      #     sonobuoy-mode:
+      #     requires:
+      #       - deploy-sandbox-core-services
+      #     filters: *on-push-main
+
+      # # release preview
+      # - terraform/plan:
+      #     name: preview-change-plan
+      #     context: twdps-core-labs-team
+      #     shell: secrethub run --env-file secrethub.nonprod.env -- /bin/sh -eo pipefail
+      #     workspace: preview
+      #     before-terraform:
+      #       - set-environment:
+      #           cluster: preview
+      #     after-terraform-init:
+      #       - check-taint:
+      #           node-group: group_a
+      #           plan-or-apply: plan
+      #     filters: *on-tag-master
+
+      # - approve-preview-changes:
+      #     type: approval
+      #     requires:
+      #       - preview-change-plan
+      #     filters: *on-tag-master
+
+      # - terraform/apply:
+      #     name: preview-change-apply
+      #     context: twdps-di
+      #     shell: secrethub run --env-file secrethub.nonprod.env -- /bin/sh -eo pipefail
+      #     workspace: preview
+      #     before-terraform:
+      #       - set-environment:
+      #           cluster: preview
+      #     after-terraform-init:
+      #       - check-taint:
+      #           node-group: group_a
+      #           plan-or-apply: apply
+      #     after-terraform:
+      #       - validate-and-configure-cluster:
+      #           cluster: preview
+      #           sonobuoy-mode: quick
+      #     requires:
+      #       - approve-preview-changes
+      #     filters: *on-tag-master

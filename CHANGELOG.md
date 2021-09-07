@@ -1,3 +1,18 @@
+### 09-05-2021 Release Versions in 1.3.4
+
+^changes  
+
+adopted twdps orb for terraform deploy  
+
+| release            | version                        |
+|--------------------|--------------------------------|
+| kubernetes         | 1.21                           |
+| metrics-server     | 0.5.0                          |
+| kube-state-metrics | 2.2.0^                         |
+| cluster-autoscaler | 1.21.0                         |
+| cloudwatch-agent   | 1.247348.0b251399^             |
+| fluentd            | v1.14.0-debian-cloudwatch-1.0^ |
+
 ### 07-22-2021 Release Versions
 
 ^changes
