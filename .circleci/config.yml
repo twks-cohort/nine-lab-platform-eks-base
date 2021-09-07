@@ -190,6 +190,8 @@ workflows:
           name: validate-sandbox-cluster
           context: << pipeline.parameters.context >>
           cluster: sandbox
+          requires:
+            - apply-sandbox-changes
           filters: *on-push-main
 
       - deploy-core-services:
