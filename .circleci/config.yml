@@ -122,6 +122,8 @@ jobs:
         type: string
         default: ""
     steps:
+      - set-environment:
+          cluster: sandbox
       - set-kubeconfig:
           cluster: sandbox
       - kube/packages:
