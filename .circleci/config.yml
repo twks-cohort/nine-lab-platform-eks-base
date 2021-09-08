@@ -124,8 +124,8 @@ jobs:
         type: string
         default: ""
     steps:
-      # - set-environment:
-      #     cluster: sandbox
+      - checkout
+      - setup_remote_docker
       - set-kubeconfig:
           cluster: sandbox
       - kube/packages:
@@ -205,5 +205,5 @@ workflows:
           context: << pipeline.parameters.context >>
           cluster: sandbox
           requires:
-            - validate-sandbox-cluster
+            - apply-sandbox-changes
           filters: *on-push-main
