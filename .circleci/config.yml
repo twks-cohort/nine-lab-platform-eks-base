@@ -102,6 +102,8 @@ jobs:
       - image: twdps/circleci-infra-aws:alpine-1.0.2
     shell: << pipeline.parameters.shell-options >>
     steps:
+      - checkout
+      - setup_remote_docker
       - set-kubeconfig:
           cluster: << parameters.cluster >>
       - run:
