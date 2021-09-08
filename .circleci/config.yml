@@ -144,7 +144,6 @@ jobs:
           name: deploy containter-insights
           command: bash scripts/deploy_cloud_watch.sh << parameters.cluster >>
 
-
 workflows:
   version: 2
 
