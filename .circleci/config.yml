@@ -19,7 +19,7 @@ parameters:
   shell-options:
     description: shell options for all jobs
     type: string
-    default: secrethub run --env-file secrethub.nonprod.env -- /bin/sh -eo pipefail
+    default: secrethub run --env-file secrethub.nonprod.env -- /bin/bash -eo pipefail
 
 # git push: deploy sandbox, also run sandbox deploy on taint-tag
 on-push-main: &on-push-main
