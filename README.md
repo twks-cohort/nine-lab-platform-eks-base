@@ -15,7 +15,6 @@
 </div>
 <br />
 
-
 ## current configuration
 
 * OIDC for service accounts (irsa) installed and used by core services
