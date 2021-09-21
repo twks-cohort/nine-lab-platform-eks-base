@@ -11,7 +11,7 @@ parameters:
   terraform-version:
     description: terraform version for all jobs
     type: string
-    default: "1.0.6"
+    default: "1.0.7"
   context:
     description: circleci context for all jobs
     type: string
@@ -90,6 +90,26 @@ commands:
           name: write cluster oidc-assume-role kubeconfig
           command: bash scripts/write_cluster_credentials.sh << parameters.cluster >>
 
+  smoke-test-core-services:
+    parameters:
+      cluster:
+        type: string
+        default: ''
+      sonobuoy-mode:
+        description: sonobuoy conformance test mode; default is quick
+        type: string
+        default: quick
+    steps:
+      - run:
+          name: validate core service health
+          command: bats test
+      - run:
+          name: cis benchmarks
+          command: bash scripts/kube_bench.sh << parameters.cluster >>
+      - run:
+          name: conformance smoke-test
+          command: bash scripts/sonobuoy_conformance_test.sh << parameters.cluster >> << parameters.sonobuoy-mode >>
+    
 
 jobs:
   validate-eks:
@@ -143,6 +163,8 @@ jobs:
       - run:
           name: deploy containter-insights
           command: bash scripts/deploy_cloud_watch.sh << parameters.cluster >>
+      - smoke-test-core-services:
+          cluster: << parameters.cluster >>
 
 workflows:
   version: 2
