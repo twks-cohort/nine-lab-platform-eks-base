@@ -110,7 +110,6 @@ commands:
           name: conformance smoke-test
           command: bash scripts/sonobuoy_conformance_test.sh << parameters.cluster >> << parameters.sonobuoy-mode >>
     
-
 jobs:
   validate-eks:
     parameters:
@@ -227,4 +226,5 @@ workflows:
           cluster: sandbox
           requires:
             - apply-sandbox-changes
+            - validate-sandbox-cluster
           filters: *on-push-main
