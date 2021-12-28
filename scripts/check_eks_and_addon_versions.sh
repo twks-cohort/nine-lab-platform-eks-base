@@ -20,15 +20,15 @@ export DESIRED_VPC_CNI_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .amazon_v
 export DESIRED_COREDNS_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .coredns_version)
 export DESIRED_KUBE_PROXY_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .kube_proxy_version)
 
-export CLUSTER_NODES=$(aws-vault exec tf.dps2 -- aws ec2 describe-instances --filter "Name=tag:kubernetes.io/cluster/$CLUSTER,Values=owned")
+export CLUSTER_NODES=$(aws ec2 describe-instances --filter "Name=tag:kubernetes.io/cluster/$CLUSTER,Values=owned")
 export CURRENT_AMI_VERSION=$(echo $CLUSTER_NODES | jq -r '.Reservations | .[0] | .Instances | .[0] | .ImageId')
-export LATEST_AMI_VERSION=$(aws-vault exec tf.dps2 -- aws ssm get-parameter --name /aws/service/eks/optimized-ami/$DESIRED_CLUSTER_VERSION/amazon-linux-2/recommended/image_id --region $REGION | jq -r '.Parameter.Value')
+export LATEST_AMI_VERSION=$(aws ssm get-parameter --name /aws/service/eks/optimized-ami/$DESIRED_CLUSTER_VERSION/amazon-linux-2/recommended/image_id --region $REGION | jq -r '.Parameter.Value')
 
 if [ "$CURRENT_AMI_VERSION" != "$LATEST_AMI_VERSION" ]; then
   echo "new eks ami available: $LATEST_AMI_VERSION"
 fi
 
-export AVAILABLE_ADDON_VERSIONS=$(aws-vault exec tf.dps2 -- aws eks describe-addon-versions)
+export AVAILABLE_ADDON_VERSIONS=$(aws eks describe-addon-versions)
 export LATEST_VPC_CNI_VERSION=$(echo $AVAILABLE_ADDON_VERSIONS | jq -r '.addons[] | select(.addonName=="vpc-cni") | .addonVersions[0] | .addonVersion')
 export LATEST_COREDNS_VERSION=$(echo $AVAILABLE_ADDON_VERSIONS | jq -r '.addons[] | select(.addonName=="coredns") | .addonVersions[0] | .addonVersion')
 export LATEST_KUBE_PROXY_VERSION=$(echo $AVAILABLE_ADDON_VERSIONS | jq -r '.addons[] | select(.addonName=="kube-proxy") | .addonVersions[0] | .addonVersion')
