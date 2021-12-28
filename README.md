@@ -23,19 +23,12 @@
 * control plan internals encrypted using generated kms key
 * Managed node_groups for worker pools
   * _note._ managed node groups do not currently permit the docker bridge network to be accessible.
-* core cluster services installed:
-  * metrics-server
-  * kube-state-metrics
-  * cluster-autoscaler
-  * AWS container-insights (basic log/metrics aggregation)
+* eks addons activated:
+  * vpc-cni
+  * coredns
+  * kube-proxy
 * default EKS storage class (EBS)
-* see lab-platform-hosted-zones for domain configuration
-* see lab-platform-servicemesh for ingress configuration
-* See [CHANGELOG.md](./CHANGELOG.md) for current release versions
-
-## CloudWatch Container Insights
-
-Refer to the ContainerInsights tab on Cloudwatch for metrics and logging aggregation.
+* See release notes for current release versions
 
 ## upgrade How-tos
 
@@ -53,16 +46,9 @@ Ex:
 
 **upgrade managed node_groups**
 
-AWS releases multiple eks-optimized aws linux 2 version updates. This is for all the usual reasons - upgrade and refinements to al2, security patches, kublet updates, etc. To update to the latest ami release for the current k8s version of a cluster:
-
-Include `-taint` in the release tag to trigger a deployment, starting from sandbox, that will taint the managed node groups prior to performing the terraform apply.
+AWS releases multiple eks-optimized aws linux 2 version updates. This is for all the usual reasons - upgrade and refinements to al2, security patches, kublet updates, etc. Approving the plan configuration for application will result in a terraform taint of the managed node group so that the latest ami version will be used.
 
 # NEED TODO
 
 - convert to datadog as soon as funding in place
-
-Standard tests not inclued in pipeline:
-
-- test cluster-autoscaler response to load
-- test to confirm aws container-insight aggregation is occuring
 - no operational monitors defined

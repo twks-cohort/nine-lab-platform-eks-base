@@ -11,6 +11,10 @@ variable "cluster_version" {}
 variable "cluster_enabled_log_types" {
   default = ["api", "audit", "authenticator"]
 }
+variable "create_aws_node_role" {}
+variable "amazon_vpc_cni_version" {}
+variable "coredns_version" {}
+variable "kube_proxy_version" {}
 
 variable "node_group_a_desired_capacity" {}
 variable "node_group_a_capacity_type" {}

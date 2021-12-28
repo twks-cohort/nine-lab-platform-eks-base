@@ -1,3 +1,15 @@
+### 12-27-2021 Adopt automated release note generation
+
+Moved core services deployment to separate pipeline to support better manage node group lifecycle automation.  
+
+- metrics-server
+- kube-state-metrics
+- cluster-autoscaler
+- cloudwatch-agent
+- fluentd
+
+CHANGES.md deprecated. See release notes.  
+
 ### 09-05-2021 Release Versions in 1.3.4
 
 ^changes  
