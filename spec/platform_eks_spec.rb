@@ -8,8 +8,3 @@ describe eks(tfvars["cluster_name"]) do
   it { should be_active }
   its(:version) { should eq tfvars['cluster_version'] }
 end
-
-describe eks_nodegroup('group_a'), cluster: tfvars["cluster_name"] do
-  it { should exist }
-  it { should be_ready }
-end
