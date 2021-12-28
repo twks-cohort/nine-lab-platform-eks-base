@@ -5,7 +5,7 @@
 # been given access to the 1password api, etc.
 
 export CLUSTER=$1
-export REGION=$(cat $CLUSTER.auto.tfvars.json | jq -r .aws_region)
+export AWS_DEFAULT_REGION=$(cat $CLUSTER.auto.tfvars.json | jq -r .aws_region)
 export AWS_ASSUME_ROLE=$(cat $CLUSTER.auto.tfvars.json | jq -r .assume_role)
 export AWS_ACCOUNT_ID=$(cat $CLUSTER.auto.tfvars.json | jq -r .account_id)
 
@@ -22,7 +22,7 @@ export DESIRED_KUBE_PROXY_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .kube_
 
 export CLUSTER_NODES=$(aws ec2 describe-instances --filter "Name=tag:kubernetes.io/cluster/$CLUSTER,Values=owned")
 export CURRENT_AMI_VERSION=$(echo $CLUSTER_NODES | jq -r '.Reservations | .[0] | .Instances | .[0] | .ImageId')
-export LATEST_AMI_VERSION=$(aws ssm get-parameter --name /aws/service/eks/optimized-ami/$DESIRED_CLUSTER_VERSION/amazon-linux-2/recommended/image_id --region $REGION | jq -r '.Parameter.Value')
+export LATEST_AMI_VERSION=$(aws ssm get-parameter --name /aws/service/eks/optimized-ami/$DESIRED_CLUSTER_VERSION/amazon-linux-2/recommended/image_id --region $AWS_DEFAULT_REGION | jq -r '.Parameter.Value')
 
 if [ "$CURRENT_AMI_VERSION" != "$LATEST_AMI_VERSION" ]; then
   echo "new eks ami available: $LATEST_AMI_VERSION"
