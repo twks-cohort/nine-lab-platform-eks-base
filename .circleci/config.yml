@@ -23,7 +23,7 @@ parameters:
   executor-image:
     description: image to use for terraform runs
     type: string
-    default: twdps/circleci-kube-ops:alpine-1.3.0
+    default: twdps/circleci-kube-ops:alpine-0.4.0
 
 # git push: deploy sandbox
 on-push-main: &on-push-main
@@ -68,7 +68,7 @@ commands:
           command: |
             mkdir -p ~/.kube
             SECRETHUB_VAR_ENV=<< parameters.cluster >> secrethub inject -i tpl/kubeconfig.tpl -o ~/.kube/config
-            
+
   taint-node-group:
     description: apply node taint for automatic lastest eks-optimized-al2 managed node ami updates
     parameters:
