@@ -5,7 +5,16 @@
 # been given access to the 1password api, etc.
 
 export CLUSTER=$1
-export REGION=$2
+export REGION=$(cat $CLUSTER.auto.tfvars.json | jq -r .aws_region)
+export AWS_ASSUME_ROLE=$(cat $CLUSTER.auto.tfvars.json | jq -r .assume_role)
+export AWS_ACCOUNT_ID=$(cat $CLUSTER.auto.tfvars.json | jq -r .account_id)
+
+aws sts assume-role --output json --role-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/$AWS_ASSUME_ROLE --role-session-name eks-configuration-test > credentials
+
+export AWS_ACCESS_KEY_ID=$(cat credentials | jq -r ".Credentials.AccessKeyId")
+export AWS_SECRET_ACCESS_KEY=$(cat credentials | jq -r ".Credentials.SecretAccessKey")
+export AWS_SESSION_TOKEN=$(cat credentials | jq -r ".Credentials.SessionToken")
+
 export DESIRED_CLUSTER_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .cluster_version)
 export DESIRED_VPC_CNI_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .amazon_vpc_cni_version)
 export DESIRED_COREDNS_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .coredns_version)

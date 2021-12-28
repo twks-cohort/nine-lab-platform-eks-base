@@ -97,7 +97,6 @@ jobs:
       cluster:
         description: cluster being validated
         type: string
-        default: ""
     docker:
       - image: << pipeline.parameters.executor-image >>
     shell: << pipeline.parameters.shell-options >>
@@ -116,7 +115,26 @@ jobs:
       - run:
           name: run CIS EKS benchmarks
           command: bash scripts/kube_bench.sh << parameters.cluster >>
- 
+
+  version-check:
+    parameters:
+      cluster:
+        description: cluster being checked
+        type: string
+    docker:
+      - image: << pipeline.parameters.executor-image >>
+    shell: << pipeline.parameters.shell-options >>
+    steps:
+      - checkout
+      - setup_remote_docker
+      - set-environment:
+          cluster: sandbox
+      - set-kubeconfig:
+          cluster: << parameters.cluster >>
+      - run:
+          name: test addon and managed node group ami versions
+          command: bash scripts/check_eks_and_addon_versions.sh << parameters.cluster >>
+
 workflows:
   version: 2
 
@@ -163,6 +181,17 @@ workflows:
           name: validate-sandbox-cluster
           context: << pipeline.parameters.context >>
           cluster: sandbox
-          # requires:
-          #   - apply-sandbox-changes
+          requires:
+            - apply-sandbox-changes
           filters: *on-push-main
+
+  nightly-tests:
+    jobs:
+      - validate-eks:
+          name: validate-sandbox-cluster
+          context: << pipeline.parameters.context >>
+          cluster: sandbox
+      - version-check:
+          name: check-sandbox-addon-and-ami-versions
+          context: << pipeline.parameters.context >>
+          cluster: sandbox
