@@ -55,7 +55,20 @@ commands:
           name: set << parameters.cluster >> environment variables
           command: |
             secrethub inject -i environments/<< parameters.cluster >>.auto.tfvars.json.tpl -o << parameters.cluster >>.auto.tfvars.json
-
+  
+  set-kubeconfig:
+    parameters:
+      cluster:
+        description: cluster name to use for configuration
+        type: string
+        default: ""
+    steps:
+      - run:
+          name: setup kubeconfig and deploy core services
+          command: |
+            mkdir -p ~/.kube
+            SECRETHUB_VAR_ENV=<< parameters.cluster >> secrethub inject -i tpl/kubeconfig.tpl -o ~/.kube/config
+            
   taint-node-group:
     description: apply node taint for automatic lastest eks-optimized-al2 managed node ami updates
     parameters:
