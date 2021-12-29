@@ -185,8 +185,8 @@ workflows:
           name: validate-sandbox-cluster
           context: << pipeline.parameters.context >>
           cluster: sandbox
-          requires:
-            - apply-sandbox-changes
+          # requires:
+          #   - apply-sandbox-changes
           filters: *on-push-main
 
   # perform the pipeline health checks and compare desired eks component verions with current release versions
