@@ -104,18 +104,22 @@ jobs:
       - checkout
       - setup_remote_docker
       - set-environment:
-          cluster: sandbox
+          cluster: << parameters.cluster >>
       - set-kubeconfig:
           cluster: << parameters.cluster >>
       - run:
           name: test eks configuration
           environment:
             TEST_ENV: << parameters.cluster >>
-          command: bash scripts/cluster_configuration_tests.sh << parameters.cluster >>
-      - run:
-          name: run CIS EKS benchmarks
-          command: bash scripts/kube_bench.sh << parameters.cluster >>
+          command: bash scripts/eks_configuration_tests.sh << parameters.cluster >>
+      - kube/cis-benchmarks:
+          benchmark: eks
+          namespace: default
+      # - run:
+      #     name: run CIS EKS benchmarks
+      #     command: bash scripts/cis_eks_benchmarks.sh << parameters.cluster >>
 
+ # compare desired eks component verions with current release versions
   version-check:
     parameters:
       cluster:
@@ -128,7 +132,7 @@ jobs:
       - checkout
       - setup_remote_docker
       - set-environment:
-          cluster: sandbox
+          cluster: << parameters.cluster >>
       - set-kubeconfig:
           cluster: << parameters.cluster >>
       - run:
@@ -185,7 +189,15 @@ workflows:
             - apply-sandbox-changes
           filters: *on-push-main
 
-  nightly-tests:
+  # perform the pipeline health checks and compare desired eks component verions with current release versions
+  nightly-validation:
+    triggers:
+      - schedule:
+          cron: "0 0 1 * *"
+          filters:
+            branches:
+              only:
+                - main
     jobs:
       - validate-eks:
           name: validate-sandbox-cluster
@@ -195,3 +207,11 @@ workflows:
           name: check-sandbox-addon-and-ami-versions
           context: << pipeline.parameters.context >>
           cluster: sandbox
+      - validate-eks:
+          name: validate-preview-cluster
+          context: << pipeline.parameters.context >>
+          cluster: preview
+      - version-check:
+          name: check-preview-addon-and-ami-versions
+          context: << pipeline.parameters.context >>
+          cluster: preview
