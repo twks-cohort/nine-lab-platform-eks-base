@@ -46,7 +46,7 @@ Ex:
 
 **upgrade managed node_groups**
 
-AWS releases multiple eks-optimized aws linux 2 version updates. This is for all the usual reasons - upgrade and refinements to al2, security patches, kublet updates, etc. Approving the plan configuration for application will result in a terraform taint of the managed node group so that the latest ami version will be used.
+AWS releases regular eks-optimized aws linux 2 version updates. This is for all the usual reasons - upgrade and refinements to al2, security patches, kublet updates, etc. Approving the plan configuration for application will result in a terraform taint of the managed node group so that the latest ami version will be used.
 
 # NEED TODO
 
