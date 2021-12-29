@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 export CLUSTER=$1
 
 cat << EOF > kube-bench.yaml
