@@ -47,6 +47,5 @@ if [[ $(cat temp.results) ]]; then
   cat temp.results
   exit 1
 fi
-rm temp.results
 
 kubectl delete -f kube-bench.yaml
