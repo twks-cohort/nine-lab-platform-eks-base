@@ -4,6 +4,7 @@ version: 2.1
 orbs:
   terraform: twdps/terraform@0.4.0
   kube: twdps/kube-ops@dev:latest
+  executor-tools: twdps/executor-tools@0.2.0
 
 # ==== global pipeline parameters
 
@@ -30,7 +31,7 @@ on-push-main: &on-push-main
   branches:
     only: /main/
   tags:
-    only: /.*-taint$/
+    ignore: /.*/
 
 # git tag: release to preview cluster
 on-tag-main: &on-tag-main
@@ -229,6 +230,14 @@ workflows:
           cluster: preview
           requires:
             - apply-preview-changes
+          filters: *on-tag-main
+
+  generate-release-notes:
+    jobs:
+      - executor-tools/release:
+          name: release-lab-platform-eks
+          context: << pipeline.parameters.context >>
+          shell: << pipeline.parameters.shell-options >>
           filters: *on-tag-main
 
   # perform the pipeline health checks and compare desired eks component verions with current release versions
