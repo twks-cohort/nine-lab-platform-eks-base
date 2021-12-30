@@ -6,7 +6,7 @@
     "cluster_name": "sandbox",
     "create_aws_node_role": true,
     "cluster_version": "1.21",
-    "amazon_vpc_cni_version": "v1.9.1-eksbuild.1",
+    "amazon_vpc_cni_version": "v1.10.1-eksbuild.1",
     "coredns_version": "v1.8.4-eksbuild.1",
     "kube_proxy_version": "v1.21.2-eksbuild.2",
 

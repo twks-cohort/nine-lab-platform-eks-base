@@ -115,9 +115,6 @@ jobs:
       - kube/cis-benchmarks:
           benchmark: eks
           namespace: default
-      # - run:
-      #     name: run CIS EKS benchmarks
-      #     command: bash scripts/cis_eks_benchmarks.sh << parameters.cluster >>
 
  # compare desired eks component verions with current release versions
   version-check:
@@ -144,7 +141,7 @@ workflows:
 
   lab-platform-eks-pipeline:
     jobs:
-
+      # sandbox cluster
       - terraform/plan:
           name: sandbox-change-plan
           context: << pipeline.parameters.context >>
@@ -185,9 +182,54 @@ workflows:
           name: validate-sandbox-cluster
           context: << pipeline.parameters.context >>
           cluster: sandbox
-          # requires:
-          #   - apply-sandbox-changes
+          requires:
+            - apply-sandbox-changes
           filters: *on-push-main
+
+      # preview cluster
+      - terraform/plan:
+          name: preview-change-plan
+          context: << pipeline.parameters.context >>
+          shell: << pipeline.parameters.shell-options >>
+          workspace: preview
+          terraform-version: << pipeline.parameters.terraform-version >>
+          before-terraform:
+            - set-environment:
+                cluster: preview
+          filters: *on-tag-main
+
+      - approve-preview-changes:
+          type: approval
+          requires:
+            - preview-change-plan
+          filters: *on-tag-main
+
+      - terraform/apply:
+          name: apply-preview-changes
+          context: << pipeline.parameters.context >>
+          shell: << pipeline.parameters.shell-options >>
+          workspace: preview
+          terraform-version: << pipeline.parameters.terraform-version >>
+          before-terraform:
+            - set-environment:
+                cluster: preview
+          after-terraform-init:
+            - taint-node-group:
+                node-group: group_a
+          after-terraform:
+            - store-system-credentials:
+                cluster: preview
+          requires:
+            - approve-preview-changes
+          filters: *on-tag-main
+
+      - validate-eks:
+          name: validate-preview-cluster
+          context: << pipeline.parameters.context >>
+          cluster: preview
+          requires:
+            - apply-preview-changes
+          filters: *on-tag-main
 
   # perform the pipeline health checks and compare desired eks component verions with current release versions
   nightly-validation:
