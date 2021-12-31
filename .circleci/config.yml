@@ -3,16 +3,14 @@ version: 2.1
 
 orbs:
   terraform: twdps/terraform@0.4.0
+  # can override kubectl, awspec versions as necessary
   kube: twdps/kube-ops@dev:latest
+  # used for github-release-notes feature
   executor-tools: twdps/executor-tools@0.2.0
 
 # ==== global pipeline parameters
 
 parameters:
-  terraform-version:
-    description: terraform version for all jobs
-    type: string
-    default: "1.1.2"
   context:
     description: circleci context for all jobs
     type: string
@@ -21,6 +19,10 @@ parameters:
     description: shell options for all jobs
     type: string
     default: secrethub run --env-file secrethub.nonprod.env -- /bin/bash -eo pipefail
+  terraform-version:
+    description: terraform version for all jobs
+    type: string
+    default: "1.1.2"
   executor-image:
     description: image to use for terraform runs
     type: string
@@ -92,6 +94,23 @@ commands:
           command: bash scripts/write_cluster_credentials.sh << parameters.cluster >>
     
 jobs:
+
+  create-custom-system-namespaces:
+    parameters:
+      cluster:
+        description: cluster being configured
+        type: string
+    docker:
+      - image: << pipeline.parameters.executor-image >>
+    shell: << pipeline.parameters.shell-options >>
+    steps:
+      - checkout
+      - setup_remote_docker
+      - set-kubeconfig:
+          cluster: << parameters.cluster >>
+      - run:
+          name: Create custom system namespaces
+          command: kubectl apply -f standard-system-namespaces.yaml
 
   validate-eks:
     parameters:
@@ -179,13 +198,23 @@ workflows:
             - approve-sandbox-changes
           filters: *on-push-main
 
-      - validate-eks:
-          name: validate-sandbox-cluster
+      - create-custom-system-namespaces:
+          name: create-custom-sandbox-system-namespaces
           context: << pipeline.parameters.context >>
           cluster: sandbox
           requires:
             - apply-sandbox-changes
           filters: *on-push-main
+
+      - validate-eks:
+          name: validate-sandbox-cluster
+          context: << pipeline.parameters.context >>
+          cluster: sandbox
+          requires:
+            - create-custom-sandbox-system-namespaces
+          filters: *on-push-main
+
+
 
       # preview cluster
       - terraform/plan:

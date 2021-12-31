@@ -15,7 +15,7 @@
   [[ "${output}" =~ "image" ]]
 }
 
-# @test "evaluate standard namespaces" {
-#   run bash -c "kubectl get ns"
-#   [[ "${output}" =~ "lab-system" ]]
-# }
+@test "evaluate standard namespaces" {
+  run bash -c "kubectl get ns"
+  [[ "${output}" =~ "lab-system" ]]
+}
