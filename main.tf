@@ -45,7 +45,10 @@ module "eks" {
       }
       additional_tags = {
         "cluster"  = var.cluster_name
-        "pipeline" = "lab-platform-eks"
+        "pipeline" = "lab-platform-eks-base"
+        "k8s.io/cluster-autoscaler/enabled" = "true"
+        "k8s.io/cluster-autoscaler/${var.cluster_name}" = "true"
+        "kubernetes.io/cluster/${var.cluster_name}" = "owned"
       }
     }
   }
