@@ -186,7 +186,7 @@ workflows:
           context: << pipeline.parameters.context >>
           cluster: sandbox
           requires:
-            - create-custom-sandbox-system-namespaces
+            - apply-sandbox-changes
           filters: *on-push-main
 
       # preview cluster
