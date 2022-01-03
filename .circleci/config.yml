@@ -95,23 +95,6 @@ commands:
     
 jobs:
 
-  create-custom-system-namespaces:
-    parameters:
-      cluster:
-        description: cluster being configured
-        type: string
-    docker:
-      - image: << pipeline.parameters.executor-image >>
-    shell: << pipeline.parameters.shell-options >>
-    steps:
-      - checkout
-      - setup_remote_docker
-      - set-kubeconfig:
-          cluster: << parameters.cluster >>
-      - run:
-          name: Create custom system namespaces
-          command: kubectl apply -f standard-system-namespaces.yaml
-
   validate-eks:
     parameters:
       cluster:
@@ -198,14 +181,6 @@ workflows:
             - approve-sandbox-changes
           filters: *on-push-main
 
-      - create-custom-system-namespaces:
-          name: create-custom-sandbox-system-namespaces
-          context: << pipeline.parameters.context >>
-          cluster: sandbox
-          requires:
-            - apply-sandbox-changes
-          filters: *on-push-main
-
       - validate-eks:
           name: validate-sandbox-cluster
           context: << pipeline.parameters.context >>
@@ -213,8 +188,6 @@ workflows:
           requires:
             - create-custom-sandbox-system-namespaces
           filters: *on-push-main
-
-
 
       # preview cluster
       - terraform/plan:
@@ -273,7 +246,7 @@ workflows:
   nightly-validation:
     triggers:
       - schedule:
-          cron: "0 0 1 * *"
+          cron: "0 0 * * *"
           filters:
             branches:
               only:
