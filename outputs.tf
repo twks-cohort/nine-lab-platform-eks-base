@@ -8,6 +8,21 @@ output "cluster_node_groups" {
   value       = module.eks.node_groups
 }
 
+output "cluster_security_group_id" {
+  description = "Security group ids attached to the cluster control plane."
+  value       = module.eks.cluster_security_group_id
+}
+
+output "node_group_security_group_id" {
+  description = "Security group ids created for node groups."
+  value       = module.eks.worker_security_group_id
+}
+
+output "node_group_iam_role_arn" {
+  description = "IAM role created for nodes."
+  value       = module.eks.worker_iam_role_arn
+}
+
 output "config_map_aws_auth" {
   description = "A kubernetes configuration to authenticate to this EKS cluster."
   value       = module.eks.config_map_aws_auth

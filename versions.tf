@@ -10,7 +10,7 @@ terraform {
     hostname     = "app.terraform.io"
     organization = "twdps"
     workspaces {
-      prefix = "lab-platform-eks-"
+      prefix = "lab-platform-eks-base-"
     }
   }
 }
@@ -19,7 +19,7 @@ provider "aws" {
   region = var.aws_region
   assume_role {
     role_arn     = "arn:aws:iam::${var.account_id}:role/${var.assume_role}"
-    session_name = "lab-platform-eks"
+    session_name = "lab-platform-eks-base"
   }
 }
 

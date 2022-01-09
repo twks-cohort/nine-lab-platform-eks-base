@@ -59,8 +59,20 @@ Ex:
 
 _Note._ Must upgrade to each major version as release; don't skip over a version.  
 
+**Delete aws-auth configmap after destroy**
+
+Known issue related to cleanly destroying EKS cluster. Remove the aws-auth configmap manually to resolve:  
+
+```
+$ terraform state rm 'module.eks.kubernetes_config_map.aws_auth[0]'
+```
+
 # NEED TODO
 
 - add eks major version release check
 - convert to datadog as soon as funding in place
 - no operational monitors defined
+
+
+ebs-csi testing: https://github.com/kubernetes-sigs/aws-ebs-csi-driver/tree/master/examples/kubernetes  
+
