@@ -89,20 +89,6 @@ commands:
           name: write cluster oidc-assume-role kubeconfig
           command: bash scripts/write_cluster_credentials.sh << parameters.cluster >>
 
-  configure-addons-and-system-namespaces:
-    parameters:
-      cluster:
-        type: string
-    steps:
-      - set-kubeconfig:
-          cluster: << parameters.cluster >>
-      - run:
-          name: deploy ebs-csi storage class definition
-          command: kubectl apply -f storage-classes/ --recursive
-      - run:
-          name: create standard system namespaces
-          command: kubectl apply -f standard-system-namespaces.yaml
-
 jobs:
 
   validate-eks:
@@ -186,8 +172,6 @@ workflows:
                 node-group: group_a
           after-terraform:
             - store-system-credentials:
-                cluster: sandbox
-            - configure-addons-and-system-namespaces:
                 cluster: sandbox
           requires:
             - approve-sandbox-changes
