@@ -17,6 +17,6 @@
 
 #   tags = {
 #     "cluster" = var.cluster_name
-#     "pipeline" = "lab-platform-eks-base"
+#     "pipeline" = "lab-platform-eks-base-core"
 #   }
 # }

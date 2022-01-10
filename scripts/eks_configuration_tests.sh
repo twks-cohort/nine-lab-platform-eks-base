@@ -17,6 +17,7 @@ export DESIRED_VPC_CNI_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .vpc_cni_
 export DESIRED_COREDNS_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .coredns_version)
 export DESIRED_KUBE_PROXY_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .kube_proxy_version)
 export DESIRED_EBS_CSI_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .aws_ebs_csi_version)
-
+export DESIRED_EBS_CSI_VERSION=$(echo "${DESIRED_EBS_CSI_VERSION%%-*}")
 # validate primary addons and standard system namespaces
 bats test
+
