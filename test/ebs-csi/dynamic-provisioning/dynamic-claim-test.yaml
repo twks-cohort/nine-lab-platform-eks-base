@@ -2,11 +2,12 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: ebs-claim
+  name: test-ebs-claim
+  namespace: lab-system
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: ebs-sc
+  storageClassName: ebs-csi
   resources:
     requests:
       storage: 4Gi
@@ -15,10 +16,11 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: app
+  name: claim-test-pod
+  namespace: lab-system
 spec:
   containers:
-  - name: app
+  - name: claim-test-pod
     image: centos
     command: ["/bin/sh"]
     args: ["-c", "while true; do echo $(date -u) >> /data/out.txt; sleep 5; done"]
@@ -28,4 +30,4 @@ spec:
   volumes:
   - name: persistent-storage
     persistentVolumeClaim:
-      claimName: ebs-claim
+      claimName: test-ebs-claim

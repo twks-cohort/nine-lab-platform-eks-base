@@ -1,6 +1,6 @@
 1. Create a sample app along with the StorageClass and the PersistentVolumeClaim:
 ```
-kubectl apply -f ebs-csi/test/block-volume --recursive
+kubectl apply -f /test/ebs-csi/block-volume/block-claim-test.yaml
 ```
 
 2. Verify that pod is running:
@@ -26,5 +26,5 @@ dd if=/dev/zero of=/dev/xvda bs=1024k count=100
 
 5. Cleanup resources:
 ```
-kubectl delete -f ebs-csi/test/block-volume --recursive
+kubectl delete -f /test/ebs-csi/block-volume/block-claim-test.yaml
 ```

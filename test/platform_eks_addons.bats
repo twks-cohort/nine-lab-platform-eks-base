@@ -14,3 +14,8 @@
   run bash -c "kubectl get deployment coredns -n kube-system -o json | grep $DESIRED_COREDNS_VERSION"
   [[ "${output}" =~ "image" ]]
 }
+
+@test "check system namespace" {
+  run bash -c "kubectl get ns"
+  [[ "${output}" =~ "lab-system" ]]
+}

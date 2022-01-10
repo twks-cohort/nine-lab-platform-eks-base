@@ -16,9 +16,10 @@ export AWS_SECRET_ACCESS_KEY=$(cat credentials | jq -r ".Credentials.SecretAcces
 export AWS_SESSION_TOKEN=$(cat credentials | jq -r ".Credentials.SessionToken")
 
 export DESIRED_CLUSTER_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .cluster_version)
-export DESIRED_VPC_CNI_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .amazon_vpc_cni_version)
+export DESIRED_VPC_CNI_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .vpc_cni_version)
 export DESIRED_COREDNS_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .coredns_version)
 export DESIRED_KUBE_PROXY_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .kube_proxy_version)
+export DESIRED_EBS_CSI_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .aws_ebs_csi_version)
 
 export CLUSTER_NODES=$(aws ec2 describe-instances --filter "Name=tag:kubernetes.io/cluster/$CLUSTER,Values=owned")
 export CURRENT_AMI_VERSION=$(echo $CLUSTER_NODES | jq -r '.Reservations | .[0] | .Instances | .[0] | .ImageId')
@@ -32,6 +33,17 @@ export AVAILABLE_ADDON_VERSIONS=$(aws eks describe-addon-versions)
 export LATEST_VPC_CNI_VERSION=$(echo $AVAILABLE_ADDON_VERSIONS | jq -r '.addons[] | select(.addonName=="vpc-cni") | .addonVersions[0] | .addonVersion')
 export LATEST_COREDNS_VERSION=$(echo $AVAILABLE_ADDON_VERSIONS | jq -r '.addons[] | select(.addonName=="coredns") | .addonVersions[0] | .addonVersion')
 export LATEST_KUBE_PROXY_VERSION=$(echo $AVAILABLE_ADDON_VERSIONS | jq -r '.addons[] | select(.addonName=="kube-proxy") | .addonVersions[0] | .addonVersion')
+export LATEST_EBS_CSI_VERSION=$(echo $AVAILABLE_ADDON_VERSIONS | jq -r '.addons[] | select(.addonName=="aws-ebs-csi-driver") | .addonVersions[0] | .addonVersion')
+
+echo "DESIRED_VPC_CNI_VERSION $DESIRED_VPC_CNI_VERSION"
+echo "DESIRED_COREDNS_VERSION $DESIRED_COREDNS_VERSION"
+echo "DESIRED_KUBE_PROXY_VERSION $DESIRED_KUBE_PROXY_VERSION"
+echo "DESIRED_EBS_CSI_VERSION $DESIRED_EBS_CSI_VERSION"
+
+echo "LATEST_VPC_CNI_VERSION $LATEST_VPC_CNI_VERSION"
+echo "LATEST_COREDNS_VERSION $LATEST_COREDNS_VERSION"
+echo "LATEST_KUBE_PROXY_VERSION $LATEST_KUBE_PROXY_VERSION"
+echo "LATEST_EBS_CSI_VERSION $LATEST_EBS_CSI_VERSION"
 
 if [ $DESIRED_VPC_CNI_VERSION != $LATEST_VPC_CNI_VERSION ]; then
   echo "new vpc-cni version available: $LATEST_VPC_CNI_VERSION"
@@ -43,4 +55,8 @@ fi
 
 if [ $DESIRED_KUBE_PROXY_VERSION != $LATEST_KUBE_PROXY_VERSION ]; then
   echo "new kube-proxy version available: $LATEST_KUBE_PROXY_VERSION"
+fi
+
+if [ $DESIRED_EBS_CSI_VERSION != $LATEST_EBS_CSI_VERSION ]; then
+  echo "new aws-ebs-csi-driver version available: $LATEST_EBS_CSI_VERSION"
 fi

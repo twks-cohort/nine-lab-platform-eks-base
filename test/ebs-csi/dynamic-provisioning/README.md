@@ -2,6 +2,7 @@
 ```
 kubectl apply -f ebs-csi/test/dynamic-provisioning --recursive
 ```
+wait 30 sec
 
 2. Validate the volume was created and `volumeHandle` contains an EBS volumeID:
 ```
@@ -13,7 +14,11 @@ kubectl describe pv
 kubectl exec -it app cat /data/out.txt
 ```
 
-4. Cleanup resources:
+4. Cleanup resources (or go to perform resizing test):
 ```
 kubectl delete -f ebs-csi/test/dynamic-provisioning --recursive
 ```
+
+### bats test
+
+bats test/ebs-csi/dynamic-provisioning
