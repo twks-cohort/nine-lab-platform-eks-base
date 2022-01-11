@@ -18,30 +18,30 @@
 
 ## current configuration
 
-* OIDC for service accounts (irsa) installed and used by resulting admin kubeconfig
-* control plane logging default = "api", "audit", "authenticator"
+* OIDC for service accounts (irsa) installed and used by resulting admin kubeconfig, and for oidc-assumable roles
+* control plane logging default = "api", "audit", "authenticator", "controllerManager", "scheduler"
 * control plan internals encrypted using managed kms key
 * AWS Managed node_groups for worker pools
   * _note._ managed node groups do not currently permit the docker bridge network to be accessible.
 * eks addons activated:
-  * vpc-cni
+  * vpc-cni, with required role
   * coredns
   * kube-proxy
-* default EKS storage class (EBS)
-* creates the custom, system namespace `lab-system` to be used by cluster owners for non-istio-controlled services or testing
+  * aws-ebs-csi-driver, with required role (note: storage class definition managed in core-services pipeline)
+* creates the custom, system namespace `lab-system` to be used by cluster owners for non-istio-controlled services and testing
 * See release notes for current release versions
 
 ## upgrade How-tos
 
 **upgrade managed node_groups**
 
-AWS releases regular eks-optimized aws linux 2 version updates. This is for all the usual reasons - upgrade and refinements to al2, security patches, kublet updates, etc. Approving the plan configuration for application will result in a terraform taint of the managed node group so that the latest ami version will be used.  
+AWS releases regular eks-optimized aws linux 2 version updates. This is for all the usual reasons - upgrade and refinements to al2, security patches, kublet updates, etc. Each time the terraform plan is applied will result in a terraform taint of the managed node group so that the latest ami version will be used in a rolling update of nodes.  
 
 **upgrade kubernetes and addon version**
 
 Minor EKS/Kubernetes version upgrades are performed by AWS automatically as they are released.  
 
-AWS also managed major version upgrades and upgrades to the eks addons but these must be triggered by the pipeline. To trigger these aws-managed, automated version upgrades, edit the specified version in tfvars file.  
+AWS will manage version updates and upgrades to the eks addons but these must be triggered by the pipeline. To trigger these aws-managed, automated version upgrades, edit the specified version in tfvars file.  
 
 Ex:
 ```bash
@@ -72,7 +72,3 @@ $ terraform state rm 'module.eks.kubernetes_config_map.aws_auth[0]'
 - add eks major version release check
 - convert to datadog as soon as funding in place
 - no operational monitors defined
-
-
-ebs-csi testing: https://github.com/kubernetes-sigs/aws-ebs-csi-driver/tree/master/examples/kubernetes  
-

@@ -22,6 +22,7 @@ module "ebs_csi_role" {
 }
 
 resource "aws_iam_policy" "ebs_csi_role_policy" {
+  count       = var.create_aws_ebs_csi_role ? 1 : 0
   name        = "AmazonEKS_EBS_CSI_Driver_Policy"
   description = "EKS EBS CSI policy for ebs storage class"
   policy      = data.aws_iam_policy_document.ebs_csi.json

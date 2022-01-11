@@ -17,6 +17,6 @@
 
 # 
 @test "validate aws-ebs-csi-driver status" {
-  run bash -c "kubectl get deployment ebs-csi-controller -n kube-system -o json | grep $DESIRED_EBS_CSI_VERSION"
+  run bash -c "kubectl get deployment aws-ebs-csi-driver -n kube-system -o json | grep $DESIRED_EBS_CSI_VERSION"
   [[ "${output}" =~ "image" ]]
 }
