@@ -16,7 +16,7 @@ module "ebs_csi_role" {
   role_name                     = "ebs-csi-controller-sa"
   provider_url                  = data.aws_eks_cluster.cluster.identity[0].oidc[0].issuer
 
-  role_policy_arns              = [aws_iam_policy.ebs_csi_role_policy.arn]
+  role_policy_arns              = [aws_iam_policy.ebs_csi_role_policy[0].arn]
   oidc_fully_qualified_subjects = ["system:serviceaccount:kube-system:ebs-csi-controller-sa"]
   number_of_role_policy_arns    = 1
 }
