@@ -258,7 +258,7 @@ workflows:
           cluster: preview
           requires:
             - apply-preview-changes
-          filters: *on-push-main
+          filters: *on-tag-main
 
       - validate-eks:
           name: validate-preview-cluster
