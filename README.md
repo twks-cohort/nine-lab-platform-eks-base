@@ -27,7 +27,7 @@
   * coredns
   * kube-proxy
   * aws-ebs-csi-driver, with required role (note: storage class definition managed in core-services pipeline)
-* vpc-cni WARM_IP_TARGET set to 15 (testing size of reserve pool on subnet IP usage)
+* set vpc-cni WARM_IP_TARGET to 15 (testing size of reserve pool on subnet IP usage)
 * See release notes for current release versions
 
 ## upgrade How-tos
