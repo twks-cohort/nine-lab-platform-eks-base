@@ -89,11 +89,21 @@ commands:
           name: write cluster oidc-assume-role kubeconfig
           command: bash scripts/write_cluster_credentials.sh << parameters.cluster >>
 
+jobs:
+
   post-terraform-configuration:
     parameters:
       cluster:
+        description: cluster being validated
         type: string
+    docker:
+      - image: << pipeline.parameters.executor-image >>
+    shell: << pipeline.parameters.shell-options >>
     steps:
+      - checkout
+      - setup_remote_docker
+      - set-environment:
+          cluster: << parameters.cluster >>
       - set-kubeconfig:
           cluster: << parameters.cluster >>
       - run:
@@ -102,8 +112,6 @@ commands:
       - run:
           name: rolling restart of aws-node to use environment parameters
           command: kubectl rollout restart ds aws-node -n kube-system
-          
-jobs:
 
   validate-eks:
     parameters:
@@ -187,10 +195,17 @@ workflows:
           after-terraform:
             - store-system-credentials:
                 cluster: sandbox
-            - post-terraform-configuration:
-                cluster: sandbox
+            - 
           requires:
             - approve-sandbox-changes
+          filters: *on-push-main
+
+      - post-terraform-configuration:
+          name: post-terraform-sandbox-configuration
+          context: << pipeline.parameters.context >>
+          cluster: sandbox
+          requires:
+            - apply-sandbox-changes
           filters: *on-push-main
 
       - validate-eks:
@@ -198,7 +213,7 @@ workflows:
           context: << pipeline.parameters.context >>
           cluster: sandbox
           requires:
-            - apply-sandbox-changes
+            - post-terraform-sandbox-configuration
           filters: *on-push-main
 
       # preview cluster
@@ -240,12 +255,20 @@ workflows:
             - approve-preview-changes
           filters: *on-tag-main
 
+      - post-terraform-configuration:
+          name: post-terraform-preview-configuration
+          context: << pipeline.parameters.context >>
+          cluster: preview
+          requires:
+            - apply-preview-changes
+          filters: *on-push-main
+
       - validate-eks:
           name: validate-preview-cluster
           context: << pipeline.parameters.context >>
           cluster: preview
           requires:
-            - apply-preview-changes
+            - post-terraform-preview-configuration
           filters: *on-tag-main
 
   generate-release-notes:
