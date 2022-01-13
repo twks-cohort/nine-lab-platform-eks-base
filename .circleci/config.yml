@@ -89,6 +89,20 @@ commands:
           name: write cluster oidc-assume-role kubeconfig
           command: bash scripts/write_cluster_credentials.sh << parameters.cluster >>
 
+  post-terraform-configuration:
+    parameters:
+      cluster:
+        type: string
+    steps:
+      - set-kubeconfig:
+          cluster: << parameters.cluster >>
+      - run:
+          name: configure ENI environment parameters
+          command: kubectl set env ds aws-node -n kube-system WARM_IP_TARGET=15
+      - run:
+          name: rolling restart of aws-node to use environment parameters
+          command: kubectl rollout restart ds aws-node -n kube-system
+          
 jobs:
 
   validate-eks:
@@ -173,6 +187,8 @@ workflows:
           after-terraform:
             - store-system-credentials:
                 cluster: sandbox
+            - post-terraform-configuration:
+                cluster: sandbox
           requires:
             - approve-sandbox-changes
           filters: *on-push-main
@@ -212,12 +228,14 @@ workflows:
           before-terraform:
             - set-environment:
                 cluster: preview
-          # after-terraform-init:
-          #   - taint-node-group:
-          #       node-group: group_a
+          after-terraform-init:
+            - taint-node-group:
+                node-group: group_a
           after-terraform:
             - store-system-credentials:
                 cluster: preview
+            - post-terraform-configuration:
+                cluster: preview 
           requires:
             - approve-preview-changes
           filters: *on-tag-main

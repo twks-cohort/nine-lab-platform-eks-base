@@ -72,3 +72,8 @@ $ terraform state rm 'module.eks.kubernetes_config_map.aws_auth[0]'
 - add eks major version release check
 - convert to datadog as soon as funding in place
 - no operational monitors defined
+
+
+kubectl set env ds aws-node -n kube-system WARM_IP_TARGET=5
+
+8156

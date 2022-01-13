@@ -11,19 +11,18 @@ resource "aws_eks_addon" "ebs_csi_driver" {
 module "ebs_csi_role" {
   source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
   version                       = "~> v4.7.0"
-  create_role                   = var.create_aws_ebs_csi_role ? true : false
+  create_role                   = true
 
-  role_name                     = "ebs-csi-controller-sa"
+  role_name                     = "${var.cluster_name}-ebs-csi-controller-sa"
   provider_url                  = data.aws_eks_cluster.cluster.identity[0].oidc[0].issuer
 
-  role_policy_arns              = [aws_iam_policy.ebs_csi_role_policy[0].arn]
+  role_policy_arns              = [aws_iam_policy.ebs_csi_role_policy.arn]
   oidc_fully_qualified_subjects = ["system:serviceaccount:kube-system:ebs-csi-controller-sa"]
   number_of_role_policy_arns    = 1
 }
 
 resource "aws_iam_policy" "ebs_csi_role_policy" {
-  count       = var.create_aws_ebs_csi_role ? 1 : 0
-  name        = "AmazonEKS_EBS_CSI_Driver_Policy"
+  name        = "${var.cluster_name}_AmazonEKS_EBS_CSI_Driver_Policy"
   description = "EKS EBS CSI policy for ebs storage class"
   policy      = data.aws_iam_policy_document.ebs_csi.json
 }
