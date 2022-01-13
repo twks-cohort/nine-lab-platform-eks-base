@@ -160,7 +160,7 @@ jobs:
 workflows:
   version: 2
 
-  lab-platform-eks-pipeline:
+  lab-platform-eks-base-pipeline:
     jobs:
       # sandbox cluster
       - terraform/plan:

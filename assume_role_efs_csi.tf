@@ -3,7 +3,7 @@
 #   version                       = "~> v4.7.0"
 #   create_role                   = true
 
-#   role_name                     = "efs-csi-controller-sa"
+#   role_name                     = "${var.cluster_name}-efs-csi-controller-sa"
 #   provider_url                  = data.aws_eks_cluster.cluster.identity[0].oidc[0].issuer
 
 #   role_policy_arns              = [aws_iam_policy.efs_csi_role_policy.arn]
@@ -12,7 +12,7 @@
 # }
 
 # resource "aws_iam_policy" "efs_csi_role_policy" {
-#   name        = "AmazonEKS_EFS_CSI_Driver_Policy"
+#   name        = "${var.cluster_name}_AmazonEKS_EFS_CSI_Driver_Policy"
 #   description = "EKS EFS CSI policy for efs storage class"
 #   policy      = data.aws_iam_policy_document.efs_csi.json
 # }

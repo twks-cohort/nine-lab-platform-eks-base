@@ -10,7 +10,7 @@
 #   vpc_id    = data.aws_vpc.cluster_vpc.id
 #   subnets   = data.aws_subnet_ids.cluster_node_subnets.ids
 
-#   allowed_security_group_ids = [module.eks.worker_security_group_id]
+#   allowed_security_group_ids = [module.eks.cluster_security_group_id]
 
 #   efs_backup_policy_enabled = true
 #   encrypted = true
