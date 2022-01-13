@@ -15,7 +15,6 @@
 </div>
 <br />
 
-
 ## current configuration
 
 * OIDC for service accounts (irsa) installed and used by resulting admin kubeconfig, and for oidc-assumable roles
@@ -28,7 +27,7 @@
   * coredns
   * kube-proxy
   * aws-ebs-csi-driver, with required role (note: storage class definition managed in core-services pipeline)
-* creates the custom, system namespace `lab-system` to be used by cluster owners for non-istio-controlled services and testing
+* vpc-cni WARM_IP_TARGET set to 15 (testing size of reserve pool on subnet IP usage)
 * See release notes for current release versions
 
 ## upgrade How-tos
@@ -72,8 +71,3 @@ $ terraform state rm 'module.eks.kubernetes_config_map.aws_auth[0]'
 - add eks major version release check
 - convert to datadog as soon as funding in place
 - no operational monitors defined
-
-
-kubectl set env ds aws-node -n kube-system WARM_IP_TARGET=5
-
-8156
