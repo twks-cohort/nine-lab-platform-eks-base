@@ -195,7 +195,6 @@ workflows:
           after-terraform:
             - store-system-credentials:
                 cluster: sandbox
-            - 
           requires:
             - approve-sandbox-changes
           filters: *on-push-main
@@ -249,8 +248,6 @@ workflows:
           after-terraform:
             - store-system-credentials:
                 cluster: preview
-            - post-terraform-configuration:
-                cluster: preview 
           requires:
             - approve-preview-changes
           filters: *on-tag-main
