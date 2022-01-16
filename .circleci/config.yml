@@ -271,7 +271,7 @@ workflows:
   generate-release-notes:
     jobs:
       - executor-tools/release:
-          name: release-lab-platform-eks
+          name: release-lab-platform-eks-base
           context: << pipeline.parameters.context >>
           shell: << pipeline.parameters.shell-options >>
           filters: *on-tag-main

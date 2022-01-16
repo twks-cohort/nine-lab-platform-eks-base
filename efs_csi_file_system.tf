@@ -1,22 +1,23 @@
-# module "efs_csi_storage" {
-#   source = "cloudposse/efs/aws"
-#   version     = "0.32.5"
+module "efs_csi_storage" {
+  source = "cloudposse/efs/aws"
+  version     = "0.32.5"
 
-#   name      = "${var.cluster_name}-efs-csi-storage"
-#   namespace = "twdps-lab"
-#   stage     = var.cluster_name
+  name      = "${var.cluster_name}-efs-csi-storage"
+  namespace = "twdps-lab"
+  stage     = var.cluster_name
 
-#   region    = var.aws_region
-#   vpc_id    = data.aws_vpc.cluster_vpc.id
-#   subnets   = data.aws_subnet_ids.cluster_node_subnets.ids
+  region    = var.aws_region
+  vpc_id    = data.aws_vpc.cluster_vpc.id
+  subnets   = data.aws_subnet_ids.private.ids
 
-#   allowed_security_group_ids = [module.eks.cluster_security_group_id]
+  security_group_name        = ["${var.cluster_name}-efs-csi-storage-sg"]
+  allowed_security_group_ids = [module.eks.cluster_security_group_id]
 
-#   efs_backup_policy_enabled = true
-#   encrypted = true
+  efs_backup_policy_enabled = true
+  encrypted = true
 
-#   tags = {
-#     "cluster" = var.cluster_name
-#     "pipeline" = "lab-platform-eks-base"
-#   }
-# }
+  tags = {
+    "cluster" = var.cluster_name
+    "pipeline" = "lab-platform-eks-base"
+  }
+}
