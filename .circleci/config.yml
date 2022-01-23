@@ -218,7 +218,7 @@ workflows:
           context: << pipeline.parameters.context >>
           cluster: sandbox
           requires:
-            - post-terraform-sandbox-configuration
+            - apply-sandbox-changes
           filters: *on-push-main
 
       # preview cluster
@@ -272,7 +272,7 @@ workflows:
           context: << pipeline.parameters.context >>
           cluster: preview
           requires:
-            - post-terraform-preview-configuration
+            - apply-preview-changes
           filters: *on-tag-main
 
   generate-release-notes:
