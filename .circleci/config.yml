@@ -4,7 +4,7 @@ version: 2.1
 orbs:
   terraform: twdps/terraform@0.4.0
   # can override kubectl, awspec versions as necessary
-  kube: twdps/kube-ops@dev:latest
+  kube: twdps/kube-ops@d0.1.0
   # used for github-release-notes feature
   executor-tools: twdps/executor-tools@0.2.0
 
@@ -22,7 +22,7 @@ parameters:
   terraform-version:
     description: terraform version for all jobs
     type: string
-    default: "1.1.3"
+    default: "1.1.4"
   executor-image:
     description: image to use for terraform runs
     type: string
@@ -48,6 +48,7 @@ commands:
     description: generate environment credentials and configuration from templates
     parameters:
       cluster:
+        description: cluster name to use for configuration
         type: string
     steps:
       - run:
@@ -78,7 +79,8 @@ commands:
     steps:
       - run:
           name: set terraform taint on managed node group to cause new node template with latest ami version
-          command: terraform taint "module.eks.module.node_groups.aws_eks_node_group.workers[\"<< parameters.node-group >>\"]"
+          # prior taint 'terraform taint "module.eks.module.node_groups.aws_eks_node_group.workers[\"<< parameters.node-group >>\"]"'
+          command: terraform taint "module.eks.module.eks_managed_node_group[\"group_a\"].aws_eks_node_group.this[0]"
 
   store-system-credentials:
     parameters:
@@ -91,27 +93,30 @@ commands:
 
 jobs:
 
-  post-terraform-configuration:
-    parameters:
-      cluster:
-        description: cluster being validated
-        type: string
-    docker:
-      - image: << pipeline.parameters.executor-image >>
-    shell: << pipeline.parameters.shell-options >>
-    steps:
-      - checkout
-      - setup_remote_docker
-      - set-environment:
-          cluster: << parameters.cluster >>
-      - set-kubeconfig:
-          cluster: << parameters.cluster >>
-      - run:
-          name: configure ENI environment parameters
-          command: kubectl set env ds aws-node -n kube-system WARM_IP_TARGET=15
-      - run:
-          name: rolling restart of aws-node to use environment parameters
-          command: kubectl rollout restart ds aws-node -n kube-system
+  # Can use this post-terraform-configuration to increase WARM_IP_TARGET if orchestrator seems to be slow assigning IPs 
+  # WARM_IP_TARGET now defaults to 1. 
+
+  # post-terraform-configuration:
+  #   parameters:
+  #     cluster:
+  #       description: cluster being validated
+  #       type: string
+  #   docker:
+  #     - image: << pipeline.parameters.executor-image >>
+  #   shell: << pipeline.parameters.shell-options >>
+  #   steps:
+  #     - checkout
+  #     - setup_remote_docker
+  #     - set-environment:
+  #         cluster: << parameters.cluster >>
+  #     - set-kubeconfig:
+  #         cluster: << parameters.cluster >>
+  #     - run:
+  #         name: configure ENI environment parameters
+  #         command: kubectl set env ds aws-node -n kube-system WARM_IP_TARGET=15
+  #     - run:
+  #         name: rolling restart of aws-node to use environment parameters
+  #         command: kubectl rollout restart ds aws-node -n kube-system
 
   validate-eks:
     parameters:
@@ -199,13 +204,14 @@ workflows:
             - approve-sandbox-changes
           filters: *on-push-main
 
-      - post-terraform-configuration:
-          name: post-terraform-sandbox-configuration
-          context: << pipeline.parameters.context >>
-          cluster: sandbox
-          requires:
-            - apply-sandbox-changes
-          filters: *on-push-main
+      # See comments on this job above
+      # - post-terraform-configuration:
+      #     name: post-terraform-sandbox-configuration
+      #     context: << pipeline.parameters.context >>
+      #     cluster: sandbox
+      #     requires:
+      #       - apply-sandbox-changes
+      #     filters: *on-push-main
 
       - validate-eks:
           name: validate-sandbox-cluster
@@ -252,13 +258,14 @@ workflows:
             - approve-preview-changes
           filters: *on-tag-main
 
-      - post-terraform-configuration:
-          name: post-terraform-preview-configuration
-          context: << pipeline.parameters.context >>
-          cluster: preview
-          requires:
-            - apply-preview-changes
-          filters: *on-tag-main
+      # See comments on this job above
+      # - post-terraform-configuration:
+      #     name: post-terraform-preview-configuration
+      #     context: << pipeline.parameters.context >>
+      #     cluster: preview
+      #     requires:
+      #       - apply-preview-changes
+      #     filters: *on-tag-main
 
       - validate-eks:
           name: validate-preview-cluster

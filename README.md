@@ -4,7 +4,8 @@
     <br />
 		<img alt="DPS Title" src="https://raw.githubusercontent.com/ThoughtWorks-DPS/static/master/dps_lab_title.png?sanitize=true" width=350/>
 	</p>
-  <h3>lab-platform-eks</h3>
+  <h3>lab-platform-eks-base</h3>
+  <a href="https://app.circleci.com/pipelines/github/ThoughtWorks-DPS/lab-platform-eks-base"><img src="https://circleci.com/gh/ThoughtWorks-DPS/lab-platform-eks-base.svg?style=shield"></a> <a href="https://badges.circleci.com/orbs/twdps/lab-platform-eks-base.svg"><img src="https://badges.circleci.com/orbs/twdps/lab-platform-eks-base.svg"></a> <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
 </div>
 <br />
 
@@ -29,6 +30,16 @@
   * aws-ebs-csi-driver, with required role (note: storage class definition managed in core-services pipeline)
 * set vpc-cni WARM_IP_TARGET to 15 (testing size of reserve pool on subnet IP usage)
 * See release notes for current release versions
+
+**changes in since eks/K8s 1.20**
+
+In 1.19 and prior, the following tags needed to be self-managed (unless using eksctl, aws cli, or the console):  
+
+"kubernetes.io/cluster/${var.cluster_name}" = "owned"  
+"k8s.io/cluster-autoscaler/enabled" = "true"  
+"k8s.io/cluster-autoscaler/${var.cluster_name}" = "true"  
+
+Now these are applied by default.  
 
 ## upgrade How-tos
 
