@@ -134,10 +134,18 @@ jobs:
       - set-kubeconfig:
           cluster: << parameters.cluster >>
       - run:
-          name: test eks configuration
+          name: test eks control plane
           environment:
             TEST_ENV: << parameters.cluster >>
-          command: bash scripts/eks_configuration_tests.sh << parameters.cluster >>
+          command: bash scripts/validate_control_plane.sh << parameters.cluster >>
+      - run:
+          name: test eks addons
+          command: bash scripts/validate_addons.sh << parameters.cluster >>
+      # - run:
+      #     name: test eks configuration
+      #     environment:
+      #       TEST_ENV: << parameters.cluster >>
+      #     command: bash scripts/eks_configuration_tests.sh << parameters.cluster >>
       - kube/cis-benchmarks:
           benchmark: eks
           namespace: default
