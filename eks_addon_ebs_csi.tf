@@ -11,7 +11,6 @@ resource "aws_eks_addon" "ebs_csi_driver" {
 module "ebs_csi_role" {
   source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
   version                       = "~> v4.7.0"
-  create_role                   = true
 
   role_name                     = "${var.cluster_name}-ebs-csi-controller-sa"
   provider_url                  = data.aws_eks_cluster.cluster.identity[0].oidc[0].issuer

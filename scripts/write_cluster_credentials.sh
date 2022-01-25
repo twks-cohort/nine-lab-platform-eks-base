@@ -10,4 +10,4 @@ export AWS_ACCESS_KEY_ID=$(cat credentials | jq -r ".Credentials.AccessKeyId")
 export AWS_SECRET_ACCESS_KEY=$(cat credentials | jq -r ".Credentials.SecretAccessKey")
 export AWS_SESSION_TOKEN=$(cat credentials | jq -r ".Credentials.SessionToken")
 
-terraform output -raw kubectl_config | secrethub write twdps/di/platform/env/$CLUSTER/cluster/kubeconfig
+cat kubeconfig_$CLUSTER | secrethub write twdps/di/platform/env/$CLUSTER/cluster/kubeconfig

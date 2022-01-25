@@ -1,9 +1,4 @@
-# # terraform-aws-eks module outputs
-
-# Formatted yaml output for base aws-auth configmap containing roles used in cluster node groups/fargate profiles
-output "aws_auth_configmap_yaml" {
-  value = module.eks.aws_auth_configmap_yaml
-}	
+# terraform-aws-eks v17.x module outputs
 
 output "cloudwatch_log_group_arn" {
   value = module.eks.cloudwatch_log_group_arn
@@ -13,21 +8,16 @@ output "cloudwatch_log_group_name" {
   value = module.eks.cloudwatch_log_group_name
 }
 
-# Map of attribute maps for all EKS cluster addons enabled
-output "cluster_addons" {
-  value = module.eks.cluster_addons
-}
-
 output "cluster_arn" {
   value = module.eks.cluster_arn
 }
 
-# Base64 encoded certificate data required to communicate with the cluster
+# Nested attribute containing certificate-authority-data for your cluster.
+# This is the base64 encoded certificate data required to communicate with your cluster.
 output "cluster_certificate_authority_data" {
   value = module.eks.cluster_certificate_authority_data
 }
 
-# Endpoint for your Kubernetes API server
 output "cluster_endpoint" {
   value = module.eks.cluster_endpoint
 }
@@ -40,76 +30,125 @@ output "cluster_iam_role_name" {
   value = module.eks.cluster_iam_role_name
 }
 
-output "cluster_iam_role_unique_id" {
-  value = module.eks.cluster_iam_role_unique_id
-}
-
 output "cluster_id" {
   value = module.eks.cluster_id
 }
 
-# Map of attribute maps for all EKS identity providers enabled
-output "cluster_identity_providers" {
-  value = module.eks.cluster_identity_providers
-}
-
-# The URL on the EKS cluster for the OpenID Connect identity provider
 output "cluster_oidc_issuer_url" {
   value = module.eks.cluster_oidc_issuer_url
 }
 
-output "cluster_platform_version" {
-  value = module.eks.cluster_platform_version
-}
-
-# Cluster security group that was created by Amazon EKS for the cluster.
-# Managed node groups use this security group for control-plane-to-data-plane communication.
-# Referred to as 'Cluster security group' in the EKS console
+# The cluster primary security group ID created by the EKS cluster on 1.14 or later.
+# Referred to as 'Cluster security group' in the EKS console.
 output "cluster_primary_security_group_id" {
   value = module.eks.cluster_primary_security_group_id
 }
 
-output "cluster_security_group_arn" {
-  value = module.eks.cluster_security_group_arn
-}
-
+# Security group ID attached to the EKS cluster.
+# On 1.14 or later, this is the 'Additional security groups' in the EKS console.
 output "cluster_security_group_id" {
   value = module.eks.cluster_security_group_id
 }
 
-# Status of the EKS cluster. One of CREATING, ACTIVE, DELETING, FAILED
-output "cluster_status" {
-  value = module.eks.cluster_status
+output "cluster_version" {
+  value = module.eks.cluster_version
 }
 
-# Map of attribute maps for all EKS managed node groups created
-output "eks_managed_node_groups" {
-  value = module.eks.eks_managed_node_groups
+# A kubernetes configuration to authenticate to this EKS cluster.
+output "config_map_aws_auth" {
+  value = module.eks.config_map_aws_auth
 }
 
-# Map of attribute maps for all EKS Fargate Profiles created
-output "fargate_profiles" {
-  value = module.eks.fargate_profiles
+output "fargate_iam_role_arn" {
+  value = module.eks.fargate_iam_role_arn
 }
 
-output "node_security_group_arn" {
-  value = module.eks.node_security_group_arn
+output "fargate_iam_role_name" {
+  value = module.eks.fargate_iam_role_name
 }
 
-output "node_security_group_id" {
-  value = module.eks.node_security_group_id
+output "fargate_profile_arns" {
+  value = module.eks.fargate_profile_arns
 }
 
-# The ARN of the OIDC Provider if enable_irsa = true
+# EKS Cluster name and EKS Fargate Profile names separated by a colon (:).
+output "fargate_profile_ids" {
+  value = module.eks.fargate_profile_ids
+}
+
+# kubectl config file contents for this EKS cluster. Will block on cluster creation until the cluster is really ready.
+output "kubeconfig" {
+  value = module.eks.kubeconfig
+  sensitive = true
+}
+
+# The filename of the generated kubectl config. Will block on cluster creation until the cluster is really ready.
+output "kubeconfig_filename" {
+  value = module.eks.kubeconfig_filename
+}
+
+# Outputs from EKS node groups. Map of maps, keyed by var.node_groups keys
+
+output "node_groups" {
+  value = module.eks.node_groups
+}
+
+# The ARN of the OIDC Provider if enable_irsa = true.
 output "oidc_provider_arn" {
   value = module.eks.oidc_provider_arn
 }
 
-output "self_managed_node_groups" {
-  value = module.eks.self_managed_node_groups
+# Security group rule responsible for allowing pods to communicate with the EKS cluster API.
+output "security_group_rule_cluster_https_worker_ingress" {
+  value = module.eks.security_group_rule_cluster_https_worker_ingress
 }
 
-output "kubectl_config" {
-  value       = local.kubeconfig
-  sensitive   = true
+output "worker_iam_instance_profile_arns" {
+  value = module.eks.worker_iam_instance_profile_arns
+}
+
+output "worker_iam_instance_profile_names" {
+  value = module.eks.worker_iam_instance_profile_names
+}
+
+output "worker_iam_role_arn" {
+  value = module.eks.worker_iam_role_arn
+}
+
+output "worker_iam_role_name" {
+  value = module.eks.worker_iam_role_name
+}
+
+output "worker_security_group_id" {
+  value = module.eks.worker_security_group_id
+}
+
+# IDs of the autoscaling groups containing workers.
+
+output "workers_asg_arns" {
+  value = module.eks.workers_asg_arns
+}
+
+output "workers_asg_names" {
+  value = module.eks.workers_asg_names
+}
+
+output "workers_default_ami_id" {
+  value = module.eks.workers_default_ami_id
+}
+
+output "workers_default_ami_id_windows" {
+  value = module.eks.workers_default_ami_id_windows
+}
+
+output "workers_launch_template_arns" {
+  value = module.eks.workers_launch_template_arns
+}
+
+output "workers_launch_template_ids" {
+  value = module.eks.workers_launch_template_ids
+}
+
+output "workers_launch_template_latest_versions" {
+  value = module.eks.workers_launch_template_latest_versions
 }

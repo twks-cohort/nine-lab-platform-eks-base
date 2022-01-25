@@ -2,7 +2,7 @@ variable "aws_region" {}
 variable "account_id" {
   sensitive = true
 }
-# once we get more secret storage space, hide the role
+
 variable "assume_role" {
   sensitive = true
 }

@@ -1,98 +1,57 @@
 locals {
   authentication_role = "arn:aws:iam::${var.account_id}:role/${var.assume_role}"
-  kubeconfig = yamlencode({
-    apiVersion      = "v1"
-    kind            = "Config"
-    current-context = "lab-${var.cluster_name}"
-    clusters = [{
-      name = module.eks.cluster_id
-      cluster = {
-        certificate-authority-data = module.eks.cluster_certificate_authority_data
-        server                     = module.eks.cluster_endpoint
-      }
-    }]
-    contexts = [{
-      name = "lab-${var.cluster_name}"
-      context = {
-        cluster = module.eks.cluster_id
-        user    = "lab-${var.cluster_name}"
-      }
-    }]
-    users = [{
-      name = "lab-${var.cluster_name}"
-      user = {
-        exec = {
-          apiVersion = "client.authentication.k8s.io/v1alpha1"
-          command    = "aws"
-          args = [
-            "eks", "get-token","--cluster-name", var.cluster_name, "--role", local.authentication_role
-          ]
-        }
-      }
-    }]
-  })
 }
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "18.2.0"
-  create  = true
+  version = "17.24.0"
 
-  cluster_name                = var.cluster_name
-  cluster_version             = var.cluster_version
-  vpc_id                      = data.aws_vpc.cluster_vpc.id
-  subnet_ids                  = data.aws_subnet_ids.private.ids
-  cluster_ip_family           = "ipv4"
-  create_cni_ipv6_iam_policy  = false
-  enable_irsa                 = true
+  cluster_name    = var.cluster_name
+  cluster_version = var.cluster_version
+  vpc_id  = data.aws_vpc.cluster_vpc.id
+  subnets = data.aws_subnet_ids.private.ids
 
-  create_cluster_security_group           = true
-  cluster_enabled_log_types               = var.cluster_enabled_log_types
+  enable_irsa                                  = true
+  kubeconfig_aws_authenticator_command         = "aws"
+  kubeconfig_aws_authenticator_command_args    = ["eks","get-token","--cluster-name",var.cluster_name]
+  kubeconfig_aws_authenticator_additional_args = ["--role", local.authentication_role]
 
-  cluster_encryption_config = [
+  cluster_enabled_log_types     = var.cluster_enabled_log_types
+  cluster_log_retention_in_days = 90
+  cluster_encryption_config     = [
     {
       provider_key_arn = aws_kms_key.cluster_encyption_key.arn
       resources        = ["secrets"]
     }
   ]
 
-  eks_managed_node_group_defaults = {
+  node_groups_defaults = {
     ami_type              = var.default_node_group_ami_type
     platform              = var.default_node_group_platform
     disk_size             = var.default_node_group_disk_size
-    instance_types        = var.default_node_group_instance_types
     force_update_version  = true
     enable_monitoring     = true
   }
 
-  eks_managed_node_groups = {
+  node_groups = {
+
     group_a = {
-      capacity_type              = var.default_node_group_capacity_type
-      desired_size               = var.default_node_group_desired_size
-      max_size                   = var.default_node_group_max_size
-      min_size                   = var.default_node_group_min_size
-      instance_types             = var.default_node_group_instance_types
+      capacity_type     = var.default_node_group_capacity_type
+      desired_capacity  = var.default_node_group_desired_size
+      max_capacity      = var.default_node_group_max_size
+      min_capacity      = var.default_node_group_min_size
+      instance_types    = var.default_node_group_instance_types
+      key_name          = ""
+      k8s_labels = {
+        env = var.cluster_name
+      }
+      additional_tags = {
+        "cluster"  = var.cluster_name
+        "pipeline" = "lab-platform-eks-base"
+      }
     }
   }
 
-  cluster_addons = {
-    coredns    = {
-      addon_version     = var.coredns_version
-      resolve_conflicts = "OVERWRITE"
-    }
-    kube-proxy = {
-      addon_version     = var.kube_proxy_version
-    }
-    vpc-cni    = {
-      addon_version     = var.vpc_cni_version
-      resolve_conflicts = "OVERWRITE"
-    }
-  }
-
-  tags = {
-    "cluster"  = var.cluster_name
-    "pipeline" = "lab-platform-eks-base"
-  }
 }
 
 resource "aws_kms_key" "cluster_encyption_key" {
