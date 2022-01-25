@@ -5,7 +5,7 @@
 		<img alt="DPS Title" src="https://raw.githubusercontent.com/ThoughtWorks-DPS/static/master/dps_lab_title.png?sanitize=true" width=350/>
 	</p>
   <h3>lab-platform-eks-base</h3>
-  <a href="https://app.circleci.com/pipelines/github/ThoughtWorks-DPS/lab-platform-eks-base"><img src="https://circleci.com/gh/ThoughtWorks-DPS/lab-platform-eks-base.svg?style=shield"></a> <a href="https://badges.circleci.com/orbs/twdps/lab-platform-eks-base.svg"><img src="https://badges.circleci.com/orbs/twdps/lab-platform-eks-base.svg"></a> <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
+  <a href="https://app.circleci.com/pipelines/github/ThoughtWorks-DPS/lab-platform-eks-base"><img src="https://circleci.com/gh/ThoughtWorks-DPS/lab-platform-eks-base.svg?style=shield"></a> <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
 </div>
 <br />
 
@@ -28,7 +28,6 @@
   * coredns
   * kube-proxy
   * aws-ebs-csi-driver, with required role (note: storage class definition managed in core-services pipeline)
-* set vpc-cni WARM_IP_TARGET to 15 (testing size of reserve pool on subnet IP usage)
 * See release notes for current release versions
 
 **changes in since eks/K8s 1.20**
@@ -64,6 +63,10 @@ Ex:
   ...
 }
 ```
+
+**WARM_IP_TARGET**  
+
+Commented section manages the WARM_IP_TARGET setting. This effects the number of IP's the aws_vpc_cni on the node will reserve to assign to pods. A higher number results is fewer available ips in the subnet for use by the ASG but a generally faster pod allocation. This recently became a '1' by default.  
 
 **The nightly `version-check` job will notify of available new AMIs or addon versions.**  
 

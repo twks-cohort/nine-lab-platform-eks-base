@@ -141,11 +141,6 @@ jobs:
       - run:
           name: test eks addons
           command: bash scripts/validate_addons.sh << parameters.cluster >>
-      # - run:
-      #     name: test eks configuration
-      #     environment:
-      #       TEST_ENV: << parameters.cluster >>
-      #     command: bash scripts/eks_configuration_tests.sh << parameters.cluster >>
       - kube/cis-benchmarks:
           benchmark: eks
           namespace: default
@@ -256,9 +251,9 @@ workflows:
           before-terraform:
             - set-environment:
                 cluster: preview
-          # after-terraform-init:
-          #   - taint-node-group:
-          #       node-group: group_a
+          after-terraform-init:
+            - taint-node-group:
+                node-group: group_a
           after-terraform:
             - store-system-credentials:
                 cluster: preview
