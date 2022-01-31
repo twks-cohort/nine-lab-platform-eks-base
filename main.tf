@@ -15,6 +15,7 @@ module "eks" {
   kubeconfig_aws_authenticator_command         = "aws"
   kubeconfig_aws_authenticator_command_args    = ["eks","get-token","--cluster-name",var.cluster_name]
   kubeconfig_aws_authenticator_additional_args = ["--role", local.authentication_role]
+  kubeconfig_name                              = "twdps-lab-${var.cluster_name}"
 
   cluster_enabled_log_types     = var.cluster_enabled_log_types
   cluster_log_retention_in_days = 90

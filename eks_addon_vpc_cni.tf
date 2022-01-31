@@ -11,7 +11,8 @@ resource "aws_eks_addon" "vpc_cni" {
 module "vpc_cni_role" {
   source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
   version                       = "~> 4.7"
-
+  create_role                   = true
+   
   role_name                     = "${var.cluster_name}-aws-node"
   provider_url                  = data.aws_eks_cluster.cluster.identity[0].oidc[0].issuer
 
