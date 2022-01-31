@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
 
 @test "validate dynamic ebs volume claim created" {
-  run bash -c "kubectl describe pv | grep 'test-ebs-csi/test-ebs-claim'"
+  run bash -c "kubectl describe pv | grep 'lab-system/test-ebs-claim'"
   [[ "${output}" =~ "Claim" ]]
 }
 

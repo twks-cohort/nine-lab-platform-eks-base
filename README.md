@@ -79,6 +79,18 @@ Known issue related to cleanly destroying EKS cluster. Remove the aws-auth confi
 ```
 $ terraform state rm 'module.eks.kubernetes_config_map.aws_auth[0]'
 ```
+**Deleting ns stuck in terminating**  
+
+The issue is tied to removing finalizers and/or services still running in a namespace that are somewhat hidden. The krew plugin get-all can help with finding those other artifacts in the namespace, but to force a deletion:  
+
+1. Directly edit the ns via `$ kubectl edit ns the-namespace` and remove any remaining finalizers.  
+
+2. From one terminal window run `kubectl proxy` and then from another terminal window run the following:
+```bash
+$ kubectl get ns the-namespace -o json | \
+  jq '.spec.finalizers=[]' | \
+  curl -X PUT http://localhost:8001/api/v1/namespaces/the-namespace/finalize -H "Content-Type: application/json" --data @-
+```
 
 # NEED TODO
 
