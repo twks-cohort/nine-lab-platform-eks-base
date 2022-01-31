@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -e
+
 export CLUSTER=$1
 
 export DESIRED_VPC_CNI_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .vpc_cni_version)
@@ -14,9 +16,9 @@ echo "validate EBS storage class"
 # validate dynamic volume provisioning
 
 kubectl apply -f test/ebs-csi/test-ebs-storage-class.yaml
-sleep 10
-kubectl apply -f test/ebs-csi/dynamic-provisioning/dynamic-claim-test.yaml
 sleep 25
+kubectl apply -f test/ebs-csi/dynamic-provisioning/dynamic-claim-test.yaml
+sleep 30
 
 bats test/ebs-csi/dynamic-provisioning
 
