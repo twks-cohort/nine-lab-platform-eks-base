@@ -3,7 +3,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: test-block-claim
-  namespace: test-ebs-csi
+  namespace: lab-system
 spec:
   accessModes:
     - ReadWriteOnce
@@ -18,7 +18,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: block-test-pod 
-  namespace: test-ebs-csi
+  namespace: lab-system
 spec:
   containers:
   - name: block-test-pod

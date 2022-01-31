@@ -6,12 +6,12 @@
 }
 
 @test "validate claim-test-pod health" {
-  run bash -c "kubectl get all -n test-ebs-csi | grep 'pod/claim-test-pod'"
+  run bash -c "kubectl get all -n lab-system | grep 'pod/claim-test-pod'"
   [[ "${output}" =~ "Running" ]]
 }
 
 @test "validate dynamic ebs pvc write access" {
-  run bash -c "kubectl exec -it claim-test-pod cat /data/out.txt -n test-ebs-csi"
+  run bash -c "kubectl exec -it claim-test-pod cat /data/out.txt -n lab-system"
   [[ "${output}" =~ "UTC" ]]
 }
 
