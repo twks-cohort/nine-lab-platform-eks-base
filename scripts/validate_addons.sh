@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-_() { echo 'cleanup'; kubectl delete -f test/ebs-csi/dynamic-provisioning/dynamic-claim-test.yaml; kubectl delete -f test/ebs-csi/block-volume/block-claim-test.yaml; kubectl delete -f test/ebs-csi/test-ebs-storage-class.yaml ; }
-trap _ EXIT
-
 set -e
 
 export CLUSTER=$1
