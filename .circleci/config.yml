@@ -177,10 +177,10 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - set-environment:
-          cluster: << parameters.cluster >>
-      - set-kubeconfig:
-          cluster: << parameters.cluster >>
+      # - set-environment:
+      #     cluster: << parameters.cluster >>
+      # - set-kubeconfig:
+      #     cluster: << parameters.cluster >>
       - run:
           name: install requirements
           command: pip install -r requirements.txt
@@ -196,10 +196,10 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - set-environment:
-          cluster: << parameters.cluster >>
-      - set-kubeconfig:
-          cluster: << parameters.cluster >>
+      # - set-environment:
+      #     cluster: << parameters.cluster >>
+      # - set-kubeconfig:
+      #     cluster: << parameters.cluster >>
       - run:
           name: install requirements
           command: pip install -r requirements.txt
