@@ -349,6 +349,7 @@ workflows:
       - update-dashboard:
           name: update-datadog-dashboard
           context: << pipeline.parameters.context >>
+          shell: << pipeline.parameters.shell-options >>
           filters: *on-push-main
 
   # perform the pipeline health checks and compare desired eks component verions with current release versions
@@ -365,6 +366,7 @@ workflows:
           name: validate-sandbox-cluster
           context: << pipeline.parameters.context >>
           cluster: sandbox
+      # now substitute the tf/plan check for this version check since the dashboard displays version-check results
       - version-check:
           name: check-sandbox-addon-and-ami-versions
           context: << pipeline.parameters.context >>

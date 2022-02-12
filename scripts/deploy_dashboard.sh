@@ -1,7 +1,15 @@
 #!/usr/bin/env bash
+set -e
+
 export AWS_DEFAULT_REGION=$(cat environments/preview.auto.tfvars.json.tpl | jq -r .aws_region)
 export AWS_ASSUME_ROLE=$(cat environments/preview.auto.tfvars.json.tpl | jq -r .assume_role)
 export AWS_ACCOUNT_ID=$(cat environments/preview.auto.tfvars.json.tpl | jq -r .account_id)
+
+echo "debug:"
+echo "AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION"
+echo "AWS_ASSUME_ROLE=$AWS_ASSUME_ROLE"
+echo "AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID"
+echo "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:0:5}"
 
 aws sts assume-role --output json --role-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/$AWS_ASSUME_ROLE --role-session-name eks-configuration-test > credentials
 
