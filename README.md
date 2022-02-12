@@ -40,6 +40,13 @@ In 1.19 and prior, the following tags needed to be self-managed (unless using ek
 
 Now these are applied by default.  
 
+### Radiators and Monitors
+
+Given that the observability agents (datadog is used by the lab) are managed by the -core-services pipeline, on the first release of this -eks-base pipeline deploying dashbaords and monitors is not possible. Come back and add the configuration after getting the deployments working in -eks-core-services.  
+
+The clusters monitors are the same for each cluster and deployed with the cluster, whereas the dashboard incorporates all clusters and is deployed by git push.   
+
+As with this repo/pipieline, the dashboard and monitors deployed by a pipeline are concerned with the services managed within the pipeline.  
 ## upgrade How-tos
 
 **upgrade managed node_groups**
@@ -92,8 +99,13 @@ $ kubectl get ns the-namespace -o json | \
   curl -X PUT http://localhost:8001/api/v1/namespaces/the-namespace/finalize -H "Content-Type: application/json" --data @-
 ```
 
-# NEED TODO
+## Maintainers
+
+Note: Although the below change was successful in stopping the spam of error messages from the efs-csi-driver liveness-probe, it did not work for EBS. Not clear why, but given the desire to keep that an AWS managed service (and EFS as soon as they go live with teh eks Addon version), leaving the current config in place.  
+```
+kubectl set image deployment/ebs-csi-controller liveness-probe=602401143452.dkr.ecr.us-east-2.amazonaws.com/eks/livenessprobe:v2.4.0 -n kube-system
+kubectl set image daemonset/ebs-csi-node liveness-probe=602401143452.dkr.ecr.us-east-2.amazonaws.com/eks/livenessprobe:v2.4.0 -n kube-system
+```
 
 - add eks major version release check
-- convert to datadog as soon as funding in place
 - no operational monitors defined

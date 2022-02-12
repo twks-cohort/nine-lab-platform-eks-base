@@ -1,0 +1,26 @@
+{
+	"name": "lab-{{ cluster }} ebs-csi-controller alert",
+	"type": "query alert",
+	"query": "max(last_10m):sum:kubernetes_state.pdb.pods_healthy{cluster:{{ cluster }},poddisruptionbudget:ebs-csi-controller-pod-disruption-budget} < 1",
+	"message": "@slack-DPS-lab-{{ cluster }}-alerts",
+	"tags": [
+		"cluster:{{ cluster }}",
+		"pipeline:lab-platform-eks-base"
+	],
+	"options": {
+		"thresholds": {
+			"critical": 1,
+			"critical_recovery": 2
+		},
+		"notify_audit": false,
+		"require_full_window": false,
+		"notify_no_data": false,
+		"renotify_interval": 0,
+		"locked": false,
+		"silenced": {},
+		"include_tags": true,
+		"new_host_delay": 300,
+		"escalation_message": ""
+	},
+	"priority": null
+}

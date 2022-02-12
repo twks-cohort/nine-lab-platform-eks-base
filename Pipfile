@@ -4,9 +4,10 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+requests = "*"
 
 [dev-packages]
 pre-commit = "*"
 
 [requires]
-python_version = "3.10.1"
+python_version = "3.10.2"
