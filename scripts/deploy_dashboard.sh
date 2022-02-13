@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
-export AWS_DEFAULT_REGION=$(cat environments/preview.auto.tfvars.json.tpl | jq -r .aws_region)
-export AWS_ASSUME_ROLE=$(cat environments/preview.auto.tfvars.json.tpl | jq -r .assume_role)
-export AWS_ACCOUNT_ID=$(cat environments/preview.auto.tfvars.json.tpl | jq -r .account_id)
+export AWS_DEFAULT_REGION=$(cat sandbox.auto.tfvars.json | jq -r .aws_region)
+export AWS_ASSUME_ROLE=$(cat sandbox.auto.tfvars.json | jq -r .assume_role)
+export AWS_ACCOUNT_ID=$(cat sandbox.auto.tfvars.json | jq -r .account_id)
 
 echo "debug:"
 echo "AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION"
