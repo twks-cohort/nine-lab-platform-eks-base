@@ -241,7 +241,7 @@
         "hide_zero_counts": true,
         "show_last_triggered": false,
         "show_priority": false,
-        "query": "tag:$cluster",
+        "query": "tag:pipeline:lab-platform-eks-base",
         "sort": "status,asc",
         "count": 50,
         "start": 0
