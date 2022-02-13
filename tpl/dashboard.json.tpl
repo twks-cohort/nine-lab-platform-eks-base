@@ -192,7 +192,7 @@
     {
       "definition": {
         "type": "note",
-        "content": "LATEST_TABLE",
+        "content": "CURRENT_TABLE",
         "background_color": "TABLE_COLOR",
         "font_size": "14",
         "text_align": "left",
@@ -212,7 +212,7 @@
     {
       "definition": {
         "type": "note",
-        "content": "CURRENT_TABLE",
+        "content": "LATEST_TABLE",
         "background_color": "yellow",
         "font_size": "14",
         "text_align": "left",
