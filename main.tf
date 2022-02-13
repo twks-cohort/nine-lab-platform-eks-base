@@ -9,7 +9,7 @@ module "eks" {
   cluster_name    = var.cluster_name
   cluster_version = var.cluster_version
   vpc_id  = data.aws_vpc.cluster_vpc.id
-  subnets = data.aws_subnet_ids.private.ids
+  subnets = data.aws_subnet.private.ids   # data.aws_subnet_ids.private.ids
 
   enable_irsa                                  = true
   kubeconfig_aws_authenticator_command         = "aws"
