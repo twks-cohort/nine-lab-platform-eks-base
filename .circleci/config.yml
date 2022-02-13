@@ -134,7 +134,7 @@ jobs:
       - set-kubeconfig:
           cluster: << parameters.cluster >>
       - kube/packages:
-          datadog: "0.43.0"
+          datadog-version: "0.43.0"
       - run:
           name: post deployment event to datadog
           command: dog event post --tags "cluster:sandbox, deployment:lab-platform-eks-base" Deploy 'lab-platform-eks-base'
