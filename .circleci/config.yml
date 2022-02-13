@@ -197,7 +197,7 @@ jobs:
       - checkout
       - setup_remote_docker
       - set-environment:
-          cluster: << parameters.cluster >>
+          cluster: sandbox
       # - set-kubeconfig:
       #     cluster: << parameters.cluster >>
       - run:
