@@ -4,7 +4,7 @@ version: 2.1
 orbs:
   terraform: twdps/terraform@0.4.0
   # can override kubectl, awspec versions as necessary
-  kube: twdps/kube-ops@0.1.0
+  kube: twdps/kube-ops@dev:latest
   # used for github-release-notes feature
   executor-tools: twdps/executor-tools@0.2.0
 
@@ -133,6 +133,11 @@ jobs:
           cluster: << parameters.cluster >>
       - set-kubeconfig:
           cluster: << parameters.cluster >>
+      - kube/packages:
+          datadog: "0.43.0"
+      - run:
+          name: post deployment event to datadog
+          command: dog event post --tags "cluster:sandbox, deployment:lab-platform-eks-base" Deploy 'lab-platform-eks-base'
       - run:
           name: test eks control plane
           environment:

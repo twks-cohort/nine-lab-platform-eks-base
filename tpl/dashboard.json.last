@@ -192,8 +192,8 @@
     {
       "definition": {
         "type": "note",
-        "content": "LATEST_TABLE",
-        "background_color": "TABLE_COLOR",
+        "content": "CURRENT_TABLE",
+        "background_color": "yellow",
         "font_size": "14",
         "text_align": "left",
         "vertical_align": "top",
@@ -212,8 +212,8 @@
     {
       "definition": {
         "type": "note",
-        "content": "CURRENT_TABLE",
-        "background_color": "pink",
+        "content": "LATEST_TABLE",
+        "background_color": "TABLE_COLOR",
         "font_size": "14",
         "text_align": "left",
         "vertical_align": "top",
@@ -267,7 +267,6 @@
           "value",
           "sum"
         ],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -314,11 +313,6 @@
               "line_width": "normal"
             },
             "display_type": "line"
-          }
-        ],
-        "events": [
-          {
-            "q": "tag:cluster:$cluster"
           }
         ]
       },
@@ -399,7 +393,6 @@
           "value",
           "sum"
         ],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -439,11 +432,6 @@
             },
             "display_type": "line"
           }
-        ],
-        "events": [
-          {
-            "q": "tag:cluster:$cluster"
-          }
         ]
       },
       "layout": {
@@ -467,7 +455,6 @@
           "value",
           "sum"
         ],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -490,11 +477,6 @@
               "line_width": "normal"
             },
             "display_type": "line"
-          }
-        ],
-        "events": [
-          {
-            "q": "tag:cluster:$cluster"
           }
         ]
       },
@@ -555,7 +537,6 @@
           "value",
           "sum"
         ],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -595,11 +576,6 @@
             },
             "display_type": "line"
           }
-        ],
-        "events": [
-          {
-            "q": "tag:cluster:$cluster"
-          }
         ]
       },
       "layout": {
@@ -623,7 +599,6 @@
           "value",
           "sum"
         ],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -646,11 +621,6 @@
               "line_width": "normal"
             },
             "display_type": "line"
-          }
-        ],
-        "events": [
-          {
-            "q": "tag:cluster:$cluster"
           }
         ]
       },
@@ -711,7 +681,6 @@
           "value",
           "sum"
         ],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -734,11 +703,6 @@
               "line_width": "normal"
             },
             "display_type": "line"
-          }
-        ],
-        "events": [
-          {
-            "q": "tag:cluster:$cluster"
           }
         ]
       },
@@ -763,7 +727,6 @@
           "value",
           "sum"
         ],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -786,11 +749,6 @@
               "line_width": "normal"
             },
             "display_type": "line"
-          }
-        ],
-        "events": [
-          {
-            "q": "tag:cluster:$cluster"
           }
         ]
       },
@@ -860,7 +818,6 @@
           "value",
           "sum"
         ],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -908,11 +865,6 @@
             },
             "display_type": "line"
           }
-        ],
-        "events": [
-          {
-            "q": "tag:cluster:$cluster"
-          }
         ]
       },
       "layout": {
@@ -936,7 +888,6 @@
           "value",
           "sum"
         ],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -967,11 +918,6 @@
               "line_width": "normal"
             },
             "display_type": "line"
-          }
-        ],
-        "events": [
-          {
-            "q": "tag:cluster:$cluster"
           }
         ]
       },
@@ -1042,13 +988,7 @@
         "title_size": "16",
         "title_align": "left",
         "show_legend": false,
-        "time": {},
         "type": "heatmap",
-        "events": [
-          {
-            "q": "tag:cluster:$cluster"
-          }
-        ],
         "requests": [
           {
             "q": "avg:coredns.cache_hits_count{$cluster,$node} by {host}.as_count()*100/(avg:coredns.cache_hits_count{$cluster,$node} by {host}.as_count()+avg:coredns.cache_misses_count{$cluster,$node} by {host}.as_count())",
@@ -1079,7 +1019,6 @@
           "value",
           "sum"
         ],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -1118,11 +1057,6 @@
           "min": "auto",
           "max": "auto"
         },
-        "events": [
-          {
-            "q": "tag:cluster:$cluster"
-          }
-        ],
         "markers": []
       },
       "layout": {
@@ -1146,7 +1080,6 @@
           "value",
           "sum"
         ],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -1185,11 +1118,6 @@
           "min": "auto",
           "max": "auto"
         },
-        "events": [
-          {
-            "q": "tag:cluster:$cluster"
-          }
-        ],
         "markers": []
       },
       "layout": {
@@ -1213,7 +1141,6 @@
           "value",
           "sum"
         ],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -1246,11 +1173,6 @@
           "min": "auto",
           "max": "auto"
         },
-        "events": [
-          {
-            "q": "tag:cluster:$cluster"
-          }
-        ],
         "markers": []
       },
       "layout": {
@@ -1274,7 +1196,6 @@
           "value",
           "sum"
         ],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -1307,11 +1228,6 @@
           "min": "auto",
           "max": "auto"
         },
-        "events": [
-          {
-            "q": "tag:cluster:$cluster"
-          }
-        ],
         "markers": []
       },
       "layout": {
@@ -1339,6 +1255,5 @@
   "layout_type": "ordered",
   "is_read_only": false,
   "notify_list": [],
-  "reflow_type": "fixed",
-  "id": "u7z-5p7-cfs"
+  "reflow_type": "fixed"
 }

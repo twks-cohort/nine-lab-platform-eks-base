@@ -14,7 +14,6 @@ def set_cluster():
 
 cluster = set_cluster()
 
-print(cluster)
 base_url = "https://api.datadoghq.com/api/v1/{resource}"
 headers = {
     "DD-API-KEY": os.getenv("DD_API_KEY"),
@@ -60,11 +59,6 @@ def get_monitor(monitor_string, cluster, num_nodes):
 
 
 def update_monitor(monitor_id, monitor_json, cluster, monitor_url, headers):
-    print(monitor_id)
-    print(monitor_json)
-    print(cluster)
-    print(monitor_url)
-    print(headers)
     print("updating {cluster} monitor {name} with id {id}".format(cluster=cluster, name=monitor_json["name"], id=monitor_id))
     put_response = requests.put(monitor_url + "/" + str(monitor_id),
                                     headers=headers,
