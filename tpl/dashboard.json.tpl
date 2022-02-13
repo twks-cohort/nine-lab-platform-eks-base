@@ -112,7 +112,7 @@
           }
         ],
         "autoscale": true,
-        "precision": 2
+        "precision": 0
       },
       "layout": {
         "x": 0,
@@ -146,7 +146,7 @@
           }
         ],
         "autoscale": true,
-        "precision": 2
+        "precision": 0
       },
       "layout": {
         "x": 1,
@@ -180,7 +180,7 @@
           }
         ],
         "autoscale": true,
-        "precision": 2
+        "precision": 0
       },
       "layout": {
         "x": 2,
