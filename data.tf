@@ -23,6 +23,10 @@ data "aws_subnets" "private" {
   }
 }
 
+output "subnet_ids" {
+  value = data.aws_subnets.private.ids
+}
+
 data "aws_subnet" "private_subnets" {
   for_each = data.aws_subnet_ids.private.ids
   id       = each.value
