@@ -213,7 +213,7 @@
       "definition": {
         "type": "note",
         "content": "CURRENT_TABLE",
-        "background_color": "pink",
+        "background_color": "yellow",
         "font_size": "14",
         "text_align": "left",
         "vertical_align": "top",
