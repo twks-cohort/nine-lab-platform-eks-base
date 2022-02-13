@@ -362,20 +362,16 @@ workflows:
               only:
                 - main
     jobs:
+      - update-dashboard:
+          name: update-datadog-dashboard
+          context: << pipeline.parameters.context >>
       - validate-eks:
           name: validate-sandbox-cluster
           context: << pipeline.parameters.context >>
           cluster: sandbox
-      # now substitute the tf/plan check for this version check since the dashboard displays version-check results
-      - version-check:
-          name: check-sandbox-addon-and-ami-versions
-          context: << pipeline.parameters.context >>
-          cluster: sandbox
+      # If continuous configuration checking required, insert night tf/plan and assess output
       - validate-eks:
           name: validate-preview-cluster
           context: << pipeline.parameters.context >>
           cluster: preview
-      - version-check:
-          name: check-preview-addon-and-ami-versions
-          context: << pipeline.parameters.context >>
-          cluster: preview
+

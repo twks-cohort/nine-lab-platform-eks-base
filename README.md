@@ -107,5 +107,5 @@ kubectl set image deployment/ebs-csi-controller liveness-probe=602401143452.dkr.
 kubectl set image daemonset/ebs-csi-node liveness-probe=602401143452.dkr.ecr.us-east-2.amazonaws.com/eks/livenessprobe:v2.4.0 -n kube-system
 ```
 
-- add eks major version release check
-- no operational monitors defined
+- Still need to add eks major version release check. The current radiator does report latest nor indicate when prod is behind.  
+
