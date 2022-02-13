@@ -318,7 +318,7 @@
         ],
         "events": [
           {
-            "q": "tag:cluster:$cluster"
+            "q": "tags:cluster:$cluster, deployment:lab*"
           }
         ]
       },
@@ -442,7 +442,7 @@
         ],
         "events": [
           {
-            "q": "tag:cluster:$cluster"
+            "q": "tags:cluster:$cluster, deployment:lab*"
           }
         ]
       },
@@ -494,7 +494,7 @@
         ],
         "events": [
           {
-            "q": "tag:cluster:$cluster"
+            "q": "tags:cluster:$cluster, deployment:lab*"
           }
         ]
       },
@@ -598,7 +598,7 @@
         ],
         "events": [
           {
-            "q": "tag:cluster:$cluster"
+            "q": "tags:cluster:$cluster, deployment:lab*"
           }
         ]
       },
@@ -650,7 +650,7 @@
         ],
         "events": [
           {
-            "q": "tag:cluster:$cluster"
+            "q": "tags:cluster:$cluster, deployment:lab*"
           }
         ]
       },
@@ -738,7 +738,7 @@
         ],
         "events": [
           {
-            "q": "tag:cluster:$cluster"
+            "q": "tags:cluster:$cluster, deployment:lab*"
           }
         ]
       },
@@ -790,7 +790,7 @@
         ],
         "events": [
           {
-            "q": "tag:cluster:$cluster"
+            "q": "tags:cluster:$cluster, deployment:lab*"
           }
         ]
       },
@@ -911,7 +911,7 @@
         ],
         "events": [
           {
-            "q": "tag:cluster:$cluster"
+            "q": "tags:cluster:$cluster, deployment:lab*"
           }
         ]
       },
@@ -971,7 +971,7 @@
         ],
         "events": [
           {
-            "q": "tag:cluster:$cluster"
+            "q": "tags:cluster:$cluster, deployment:lab*"
           }
         ]
       },
@@ -1046,7 +1046,7 @@
         "type": "heatmap",
         "events": [
           {
-            "q": "tag:cluster:$cluster"
+            "q": "tags:cluster:$cluster, deployment:lab*"
           }
         ],
         "requests": [
@@ -1120,7 +1120,7 @@
         },
         "events": [
           {
-            "q": "tag:cluster:$cluster"
+            "q": "tags:cluster:$cluster, deployment:lab*"
           }
         ],
         "markers": []
@@ -1187,7 +1187,7 @@
         },
         "events": [
           {
-            "q": "tag:cluster:$cluster"
+            "q": "tags:cluster:$cluster, deployment:lab*"
           }
         ],
         "markers": []
@@ -1248,7 +1248,7 @@
         },
         "events": [
           {
-            "q": "tag:cluster:$cluster"
+            "q": "tags:cluster:$cluster, deployment:lab*"
           }
         ],
         "markers": []
@@ -1309,7 +1309,7 @@
         },
         "events": [
           {
-            "q": "tag:cluster:$cluster"
+            "q": "tags:cluster:$cluster, deployment:lab*"
           }
         ],
         "markers": []
