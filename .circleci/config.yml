@@ -4,7 +4,7 @@ version: 2.1
 orbs:
   terraform: twdps/terraform@0.4.0
   # can override kubectl, awspec versions as necessary
-  kube: twdps/kube-ops@dev:latest
+  kube: twdps/kube-ops@0.2.0
   # used for github-release-notes feature
   executor-tools: twdps/executor-tools@0.2.0
 
