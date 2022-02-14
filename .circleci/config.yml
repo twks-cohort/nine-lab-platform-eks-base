@@ -267,14 +267,6 @@ workflows:
             - apply-sandbox-changes
           filters: *on-push-main
 
-      - update-monitors:
-          name: update-sandbox-monitors
-          context: << pipeline.parameters.context >>
-          cluster: sandbox
-          requires:
-            - validate-sandbox-cluster
-          filters: *on-push-main
-
       # preview cluster
       - terraform/plan:
           name: preview-change-plan
@@ -329,14 +321,6 @@ workflows:
             - apply-preview-changes
           filters: *on-tag-main
 
-      - update-monitors:
-          name: update-preview-monitors
-          context: << pipeline.parameters.context >>
-          cluster: preview
-          requires:
-            - validate-preview-cluster
-          filters: *on-tag-main
-
   generate-release-notes:
     jobs:
       - executor-tools/release:
@@ -344,6 +328,30 @@ workflows:
           context: << pipeline.parameters.context >>
           shell: << pipeline.parameters.shell-options >>
           filters: *on-tag-main
+
+  lab-platform-eks-base-monitors:
+    jobs:
+      - update-monitors:
+          name: update-sandbox-monitors
+          context: << pipeline.parameters.context >>
+          cluster: sandbox
+          requires:
+            - validate-sandbox-cluster
+          filters: *on-push-main
+
+      - approve-preview-monitors:
+          type: approval
+          requires:
+            - update-sandbox-monitors
+          filters: *on-push-main
+
+      - update-monitors:
+          name: update-preview-monitors
+          context: << pipeline.parameters.context >>
+          cluster: preview
+          requires:
+            - approve-preview-monitors
+          filters: *on-push-main
 
   lab-platform-eks-base-dashboard:
     jobs:
