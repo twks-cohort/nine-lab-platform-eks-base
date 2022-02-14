@@ -100,23 +100,23 @@ export EBS_CSI_VERSIONS="$EBS_CSI_VERSIONS $LATEST_EBS_CSI_VERSION |"
 export LATEST_TABLE="$TABLE$EKS_VERSIONS\\\\n$AMI_VERSIONS\\\\n$COREDNS_VERSIONS\\\\n$KUBE_PROXY_VERSIONS\\\\n$VPC_CNI_VERSIONS\\\\n$EBS_CSI_VERSIONS\\\\n"
 
 echo "check production current versions against latest"
-export LATEST_TABLE_COLOR="green"
+export TABLE_COLOR="green"
 export ALERT_TABLE_COLOR="pink"
 
 if [[ $CURRENT_AMI_VERSION == $LATEST_AMI_VERSION ]]; then
-  export LATEST_TABLE_COLOR=$ALERT_TABLE_COLOR
+  export TABLE_COLOR=$ALERT_TABLE_COLOR
 fi
 if [[ $DESIRED_COREDNS_VERSION == $LATEST_COREDNS_VERSION ]]; then
-  export LATEST_TABLE_COLOR=$ALERT_TABLE_COLOR
+  export TABLE_COLOR=$ALERT_TABLE_COLOR
 fi
 if [[ $DESIRED_KUBE_PROXY_VERSION == $LATEST_KUBE_PROXY_VERSION ]]; then
-  export LATEST_TABLE_COLOR=$ALERT_TABLE_COLOR
+  export TABLE_COLOR=$ALERT_TABLE_COLOR
 fi
 if [[ $DESIRED_VPC_CNI_VERSION == $LATEST_VPC_CNI_VERSION ]]; then
-  export LATEST_TABLE_COLOR=$ALERT_TABLE_COLOR
+  export TABLE_COLOR=$ALERT_TABLE_COLOR
 fi
 if [[ $DESIRED_EBS_CSI_VERSION == $LATEST_EBS_CSI_VERSION ]]; then
-  export LATEST_TABLE_COLOR=$ALERT_TABLE_COLOR
+  export TABLE_COLOR=$ALERT_TABLE_COLOR
 fi
 
 echo "insert markdown into dashboard.json"
@@ -125,11 +125,11 @@ cp tpl/dashboard.json.tpl observe/dashboard.json
 if [[ $(uname) == "Darwin" ]]; then
   gsed -i "s/CURRENT_TABLE/$CURRENT_TABLE/g" observe/dashboard.json
   gsed -i "s/LATEST_TABLE/$LATEST_TABLE/g" observe/dashboard.json
-  gsed -i "s/TABLE_COLOR/$LATEST_TABLE_COLOR/g" observe/dashboard.json
+  gsed -i "s/TABLE_COLOR/$TABLE_COLOR/g" observe/dashboard.json
 else 
   sed -i "s/CURRENT_TABLE/$CURRENT_TABLE/g" observe/dashboard.json
   sed -i "s/LATEST_TABLE/$LATEST_TABLE/g" observe/dashboard.json
-  sed -i "s/TABLE_COLOR/$LATEST_TABLE_COLOR/g" observe/dashboard.json
+  sed -i "s/TABLE_COLOR/$TABLE_COLOR/g" observe/dashboard.json
 fi
 
 python scripts/dashboard.py
