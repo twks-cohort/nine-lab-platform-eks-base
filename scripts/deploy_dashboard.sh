@@ -39,6 +39,7 @@ do
   # append environment AMI version
   export CLUSTER_NODES=$(aws ec2 describe-instances --filter "Name=tag:kubernetes.io/cluster/$cluster,Values=owned")
   export CURRENT_AMI_VERSION=$(echo $CLUSTER_NODES | jq -r '.Reservations | .[0] | .Instances | .[0] | .ImageId')
+  echo "CURRENT_AMI_VERSION=$CURRENT_AMI_VERSION"
   export AMI_VERSIONS="$AMI_VERSIONS $CURRENT_AMI_VERSION |"
 
   # append environment coreDNS version
