@@ -335,8 +335,6 @@ workflows:
           name: update-sandbox-monitors
           context: << pipeline.parameters.context >>
           cluster: sandbox
-          requires:
-            - validate-sandbox-cluster
           filters: *on-push-main
 
       - approve-preview-monitors:
