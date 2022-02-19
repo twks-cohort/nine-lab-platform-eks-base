@@ -1,0 +1,4 @@
+fileignoreconfig:
+- filename: secrethub.nonprod.env
+  checksum: 4185ad1758749905d7158fa5724819a018c637c5f7bc8b810da57b24c526731a
+version: ""

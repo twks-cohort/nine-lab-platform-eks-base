@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 set -e
 
+
+function version_alert() {
+  export TABLE_COLOR=$ALERT_TABLE_COLOR
+  # every 7 days, also send a slack message
+  if (( "$(date +%d)" % 7 )); then
+    curl -X POST -H 'Content-type: application/json' --data '{"Notice":"$1"}' $SLACK_LAB_EVENTS
+  fi
+}
+
 export AWS_DEFAULT_REGION=$(cat sandbox.auto.tfvars.json | jq -r .aws_region)
 export AWS_ASSUME_ROLE=$(cat sandbox.auto.tfvars.json | jq -r .assume_role)
 export AWS_ACCOUNT_ID=$(cat sandbox.auto.tfvars.json | jq -r .account_id)
@@ -74,7 +83,7 @@ declare EBS_CSI_VERSIONS="|"
 
 echo "generate markdown table with the available versions of the services managed by the lab-platform-eks-base pipeline for all clusters"
 
-# fetch the current ami release versions available. Use this for al2= /aws/service/eks/optimized-ami/$DESIRED_CLUSTER_VERSION/amazon-linux-2/recommended/image_id 
+# fetch the current ami release versions available. Use this for al2= /aws/service/eks/optimized-ami/$DESIRED_CLUSTER_VERSION/amazon-linux-2/recommended/image_id
 export LATEST_AMI_VERSION=$(aws ssm get-parameter --name /aws/service/bottlerocket/aws-k8s-$DESIRED_CLUSTER_VERSION/x86_64/latest/image_id --region $AWS_DEFAULT_REGION | jq -r '.Parameter.Value')
 export AMI_VERSIONS="$AMI_VERSIONS $LATEST_AMI_VERSION |"
 
@@ -104,19 +113,19 @@ export TABLE_COLOR="green"
 export ALERT_TABLE_COLOR="pink"
 
 if [[ $CURRENT_AMI_VERSION != $LATEST_AMI_VERSION ]]; then
-  export TABLE_COLOR=$ALERT_TABLE_COLOR
+  version_alert
 fi
 if [[ $DESIRED_COREDNS_VERSION != $LATEST_COREDNS_VERSION ]]; then
-  export TABLE_COLOR=$ALERT_TABLE_COLOR
+  version_alert "New EKS AMI version available: $LATEST_AMI_VERSION"
 fi
 if [[ $DESIRED_KUBE_PROXY_VERSION != $LATEST_KUBE_PROXY_VERSION ]]; then
-  export TABLE_COLOR=$ALERT_TABLE_COLOR
+  version_alert "New EKS kube-proxy version available: $LATEST_KUBE_PROXY_VERSION"
 fi
 if [[ $DESIRED_VPC_CNI_VERSION != $LATEST_VPC_CNI_VERSION ]]; then
-  export TABLE_COLOR=$ALERT_TABLE_COLOR
+  version_alert " New EKS vpc-cni version available: $LATEST_VPC_CNI_VERSION"
 fi
 if [[ $DESIRED_EBS_CSI_VERSION != $LATEST_EBS_CSI_VERSION ]]; then
-  export TABLE_COLOR=$ALERT_TABLE_COLOR
+  version_alert " New EKS ebs-csi version available: $LATEST_EBS_CSI_VERSION"
 fi
 
 echo "insert markdown into dashboard.json"
@@ -126,7 +135,7 @@ if [[ $(uname) == "Darwin" ]]; then
   gsed -i "s/CURRENT_TABLE/$CURRENT_TABLE/g" observe/dashboard.json
   gsed -i "s/LATEST_TABLE/$LATEST_TABLE/g" observe/dashboard.json
   gsed -i "s/TABLE_COLOR/$TABLE_COLOR/g" observe/dashboard.json
-else 
+else
   sed -i "s/CURRENT_TABLE/$CURRENT_TABLE/g" observe/dashboard.json
   sed -i "s/LATEST_TABLE/$LATEST_TABLE/g" observe/dashboard.json
   sed -i "s/TABLE_COLOR/$TABLE_COLOR/g" observe/dashboard.json

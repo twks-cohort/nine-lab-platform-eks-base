@@ -44,7 +44,7 @@ Now these are applied by default.
 
 Given that the observability agents (datadog is used by the lab) are managed by the -core-services pipeline, on the first release of this -eks-base pipeline deploying dashbaords and monitors is not possible. Come back and add the configuration after getting the deployments working in -eks-core-services.  
 
-The clusters monitors are the same for each cluster and deployed with the cluster, whereas the dashboard incorporates all clusters and is deployed by git push.   
+The clusters monitors are the same for each cluster and deployed with the cluster, whereas the dashboard incorporates all clusters and is deployed by git push.  
 
 As with this repo/pipieline, the dashboard and monitors deployed by a pipeline are concerned with the services managed within the pipeline.  
 ## upgrade How-tos
@@ -108,4 +108,4 @@ kubectl set image daemonset/ebs-csi-node liveness-probe=602401143452.dkr.ecr.us-
 ```
 
 - Still need to add eks major version release check. The current radiator does report latest nor indicate when prod is behind.  
-
+- the datadog monitor and dashboard update scripts are simplistic and there is obviously refactoring needed to turn that into a standard piece of code with functionality accessed via an orb or something similar
