@@ -5,7 +5,7 @@
 
     "cluster_name": "sandbox",
     "cluster_version": "1.21",
-    "vpc_cni_version": "v1.10.1-eksbuild.1",
+    "vpc_cni_version": "v1.10.2-eksbuild.1",
     "coredns_version": "v1.8.4-eksbuild.1",
     "kube_proxy_version": "v1.21.2-eksbuild.2",
     "aws_ebs_csi_version": "v1.4.0-eksbuild.preview",
@@ -19,4 +19,3 @@
     "default_node_group_capacity_type": "ON_DEMAND",
     "default_node_group_instance_types": ["m5.xlarge"]
 }
-

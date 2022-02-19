@@ -58,7 +58,7 @@ commands:
           name: set << parameters.cluster >> environment variables
           command: |
             secrethub inject -i environments/<< parameters.cluster >>.auto.tfvars.json.tpl -o << parameters.cluster >>.auto.tfvars.json
-  
+
   set-kubeconfig:
     parameters:
       cluster:
@@ -93,8 +93,8 @@ commands:
 
 jobs:
 
-  # Can use this post-terraform-configuration to increase WARM_IP_TARGET if orchestrator seems to be slow assigning IPs 
-  # WARM_IP_TARGET now defaults to 1. 
+  # Can use this post-terraform-configuration to increase WARM_IP_TARGET if orchestrator seems to be slow assigning IPs
+  # WARM_IP_TARGET now defaults to 1.
 
   # post-terraform-configuration:
   #   parameters:
@@ -356,6 +356,7 @@ workflows:
       - update-dashboard:
           name: update-datadog-dashboard
           context: << pipeline.parameters.context >>
+          filters: *on-push-main
 
   # perform the pipeline health checks and compare desired eks component verions with current release versions
   nightly-validation:
@@ -379,4 +380,3 @@ workflows:
           name: validate-preview-cluster
           context: << pipeline.parameters.context >>
           cluster: preview
-
