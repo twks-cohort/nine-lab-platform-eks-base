@@ -83,8 +83,10 @@ declare EBS_CSI_VERSIONS="|"
 
 echo "generate markdown table with the available versions of the services managed by the lab-platform-eks-base pipeline for all clusters"
 
-# fetch the current ami release versions available. Use this for al2= /aws/service/eks/optimized-ami/$DESIRED_CLUSTER_VERSION/amazon-linux-2/recommended/image_id
-export LATEST_AMI_VERSION=$(aws ssm get-parameter --name /aws/service/bottlerocket/aws-k8s-$DESIRED_CLUSTER_VERSION/x86_64/latest/image_id --region $AWS_DEFAULT_REGION | jq -r '.Parameter.Value')
+
+
+# fetch the current ami release versions available. Use this for bottlerocket= /aws/service/bottlerocket/aws-k8s-$DESIRED_CLUSTER_VERSION/x86_64/latest/image_id
+export LATEST_AMI_VERSION=$(aws ssm get-parameter --name /aws/service/eks/optimized-ami/$DESIRED_CLUSTER_VERSION/amazon-linux-2/recommended/image_id --region $AWS_DEFAULT_REGION | jq -r '.Parameter.Value')
 export AMI_VERSIONS="$AMI_VERSIONS $LATEST_AMI_VERSION |"
 
 export AVAILABLE_ADDON_VERSIONS=$(aws eks describe-addon-versions)
