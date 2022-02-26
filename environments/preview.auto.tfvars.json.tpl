@@ -10,8 +10,8 @@
     "kube_proxy_version": "v1.21.2-eksbuild.2",
     "aws_ebs_csi_version": "v1.4.0-eksbuild.preview",
 
-    "default_node_group_ami_type": "BOTTLEROCKET_x86_64",
-    "default_node_group_platform": "bottlerocket",
+    "default_node_group_ami_type": "AL2_x86_64",
+    "default_node_group_platform": "linux",
     "default_node_group_min_size": "3",
     "default_node_group_max_size": "5",
     "default_node_group_desired_size": "3",
