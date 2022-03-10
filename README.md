@@ -53,9 +53,9 @@ As with this repo/pipieline, the dashboard and monitors deployed by a pipeline a
 
 AWS releases regular eks-optimized aws linux 2 version updates. This is for all the usual reasons - upgrade and refinements to al2, security patches, kublet updates, etc. Each time the terraform plan is applied will result in a terraform taint of the managed node group so that the latest ami version will be used in a rolling update of nodes.  
 
-To perform a ami-refresh-only release, update the last ami-refresh-only date below, push and do patch version update release.  
+To perform a ami-latest-only release, update the last ami-latest-only date below, push and do patch version update release.  
 
-__Last ami-refresh-only release date__: 03-10-2022  
+__ami-latest-only release date__: 03-10-2022  
 
 **upgrade kubernetes and addon version**
 
