@@ -55,7 +55,7 @@ AWS releases regular eks-optimized aws linux 2 version updates. This is for all 
 
 To perform a ami-latest-only release, update the last ami-latest-only date below, push and do patch version update release.  
 
-__ami-latest-only release date__: 03-10-2022  
+__ami-latest-only release date__: 3-10-2022  
 
 **upgrade kubernetes and addon version**
 
