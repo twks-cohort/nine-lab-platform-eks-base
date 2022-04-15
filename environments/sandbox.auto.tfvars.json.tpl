@@ -4,7 +4,7 @@
     "account_id": "{{ twdps/di/svc/aws/dps-2/aws-account-id }}",
 
     "cluster_name": "sandbox",
-    "cluster_version": "1.21",
+    "cluster_version": "1.22",
     "vpc_cni_version": "v1.10.2-eksbuild.1",
     "coredns_version": "v1.8.4-eksbuild.1",
     "kube_proxy_version": "v1.21.2-eksbuild.2",
