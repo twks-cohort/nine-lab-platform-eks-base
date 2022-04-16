@@ -6,7 +6,7 @@ orbs:
   # can override kubectl, awspec versions as necessary
   kube: twdps/kube-ops@0.2.0
   # used for github-release-notes feature
-  executor-tools: twdps/executor-tools@0.2.0
+  executor-tools: twdps/executor-tools@0.3.0
 
 # ==== global pipeline parameters
 
