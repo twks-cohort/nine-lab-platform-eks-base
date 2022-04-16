@@ -327,6 +327,7 @@ workflows:
           name: release-lab-platform-eks-base
           context: << pipeline.parameters.context >>
           shell: << pipeline.parameters.shell-options >>
+          on-tag: true
           filters: *on-tag-main
 
   lab-platform-eks-base-monitors:
