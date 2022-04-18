@@ -5,10 +5,10 @@
 
     "cluster_name": "sandbox",
     "cluster_version": "1.22",
-    "vpc_cni_version": "v1.10.2-eksbuild.1",
-    "coredns_version": "v1.8.4-eksbuild.1",
-    "kube_proxy_version": "v1.21.2-eksbuild.2",
-    "aws_ebs_csi_version": "v1.4.0-eksbuild.preview",
+    "vpc_cni_version": "v1.10.3-eksbuild.1",
+    "coredns_version": "v1.8.7-eksbuild.1",
+    "kube_proxy_version": "v1.22.6-eksbuild.1",
+    "aws_ebs_csi_version": "v1.5.2-eksbuild.1",
 
     "default_node_group_ami_type": "AL2_x86_64",
     "default_node_group_platform": "linux",
