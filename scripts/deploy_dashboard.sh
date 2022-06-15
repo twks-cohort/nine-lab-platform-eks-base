@@ -45,6 +45,9 @@ do
   # append environment AMI version
   export CLUSTER_NODES=$(aws ec2 describe-instances --filter "Name=tag:kubernetes.io/cluster/$cluster,Values=owned")
   export CURRENT_AMI_VERSION=$(echo $CLUSTER_NODES | jq -r '.Reservations | .[0] | .Instances | .[0] | .ImageId')
+  if [[ $CURRENT_AMI_VERSION == "null" ]]; then
+    export CURRENT_AMI_VERSION="-"
+  fi
   export AMI_VERSIONS="$AMI_VERSIONS ${CURRENT_AMI_VERSION:-} |"
   echo "CURRENT_AMI_VERSION: $CURRENT_AMI_VERSION"
 
@@ -75,7 +78,7 @@ export CURRENT_TABLE="$TABLE$EKS_VERSIONS\\\\n$AMI_VERSIONS\\\\n$COREDNS_VERSION
 
 # current versions table
 declare TABLE="| available |\\\\n|----|\\\\n"
-declare EKS_VERSIONS="| - |"
+declare EKS_VERSIONS="|"
 declare AMI_VERSIONS="|"
 declare COREDNS_VERSIONS="|"
 declare KUBE_PROXY_VERSIONS="|"
@@ -83,6 +86,10 @@ declare VPC_CNI_VERSIONS="|"
 declare EBS_CSI_VERSIONS="|"
 
 echo "generate markdown table with the available versions of the services managed by the lab-platform-eks-base pipeline for all clusters"
+
+export AVAILABLE_EKS_VERSIONS=$(aws eks describe-addon-versions | jq -r ".addons[] | .addonVersions[] | .compatibilities[] | .clusterVersion" | sort | uniq)
+export LATEST_EKS_VERSION=$(echo ${AVAILABLE_EKS_VERSIONS} | tail -n1)
+export EKS_VERSIONS="$EKS_VERSIONS $LATEST_EKS_VERSION |"
 
 # fetch the current ami release versions available. Use this for bottlerocket= /aws/service/bottlerocket/aws-k8s-$DESIRED_CLUSTER_VERSION/x86_64/latest/image_id
 export LATEST_AMI_VERSION=$(aws ssm get-parameter --name /aws/service/eks/optimized-ami/$DESIRED_CLUSTER_VERSION/amazon-linux-2/recommended/image_id --region $AWS_DEFAULT_REGION | jq -r '.Parameter.Value')
