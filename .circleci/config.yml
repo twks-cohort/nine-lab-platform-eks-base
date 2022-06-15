@@ -379,14 +379,14 @@ workflows:
             - apply prod-us-east-1 changes
           filters: *on-tag-main
 
-  generate release notes:
-    jobs:
-      - executor-tools/release:
-          name: generate release notes for eks-base production release
-          context: << pipeline.parameters.context >>
-          shell: << pipeline.parameters.shell-options >>
-          on-tag: true
-          filters: *on-tag-main
+  # generate release notes:
+  #   jobs:
+  #     - executor-tools/release:
+  #         name: generate release notes for eks-base production release
+  #         context: << pipeline.parameters.context >>
+  #         shell: << pipeline.parameters.shell-options >>
+  #         on-tag: true
+  #         filters: *on-tag-main
 
   update monitors:
     jobs:
