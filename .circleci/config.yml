@@ -313,24 +313,15 @@ workflows:
       #       - approve sandbox-us-east-2 changes
       #     filters: *on-push-main
 
-      # See comments on this job above
-      # - post-terraform-configuration:
-      #     name: post-terraform-sandbox-configuration
+      # - validate-eks:
+      #     name: validate sandbox-us-east-2 eks cluster
       #     context: << pipeline.parameters.context >>
-      #     cluster: sandbox
+      #     shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+      #     source-env: op.nonprod.env
+      #     cluster: sandbox-us-east-2
       #     requires:
-      #       - apply-sandbox-changes
+      #       - apply sandbox-us-east-2 changes
       #     filters: *on-push-main
-
-      - validate-eks:
-          name: validate sandbox-us-east-2 eks cluster
-          context: << pipeline.parameters.context >>
-          shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
-          source-env: op.nonprod.env
-          cluster: sandbox-us-east-2
-          # requires:
-          #   - apply sandbox-us-east-2 changes
-          filters: *on-push-main
 
   release eks-base to prod-us-east-1:
     jobs:
@@ -394,39 +385,39 @@ workflows:
   #         on-tag: true
   #         filters: *on-tag-main
 
-  update monitors:
-    jobs:
-      - update-monitors:
-          name: update sandbox-us-east-2 monitors
-          context: << pipeline.parameters.context >>
-          shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
-          source-env: op.nonprod.env
-          cluster: sandbox-us-east-2
-          filters: *on-push-main
+  # update monitors:
+  #   jobs:
+  #     - update-monitors:
+  #         name: update sandbox-us-east-2 monitors
+  #         context: << pipeline.parameters.context >>
+  #         shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+  #         source-env: op.nonprod.env
+  #         cluster: sandbox-us-east-2
+  #         filters: *on-push-main
 
-      - approve prod-us-east-1 monitors:
-          type: approval
-          requires:
-            - update sandbox-us-east-2 monitors
-          filters: *on-push-main
+  #     - approve prod-us-east-1 monitors:
+  #         type: approval
+  #         requires:
+  #           - update sandbox-us-east-2 monitors
+  #         filters: *on-push-main
 
-      - update-monitors:
-          name: update prod-us-east-1 monitors
-          context: << pipeline.parameters.context >>
-          shell: op run --env-file op.prod.env -- /bin/bash -eo pipefail
-          source-env: op.prod.env
-          cluster: prod-us-east-1
-          requires:
-            - approve prod-us-east-1 monitors
-          filters: *on-push-main
+  #     - update-monitors:
+  #         name: update prod-us-east-1 monitors
+  #         context: << pipeline.parameters.context >>
+  #         shell: op run --env-file op.prod.env -- /bin/bash -eo pipefail
+  #         source-env: op.prod.env
+  #         cluster: prod-us-east-1
+  #         requires:
+  #           - approve prod-us-east-1 monitors
+  #         filters: *on-push-main
 
-  update dashboard:
-    jobs:
-      - update-dashboard:
-          name: update dashboard
-          context: << pipeline.parameters.context >>
-          shell: op run --env-file op.prod.env -- /bin/bash -eo pipefail
-          filters: *on-push-main
+  # update dashboard:
+  #   jobs:
+  #     - update-dashboard:
+  #         name: update dashboard
+  #         context: << pipeline.parameters.context >>
+  #         shell: op run --env-file op.prod.env -- /bin/bash -eo pipefail
+  #         filters: *on-push-main
 
   # nightly-node-replacements:
   #   triggers:
@@ -442,6 +433,7 @@ workflows:
           type: approval
           filters: *on-push-main
       - replace-nodes:
+          context: << pipeline.parameters.context >>
           cluster: sandbox-us-east-2
           source-env: op.nonprod.env
           requires:
