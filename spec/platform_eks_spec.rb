@@ -24,9 +24,15 @@ describe eks(tfvars["cluster_name"]) do
   its(:version) { should eq tfvars['cluster_version'] }
 end
 
-ec2_instances.each do |instance|
-  print(instance.instance_type)
-  describe tfvars['default_node_group_instance_types'] do
-    it { should include instance.instance_type }
-  end
-end
+describe eks_nodegroup(ENV['TEST_ENV'] + '_group_a'), cluster: 'ENV['TEST_ENV']' do
+  it { should exist }
+  it { should be_ready }
+end4
+
+# if using ON_DEMAND, single instance type
+# ec2_instances.each do |instance|
+#   print(instance.instance_type)
+#   describe tfvars['default_node_group_instance_types'] do
+#     it { should include instance.instance_type }
+#   end
+# end

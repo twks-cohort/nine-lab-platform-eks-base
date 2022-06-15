@@ -6,3 +6,4 @@ terrform.*
 .terraform.lock.hcl
 Pipfile.lock
 credentials
+*.ignore

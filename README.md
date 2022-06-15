@@ -18,7 +18,7 @@
 
 ## current configuration
 
-* OIDC for service accounts (irsa) installed and used by resulting admin kubeconfig, and for oidc-assumable roles
+* OIDC for service accounts (irsa) enabled and used by resulting admin kubeconfig, and for assumable roles
 * control plane logging default = "api", "audit", "authenticator", "controllerManager", "scheduler"
 * control plan internals encrypted using managed kms key
 * AWS Managed node_groups for worker pools
@@ -30,15 +30,11 @@
   * aws-ebs-csi-driver, with required role (note: storage class definition managed in core-services pipeline)
 * See release notes for current release versions
 
-**changes in since eks/K8s 1.20**
+**IMPORTANT: When creating a new cluster**
 
-In 1.19 and prior, the following tags needed to be self-managed (unless using eksctl, aws cli, or the console):  
+We are using the IRSA created below for permissions. However, we have to deploy with the policy attached FIRST (when creating a fresh cluster) and then turn this off after the cluster/node group is created. Without this initial policy, the VPC CNI fails to assign IPs and nodes cannot join the cluster.  
 
-"kubernetes.io/cluster/${var.cluster_name}" = "owned"  
-"k8s.io/cluster-autoscaler/enabled" = "true"  
-"k8s.io/cluster-autoscaler/${var.cluster_name}" = "true"  
-
-Now these are applied by default.  
+See the comments around line 75 in `main.tf`  
 
 ### Radiators and Monitors
 
@@ -47,15 +43,12 @@ Given that the observability agents (datadog is used by the lab) are managed by 
 The clusters monitors are the same for each cluster and deployed with the cluster, whereas the dashboard incorporates all clusters and is deployed by git push.  
 
 As with this repo/pipieline, the dashboard and monitors deployed by a pipeline are concerned with the services managed within the pipeline.  
+
 ## upgrade How-tos
 
 **upgrade managed node_groups**
 
 AWS releases regular eks-optimized aws linux 2 version updates. This is for all the usual reasons - upgrade and refinements to al2, security patches, kublet updates, etc. Each time the terraform plan is applied will result in a terraform taint of the managed node group so that the latest ami version will be used in a rolling update of nodes.  
-
-To perform a ami-latest-only release, update the last ami-latest-only date below, push and do patch version update release.  
-
-__ami-latest-only release date__: 3-10-2022  
 
 **upgrade kubernetes and addon version**
 
@@ -67,10 +60,11 @@ Ex:
 ```bash
 {
   ...
-  "cluster_version": "1.21",  # <= upgrade to next version by changing to "1.22"
-  "amazon_vpc_cni_version": "v1.10.1-eksbuild.1",
-  "coredns_version": "v1.8.4-eksbuild.1",
-  "kube_proxy_version": "v1.21.2-eksbuild.2",
+  "cluster_version": "1.21",                       # <= change these eks or addon versions to trigger aws managed upgrade
+  "vpc_cni_version": "v1.11.0-eksbuild.1",
+  "coredns_version": "v1.8.7-eksbuild.1",
+  "kube_proxy_version": "v1.22.6-eksbuild.1",
+  "aws_ebs_csi_version": "v1.6.1-eksbuild.1",
   ...
 }
 ```
@@ -83,13 +77,6 @@ Commented section manages the WARM_IP_TARGET setting. This effects the number of
 
 _Note._ Must upgrade to each major version as release; don't skip over a version.  
 
-**Delete aws-auth configmap after destroy**
-
-Known issue related to cleanly destroying EKS cluster. Remove the aws-auth configmap manually to resolve:  
-
-```
-$ terraform state rm 'module.eks.kubernetes_config_map.aws_auth[0]'
-```
 **Deleting ns stuck in terminating**  
 
 The issue is tied to removing finalizers and/or services still running in a namespace that are somewhat hidden. The krew plugin get-all can help with finding those other artifacts in the namespace, but to force a deletion:  
@@ -111,5 +98,5 @@ kubectl set image deployment/ebs-csi-controller liveness-probe=602401143452.dkr.
 kubectl set image daemonset/ebs-csi-node liveness-probe=602401143452.dkr.ecr.us-east-2.amazonaws.com/eks/livenessprobe:v2.4.0 -n kube-system
 ```
 
-- Still need to add eks major version release check. The current radiator does report latest nor indicate when prod is behind.  
+- Still need to add eks major version release check. The current radiator does not report latest nor indicate when prod is behind.  
 - the datadog monitor and dashboard update scripts are simplistic and there is obviously refactoring needed to turn that into a standard piece of code with functionality accessed via an orb or something similar

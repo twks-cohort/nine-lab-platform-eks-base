@@ -6,10 +6,15 @@
 
 export CLUSTER=$1
 export AWS_DEFAULT_REGION=$(cat $CLUSTER.auto.tfvars.json | jq -r .aws_region)
-export AWS_ASSUME_ROLE=$(cat $CLUSTER.auto.tfvars.json | jq -r .assume_role)
-export AWS_ACCOUNT_ID=$(cat $CLUSTER.auto.tfvars.json | jq -r .account_id)
+export AWS_ASSUME_ROLE=$(cat $CLUSTER.auto.tfvars.json | jq -r .aws_assume_role)
+export AWS_ACCOUNT_ID=$(cat $CLUSTER.auto.tfvars.json | jq -r .aws_account_id)
 
-aws sts assume-role --output json --role-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/$AWS_ASSUME_ROLE --role-session-name eks-configuration-test > credentials
+echo "debug:"
+echo "CLUSTER: $CLUSTER"
+echo "AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION"
+echo "AWS_ASSUME_ROLE: $AWS_ASSUME_ROLE"
+
+aws sts assume-role --output json --role-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/$AWS_ASSUME_ROLE --role-session-name lab-platform-eks-base > credentials
 
 export AWS_ACCESS_KEY_ID=$(cat credentials | jq -r ".Credentials.AccessKeyId")
 export AWS_SECRET_ACCESS_KEY=$(cat credentials | jq -r ".Credentials.SecretAccessKey")
@@ -25,6 +30,9 @@ export CLUSTER_NODES=$(aws ec2 describe-instances --filter "Name=tag:kubernetes.
 export CURRENT_AMI_VERSION=$(echo $CLUSTER_NODES | jq -r '.Reservations | .[0] | .Instances | .[0] | .ImageId')
 export LATEST_AMI_VERSION=$(aws ssm get-parameter --name /aws/service/eks/optimized-ami/$DESIRED_CLUSTER_VERSION/amazon-linux-2/recommended/image_id --region $AWS_DEFAULT_REGION | jq -r '.Parameter.Value')
 
+echo "CURRENT_AMI_VERSION: $CURRENT_AMI_VERSION"
+echo "LATEST_AMI_VERSION:  $LATEST_AMI_VERSION"
+
 if [ "$CURRENT_AMI_VERSION" != "$LATEST_AMI_VERSION" ]; then
   echo "new eks ami available: $LATEST_AMI_VERSION"
 fi
@@ -35,17 +43,17 @@ export LATEST_COREDNS_VERSION=$(echo $AVAILABLE_ADDON_VERSIONS | jq -r '.addons[
 export LATEST_KUBE_PROXY_VERSION=$(echo $AVAILABLE_ADDON_VERSIONS | jq -r '.addons[] | select(.addonName=="kube-proxy") | .addonVersions[0] | .addonVersion')
 export LATEST_EBS_CSI_VERSION=$(echo $AVAILABLE_ADDON_VERSIONS | jq -r '.addons[] | select(.addonName=="aws-ebs-csi-driver") | .addonVersions[0] | .addonVersion')
 
-# echo "DESIRED_VPC_CNI_VERSION $DESIRED_VPC_CNI_VERSION"
-# echo "LATEST_VPC_CNI_VERSION $LATEST_VPC_CNI_VERSION"
+echo "DESIRED_VPC_CNI_VERSION $DESIRED_VPC_CNI_VERSION"
+echo "LATEST_VPC_CNI_VERSION  $LATEST_VPC_CNI_VERSION"
 
-# echo "DESIRED_COREDNS_VERSION $DESIRED_COREDNS_VERSION"
-# echo "LATEST_COREDNS_VERSION $LATEST_COREDNS_VERSION"
+echo "DESIRED_COREDNS_VERSION $DESIRED_COREDNS_VERSION"
+echo "LATEST_COREDNS_VERSION  $LATEST_COREDNS_VERSION"
 
-# echo "DESIRED_KUBE_PROXY_VERSION $DESIRED_KUBE_PROXY_VERSION"
-# echo "LATEST_KUBE_PROXY_VERSION $LATEST_KUBE_PROXY_VERSION"
+echo "DESIRED_KUBE_PROXY_VERSION $DESIRED_KUBE_PROXY_VERSION"
+echo "LATEST_KUBE_PROXY_VERSION  $LATEST_KUBE_PROXY_VERSION"
 
-# echo "DESIRED_EBS_CSI_VERSION $DESIRED_EBS_CSI_VERSION"
-# echo "LATEST_EBS_CSI_VERSION $LATEST_EBS_CSI_VERSION"
+echo "DESIRED_EBS_CSI_VERSION $DESIRED_EBS_CSI_VERSION"
+echo "LATEST_EBS_CSI_VERSION  $LATEST_EBS_CSI_VERSION"
 
 if [ $DESIRED_VPC_CNI_VERSION != $LATEST_VPC_CNI_VERSION ]; then
   echo "new vpc-cni version available: $LATEST_VPC_CNI_VERSION"

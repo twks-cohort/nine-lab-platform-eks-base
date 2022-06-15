@@ -112,7 +112,7 @@
           }
         ],
         "autoscale": true,
-        "precision": 2
+        "precision": 0
       },
       "layout": {
         "x": 0,
@@ -146,7 +146,7 @@
           }
         ],
         "autoscale": true,
-        "precision": 2
+        "precision": 0
       },
       "layout": {
         "x": 1,
@@ -180,7 +180,7 @@
           }
         ],
         "autoscale": true,
-        "precision": 2
+        "precision": 0
       },
       "layout": {
         "x": 2,
@@ -192,7 +192,7 @@
     {
       "definition": {
         "type": "note",
-        "content": "| dependency | sandbox | preview |\n|----|----|----|\n| eks | 1.21 | 1.21 |\n| ami | ami-05b818927a5dfee17 | ami-05b818927a5dfee17 |\n| coredns | v1.8.4-eksbuild.1 | v1.8.4-eksbuild.1 |\n| kube-proxy | v1.21.2-eksbuild.2 | v1.21.2-eksbuild.2 |\n| vpc-cni | v1.10.1-eksbuild.1 | v1.10.1-eksbuild.1 |\n| ebs-csi | v1.4.0-eksbuild.preview | v1.4.0-eksbuild.preview |\n",
+        "content": "| dependency | sandbox |   prod   |\n|----|----|----|\n| eks | 1.22 | 1.22 |\n| ami | ami-0e2f7bdfc6ff574c9 | null |\n| coredns | v1.8.7-eksbuild.1 | v1.8.7-eksbuild.1 |\n| kube-proxy | v1.22.6-eksbuild.1 | v1.22.6-eksbuild.1 |\n| vpc-cni | v1.11.0-eksbuild.1 | v1.11.0-eksbuild.1 |\n| ebs-csi | v1.6.1-eksbuild.1 | v1.6.1-eksbuild.1 |\n",
         "background_color": "yellow",
         "font_size": "14",
         "text_align": "left",
@@ -212,8 +212,8 @@
     {
       "definition": {
         "type": "note",
-        "content": "| available |\n|----|\n| - |\n| ami-0191f49f7078e423f |\n| v1.8.4-eksbuild.1 |\n| v1.21.2-eksbuild.2 |\n| v1.10.1-eksbuild.1 |\n| v1.4.0-eksbuild.preview |\n",
-        "background_color": "pink",
+        "content": "| available |\n|----|\n| - |\n| ami-0e2f7bdfc6ff574c9 |\n| v1.8.7-eksbuild.1 |\n| v1.22.6-eksbuild.1 |\n| v1.11.0-eksbuild.1 |\n| v1.6.1-eksbuild.1 |\n",
+        "background_color": "green",
         "font_size": "14",
         "text_align": "left",
         "vertical_align": "top",
@@ -241,7 +241,7 @@
         "hide_zero_counts": true,
         "show_last_triggered": false,
         "show_priority": false,
-        "query": "tag:$cluster",
+        "query": "tag:pipeline:lab-platform-eks-base",
         "sort": "status,asc",
         "count": 50,
         "start": 0
@@ -267,6 +267,7 @@
           "value",
           "sum"
         ],
+        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -313,6 +314,11 @@
               "line_width": "normal"
             },
             "display_type": "line"
+          }
+        ],
+        "events": [
+          {
+            "q": "tags:cluster:$cluster, deployment:lab*"
           }
         ]
       },
@@ -393,6 +399,7 @@
           "value",
           "sum"
         ],
+        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -432,6 +439,11 @@
             },
             "display_type": "line"
           }
+        ],
+        "events": [
+          {
+            "q": "tags:cluster:$cluster, deployment:lab*"
+          }
         ]
       },
       "layout": {
@@ -455,6 +467,7 @@
           "value",
           "sum"
         ],
+        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -477,6 +490,11 @@
               "line_width": "normal"
             },
             "display_type": "line"
+          }
+        ],
+        "events": [
+          {
+            "q": "tags:cluster:$cluster, deployment:lab*"
           }
         ]
       },
@@ -537,6 +555,7 @@
           "value",
           "sum"
         ],
+        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -576,6 +595,11 @@
             },
             "display_type": "line"
           }
+        ],
+        "events": [
+          {
+            "q": "tags:cluster:$cluster, deployment:lab*"
+          }
         ]
       },
       "layout": {
@@ -599,6 +623,7 @@
           "value",
           "sum"
         ],
+        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -621,6 +646,11 @@
               "line_width": "normal"
             },
             "display_type": "line"
+          }
+        ],
+        "events": [
+          {
+            "q": "tags:cluster:$cluster, deployment:lab*"
           }
         ]
       },
@@ -681,6 +711,7 @@
           "value",
           "sum"
         ],
+        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -703,6 +734,11 @@
               "line_width": "normal"
             },
             "display_type": "line"
+          }
+        ],
+        "events": [
+          {
+            "q": "tags:cluster:$cluster, deployment:lab*"
           }
         ]
       },
@@ -727,6 +763,7 @@
           "value",
           "sum"
         ],
+        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -749,6 +786,11 @@
               "line_width": "normal"
             },
             "display_type": "line"
+          }
+        ],
+        "events": [
+          {
+            "q": "tags:cluster:$cluster, deployment:lab*"
           }
         ]
       },
@@ -818,6 +860,7 @@
           "value",
           "sum"
         ],
+        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -865,6 +908,11 @@
             },
             "display_type": "line"
           }
+        ],
+        "events": [
+          {
+            "q": "tags:cluster:$cluster, deployment:lab*"
+          }
         ]
       },
       "layout": {
@@ -888,6 +936,7 @@
           "value",
           "sum"
         ],
+        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -918,6 +967,11 @@
               "line_width": "normal"
             },
             "display_type": "line"
+          }
+        ],
+        "events": [
+          {
+            "q": "tags:cluster:$cluster, deployment:lab*"
           }
         ]
       },
@@ -988,7 +1042,13 @@
         "title_size": "16",
         "title_align": "left",
         "show_legend": false,
+        "time": {},
         "type": "heatmap",
+        "events": [
+          {
+            "q": "tags:cluster:$cluster, deployment:lab*"
+          }
+        ],
         "requests": [
           {
             "q": "avg:coredns.cache_hits_count{$cluster,$node} by {host}.as_count()*100/(avg:coredns.cache_hits_count{$cluster,$node} by {host}.as_count()+avg:coredns.cache_misses_count{$cluster,$node} by {host}.as_count())",
@@ -1019,6 +1079,7 @@
           "value",
           "sum"
         ],
+        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -1057,6 +1118,11 @@
           "min": "auto",
           "max": "auto"
         },
+        "events": [
+          {
+            "q": "tags:cluster:$cluster, deployment:lab*"
+          }
+        ],
         "markers": []
       },
       "layout": {
@@ -1080,6 +1146,7 @@
           "value",
           "sum"
         ],
+        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -1118,6 +1185,11 @@
           "min": "auto",
           "max": "auto"
         },
+        "events": [
+          {
+            "q": "tags:cluster:$cluster, deployment:lab*"
+          }
+        ],
         "markers": []
       },
       "layout": {
@@ -1141,6 +1213,7 @@
           "value",
           "sum"
         ],
+        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -1173,6 +1246,11 @@
           "min": "auto",
           "max": "auto"
         },
+        "events": [
+          {
+            "q": "tags:cluster:$cluster, deployment:lab*"
+          }
+        ],
         "markers": []
       },
       "layout": {
@@ -1196,6 +1274,7 @@
           "value",
           "sum"
         ],
+        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -1228,6 +1307,11 @@
           "min": "auto",
           "max": "auto"
         },
+        "events": [
+          {
+            "q": "tags:cluster:$cluster, deployment:lab*"
+          }
+        ],
         "markers": []
       },
       "layout": {
@@ -1255,5 +1339,6 @@
   "layout_type": "ordered",
   "is_read_only": false,
   "notify_list": [],
-  "reflow_type": "fixed"
+  "reflow_type": "fixed",
+  "id": "u7z-5p7-cfs"
 }

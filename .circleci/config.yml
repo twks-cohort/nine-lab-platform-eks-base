@@ -2,11 +2,10 @@
 version: 2.1
 
 orbs:
-  terraform: twdps/terraform@0.4.0
+  terraform: twdps/terraform@0.9.0
   # can override kubectl, awspec versions as necessary
   kube: twdps/kube-ops@0.2.0
-  # used for github-release-notes feature
-  executor-tools: twdps/executor-tools@0.3.0
+
 
 # ==== global pipeline parameters
 
@@ -15,18 +14,14 @@ parameters:
     description: circleci context for all jobs
     type: string
     default: twdps-core-labs-team
-  shell-options:
-    description: shell options for all jobs
-    type: string
-    default: secrethub run --env-file secrethub.nonprod.env -- /bin/bash -eo pipefail
   terraform-version:
     description: terraform version for all jobs
     type: string
-    default: "1.1.7"
+    default: "1.2.2"
   executor-image:
     description: image to use for terraform runs
     type: string
-    default: twdps/circleci-kube-ops:alpine-0.4.0
+    default: twdps/circleci-kube-ops:alpine-0.7.0
 
 # git push: deploy sandbox
 on-push-main: &on-push-main
@@ -35,7 +30,7 @@ on-push-main: &on-push-main
   tags:
     ignore: /.*/
 
-# git tag: release to preview cluster
+# git tag: release to prod cluster
 on-tag-main: &on-tag-main
   branches:
     ignore: /.*/
@@ -53,11 +48,11 @@ commands:
     steps:
       - run:
           name: set ~/.terraformrc
-          command: secrethub inject -i tpl/terraformrc.tpl -o ~/.terraformrc
+          command: op inject -i tpl/terraformrc.tpl -o ~/.terraformrc
       - run:
           name: set << parameters.cluster >> environment variables
           command: |
-            secrethub inject -i environments/<< parameters.cluster >>.auto.tfvars.json.tpl -o << parameters.cluster >>.auto.tfvars.json
+            op inject -i environments/<< parameters.cluster >>.auto.tfvars.json.tpl -o << parameters.cluster >>.auto.tfvars.json
 
   set-kubeconfig:
     parameters:
@@ -69,7 +64,7 @@ commands:
           name: setup kubeconfig
           command: |
             mkdir -p ~/.kube
-            SECRETHUB_VAR_ENV=<< parameters.cluster >> secrethub inject -i tpl/kubeconfig.tpl -o ~/.kube/config
+            ENV=<< parameters.cluster >> op inject -i tpl/kubeconfig.tpl -o ~/.kube/config
 
   taint-node-group:
     description: apply node taint for automatic lastest eks-optimized-al2 managed node ami updates
@@ -79,8 +74,9 @@ commands:
     steps:
       - run:
           name: set terraform taint on managed node group to cause new node template with latest ami version
-          command: terraform taint "module.eks.module.node_groups.aws_eks_node_group.workers[\"<< parameters.node-group >>\"]"
-          # eks module 18 version: terraform taint "module.eks.module.eks_managed_node_group[\"group_a\"].aws_eks_node_group.this[0]"
+          command: terraform taint "module.eks.module.eks_managed_node_group[\"<< parameters.node-group >>\"].aws_eks_node_group.this[0]"
+          # eks module 18 version: terraform taint "module.eks.module.eks_managed_node_group[\"<< parameters.node-group >>\"].aws_eks_node_group.this[0]"
+          # eks module 17 version: terraform taint "module.eks.module.node_groups.aws_eks_node_group.workers[\"<< parameters.node-group >>\"]"
 
   store-system-credentials:
     parameters:
@@ -133,11 +129,6 @@ jobs:
           cluster: << parameters.cluster >>
       - set-kubeconfig:
           cluster: << parameters.cluster >>
-      - kube/packages:
-          datadog-version: "0.43.0"
-      - run:
-          name: post deployment event to datadog
-          command: dog event post --tags "cluster:sandbox, deployment:lab-platform-eks-base" Deploy 'lab-platform-eks-base'
       - run:
           name: test eks control plane
           environment:
@@ -211,43 +202,46 @@ jobs:
 workflows:
   version: 2
 
-  lab-platform-eks-base-pipeline:
+  deploy eks-base to sandbox-us-east-2:
     jobs:
-      # sandbox cluster
       - terraform/plan:
-          name: sandbox-change-plan
+          name: sandbox-us-east-2 change plan
           context: << pipeline.parameters.context >>
-          shell: << pipeline.parameters.shell-options >>
-          workspace: sandbox
+          shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+          workspace: sandbox-us-east-2
           terraform-version: << pipeline.parameters.terraform-version >>
           before-terraform:
             - set-environment:
-                cluster: sandbox
+                cluster: sandbox-us-east-2
           filters: *on-push-main
 
-      - approve-sandbox-changes:
+      - approve sandbox-us-east-2 changes:
           type: approval
           requires:
-            - sandbox-change-plan
+            - sandbox-us-east-2 change plan
           filters: *on-push-main
 
       - terraform/apply:
-          name: apply-sandbox-changes
+          name: apply sandbox-us-east-2 changes
           context: << pipeline.parameters.context >>
-          shell: << pipeline.parameters.shell-options >>
-          workspace: sandbox
+          shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+          workspace: sandbox-us-east-2
           terraform-version: << pipeline.parameters.terraform-version >>
           before-terraform:
             - set-environment:
-                cluster: sandbox
+                cluster: sandbox-us-east-2
           after-terraform-init:
             - taint-node-group:
-                node-group: group_a
+                node-group: sandbox-us-east-2_group_a
           after-terraform:
             - store-system-credentials:
-                cluster: sandbox
+                cluster: sandbox-us-east-2
+            - do/circle-deploy
+            - do/slack-webhook:
+                message: lab-platform-eks-base sandbox-us-east-2 deployment
+                webhook-url: $LAB_EVENTS_CHANNEL_WEBHOOK
           requires:
-            - approve-sandbox-changes
+            - approve sandbox-us-east-2 changes
           filters: *on-push-main
 
       # See comments on this job above
@@ -260,48 +254,54 @@ workflows:
       #     filters: *on-push-main
 
       - validate-eks:
-          name: validate-sandbox-cluster
+          name: validate sandbox-us-east-2 eks cluster
           context: << pipeline.parameters.context >>
-          cluster: sandbox
+          shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+          cluster: sandbox-us-east-2
           requires:
-            - apply-sandbox-changes
+            - apply sandbox-us-east-2 changes
           filters: *on-push-main
 
-      # preview cluster
+  release eks-base to prod-us-east-1:
+    jobs:
       - terraform/plan:
-          name: preview-change-plan
+          name: prod-us-east-1 change plan
           context: << pipeline.parameters.context >>
-          shell: << pipeline.parameters.shell-options >>
-          workspace: preview
+          shell: op run --env-file op.prod.env -- /bin/bash -eo pipefail
+          workspace: prod-us-east-1
           terraform-version: << pipeline.parameters.terraform-version >>
           before-terraform:
             - set-environment:
-                cluster: preview
+                cluster: prod-us-east-1
           filters: *on-tag-main
 
-      - approve-preview-changes:
+      - approve prod-us-east-1 changes:
           type: approval
           requires:
-            - preview-change-plan
+            - prod-us-east-1 change plan
           filters: *on-tag-main
 
       - terraform/apply:
-          name: apply-preview-changes
+          name: apply prod-us-east-1 changes
           context: << pipeline.parameters.context >>
-          shell: << pipeline.parameters.shell-options >>
-          workspace: preview
+          shell: op run --env-file op.prod.env -- /bin/bash -eo pipefail
+          workspace: prod-us-east-1
           terraform-version: << pipeline.parameters.terraform-version >>
           before-terraform:
             - set-environment:
-                cluster: preview
+                cluster: prod-us-east-1
           after-terraform-init:
             - taint-node-group:
-                node-group: group_a
+                node-group: prod-us-east-1-group_a
           after-terraform:
             - store-system-credentials:
-                cluster: preview
+                cluster: prod-us-east-1
+            - do/circle-deploy
+            - do/slack-webhook:
+                message: lab-platform-eks-base prod-us-east-1 release
+                webhook-url: $LAB_EVENTS_CHANNEL_WEBHOOK
           requires:
-            - approve-preview-changes
+            - approve prod-us-east-1 changes
           filters: *on-tag-main
 
       # See comments on this job above
@@ -314,49 +314,53 @@ workflows:
       #     filters: *on-tag-main
 
       - validate-eks:
-          name: validate-preview-cluster
+          name: validate prod-us-east-1 eks cluster
           context: << pipeline.parameters.context >>
-          cluster: preview
+          shell: op run --env-file op.prod.env -- /bin/bash -eo pipefail
+          cluster: prod-us-east-1
           requires:
-            - apply-preview-changes
+            - apply prod-us-east-1 changes
           filters: *on-tag-main
 
-  generate-release-notes:
-    jobs:
-      - executor-tools/release:
-          name: release-lab-platform-eks-base
-          context: << pipeline.parameters.context >>
-          shell: << pipeline.parameters.shell-options >>
-          on-tag: true
-          filters: *on-tag-main
+  # generate release notes:
+  #   jobs:
+  #     - executor-tools/release:
+  #         name: generate release notes for eks-base production release
+  #         context: << pipeline.parameters.context >>
+  #         shell: << pipeline.parameters.shell-options >>
+  #         on-tag: true
+  #         filters: *on-tag-main
 
-  lab-platform-eks-base-monitors:
+  update monitors:
     jobs:
       - update-monitors:
-          name: update-sandbox-monitors
+          name: update sandbox-us-east-2 monitors
           context: << pipeline.parameters.context >>
-          cluster: sandbox
+          shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+          cluster: sandbox-us-east-2
           filters: *on-push-main
 
-      - approve-preview-monitors:
+      - approve prod-us-east-1 monitors:
           type: approval
           requires:
-            - update-sandbox-monitors
+            - update sandbox-us-east-2 monitors
           filters: *on-push-main
 
       - update-monitors:
-          name: update-preview-monitors
+          name: update prod-us-east-1 monitors
           context: << pipeline.parameters.context >>
-          cluster: preview
+          shell: op run --env-file op.prod.env -- /bin/bash -eo pipefail
+          cluster: prod-us-east-1
           requires:
-            - approve-preview-monitors
+            - approve prod-us-east-1 monitors
           filters: *on-push-main
 
-  lab-platform-eks-base-dashboard:
+  update dashboard:
     jobs:
       - update-dashboard:
-          name: update-datadog-dashboard
+          name: update dashboard
           context: << pipeline.parameters.context >>
+          shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
           filters: *on-push-main
 
   # perform the pipeline health checks and compare desired eks component verions with current release versions
@@ -370,14 +374,17 @@ workflows:
                 - main
     jobs:
       - update-dashboard:
-          name: update-datadog-dashboard
+          name: update dashboard
+          shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
           context: << pipeline.parameters.context >>
       - validate-eks:
-          name: validate-sandbox-cluster
+          name: validate sandbox-us-east-2 eks cluster
           context: << pipeline.parameters.context >>
-          cluster: sandbox
+          shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+          cluster: sandbox-us-east-2
       # If continuous configuration checking required, insert night tf/plan and assess output
       - validate-eks:
-          name: validate-preview-cluster
+          name: validate prod-us-east-1 eks cluster
           context: << pipeline.parameters.context >>
-          cluster: preview
+          shell: op run --env-file op.prod.env -- /bin/bash -eo pipefail
+          cluster: prod-us-east-1
