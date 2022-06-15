@@ -37,7 +37,7 @@ do
   echo "cluster: $cluster"
 
   # append environment EKS version
-  export EKS_VERSION=$(cat environments/$cluster.auto.tfvars.json | jq -r .cluster_version)
+  export EKS_VERSION=$(cat environments/$cluster.auto.tfvars.json.tpl | jq -r .cluster_version)
   export DESIRED_CLUSTER_VERSION=$EKS_VERSION
   export EKS_VERSIONS="$EKS_VERSIONS $EKS_VERSION |"
   echo "DESIRED_CLUSTER_VERSION: $DESIRED_CLUSTER_VERSION"
@@ -45,26 +45,26 @@ do
   # append environment AMI version
   export CLUSTER_NODES=$(aws ec2 describe-instances --filter "Name=tag:kubernetes.io/cluster/$cluster,Values=owned")
   export CURRENT_AMI_VERSION=$(echo $CLUSTER_NODES | jq -r '.Reservations | .[0] | .Instances | .[0] | .ImageId')
-  export AMI_VERSIONS="$AMI_VERSIONS $CURRENT_AMI_VERSION |"
+  export AMI_VERSIONS="$AMI_VERSIONS ${CURRENT_AMI_VERSION:-} |"
   echo "CURRENT_AMI_VERSION: $CURRENT_AMI_VERSION"
 
   # append environment coreDNS version
-  export DESIRED_COREDNS_VERSION=$(cat environments/$cluster.auto.tfvars.json | jq -r .coredns_version)
+  export DESIRED_COREDNS_VERSION=$(cat environments/$cluster.auto.tfvars.json.tpl | jq -r .coredns_version)
   export COREDNS_VERSIONS="$COREDNS_VERSIONS $DESIRED_COREDNS_VERSION |"
   echo "DESIRED_COREDNS_VERSION: $DESIRED_COREDNS_VERSION"
 
   # append environment kube-proxy version
-  export DESIRED_KUBE_PROXY_VERSION=$(cat environments/$cluster.auto.tfvars.json | jq -r .kube_proxy_version)
+  export DESIRED_KUBE_PROXY_VERSION=$(cat environments/$cluster.auto.tfvars.json.tpl | jq -r .kube_proxy_version)
   export KUBE_PROXY_VERSIONS="$KUBE_PROXY_VERSIONS $DESIRED_KUBE_PROXY_VERSION |"
   echo "DESIRED_KUBE_PROXY_VERSION: $DESIRED_KUBE_PROXY_VERSION"
 
   # append environment VPC-CNI version
-  export DESIRED_VPC_CNI_VERSION=$(cat environments/$cluster.auto.tfvars.json | jq -r .vpc_cni_version)
+  export DESIRED_VPC_CNI_VERSION=$(cat environments/$cluster.auto.tfvars.json.tpl | jq -r .vpc_cni_version)
   export VPC_CNI_VERSIONS="$VPC_CNI_VERSIONS $DESIRED_VPC_CNI_VERSION |"
   echo "DESIRED_VPC_CNI_VERSION: $DESIRED_VPC_CNI_VERSION"
 
   # append environment EBS-CSI version
-  export DESIRED_EBS_CSI_VERSION=$(cat environments/$cluster.auto.tfvars.json | jq -r .aws_ebs_csi_version)
+  export DESIRED_EBS_CSI_VERSION=$(cat environments/$cluster.auto.tfvars.json.tpl | jq -r .aws_ebs_csi_version)
   export EBS_CSI_VERSIONS="$EBS_CSI_VERSIONS $DESIRED_EBS_CSI_VERSION |"
   echo "DESIRED_EBS_CSI_VERSION: $DESIRED_EBS_CSI_VERSION"
 
