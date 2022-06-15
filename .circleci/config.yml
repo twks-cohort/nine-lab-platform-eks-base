@@ -305,6 +305,8 @@ workflows:
           after-terraform:
             - store-system-credentials:
                 cluster: sandbox-us-east-2
+            - set-kubeconfig:
+                cluster: sandbox-us-east-2
             - kube/packages:
                 kubectl-version: 1.23.5
             - run:
@@ -362,6 +364,8 @@ workflows:
                 node-group: group-a
           after-terraform:
             - store-system-credentials:
+                cluster: prod-us-east-1
+            - set-kubeconfig:
                 cluster: prod-us-east-1
             - kube/packages:
                 kubectl-version: 1.23.5
