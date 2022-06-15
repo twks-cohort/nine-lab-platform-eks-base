@@ -59,18 +59,7 @@ for i in "${REPLACENODES[@]}"
 do
   INSTANCE_ID=$(aws ec2 describe-instances --filter Name=private-dns-name,Values=$i | jq -r '.Reservations[].Instances[] | .InstanceId')
   aws ec2 terminate-instances --instance-ids ${INSTANCE_ID}
-
-  CURRENT_READY_NODE_COUNT=$(kubectl get nodes | awk '{ print $2 }' | grep -E '(^|\s)Ready($|\s)' | wc -l)
-
-  # Wait until Ready node count is equal to starting number of nodes
-  until [ $CURRENT_READY_NODE_COUNT == $NUMNODES ]
-  do
-    echo "Waiting for 5 seconds to re-check node count. Current Ready node count is: ${CURRENT_READY_NODE_COUNT}"
-    sleep 5
-    CURRENT_READY_NODE_COUNT=$(kubectl get nodes | awk '{ print $2 }' | grep -E '(^|\s)Ready($|\s)' | wc -l)
-  done
 done || exit 1
-
 
 kubectl get nodes
 echo All planned nodes have been replaced successfully.
