@@ -24,7 +24,7 @@ describe eks(tfvars["cluster_name"]) do
   its(:version) { should eq tfvars['cluster_version'] }
 end
 
-describe eks_nodegroup(ENV['TEST_ENV'] + '_group_a'), cluster: 'ENV['TEST_ENV']' do
+describe eks_nodegroup(ENV['default_node_group_name']), cluster: 'ENV['TEST_ENV']' do
   it { should exist }
   it { should be_ready }
 end4

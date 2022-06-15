@@ -5,7 +5,7 @@ function version_alert() {
   export TABLE_COLOR=$ALERT_TABLE_COLOR
   # every 7 days, also send a slack message
   if (( "$(date +%d)" % 7 )); then
-    curl -X POST -H 'Content-type: application/json' --data '{"Notice":"$1"}' $SLACK_LAB_EVENTS
+    curl -X POST -H 'Content-type: application/json' --data '{"Notice":"$1"}' $LAB_EVENTS_CHANNEL_WEBHOOK
   fi
 }
 
@@ -87,8 +87,7 @@ declare EBS_CSI_VERSIONS="|"
 
 echo "generate markdown table with the available versions of the services managed by the lab-platform-eks-base pipeline for all clusters"
 
-export AVAILABLE_EKS_VERSIONS=$(aws eks describe-addon-versions | jq -r ".addons[] | .addonVersions[] | .compatibilities[] | .clusterVersion" | sort | uniq)
-export LATEST_EKS_VERSION=$(echo ${AVAILABLE_EKS_VERSIONS} | tail -n1)
+export LATEST_EKS_VERSION=$(aws eks describe-addon-versions | jq -r ".addons[] | .addonVersions[] | .compatibilities[] | .clusterVersion" | sort | uniq | tail -n1)
 export EKS_VERSIONS="$EKS_VERSIONS $LATEST_EKS_VERSION |"
 echo "LATEST_EKS_VERSION: $LATEST_EKS_VERSION"
 
