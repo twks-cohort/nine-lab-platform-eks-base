@@ -61,9 +61,6 @@ do
   aws ec2 terminate-instances --instance-ids ${INSTANCE_ID}
 done || exit 1
 
-kubectl get nodes
-echo All planned nodes have been replaced successfully.
-
 # echo
 # echo Checking datadog events to ensure health of bookinfo app during node replacements
 

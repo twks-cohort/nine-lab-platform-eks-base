@@ -259,6 +259,7 @@ jobs:
           source-env: << parameters.source-env >>
       - set-kubeconfig:
           cluster: << parameters.cluster >>
+      - do/circleci-deploy
       - run:
           name: replace the oldest 1/4 of the nodes in the clister
           command: bash scripts/replace_nodes.sh << parameters.cluster >>
