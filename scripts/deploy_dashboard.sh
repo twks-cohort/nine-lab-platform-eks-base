@@ -9,9 +9,10 @@ function version_alert() {
   fi
 }
 
-export AWS_DEFAULT_REGION=$(cat sandbox.auto.tfvars.json | jq -r .aws_region)
-export AWS_ASSUME_ROLE=$(cat sandbox.auto.tfvars.json | jq -r .aws_assume_role)
-export AWS_ACCOUNT_ID=$(cat sandbox.auto.tfvars.json | jq -r .aws_account_id)
+export CLUSTER=$1
+export AWS_DEFAULT_REGION=$(cat ${CLUSTER}.auto.tfvars.json | jq -r .aws_region)
+export AWS_ASSUME_ROLE=$(cat ${CLUSTER}.auto.tfvars.json | jq -r .aws_assume_role)
+export AWS_ACCOUNT_ID=$(cat ${CLUSTER}.auto.tfvars.json | jq -r .aws_account_id)
 
 echo "debug:"
 echo "AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION"
@@ -24,7 +25,7 @@ export AWS_SECRET_ACCESS_KEY=$(cat credentials | jq -r ".Credentials.SecretAcces
 export AWS_SESSION_TOKEN=$(cat credentials | jq -r ".Credentials.SessionToken")
 
 # current versions table
-export TABLE="| dependency | -us-east-2 | prod-us-east-1 |\\\\n|----|----|----|\\\\n"
+export TABLE="| dependency | sandbox-us-east-2 | prod-us-east-1 |\\\\n|----|----|----|\\\\n"
 export EKS_VERSIONS="| eks |"
 export AMI_VERSIONS="| ami |"
 export COREDNS_VERSIONS="| coredns |"
@@ -150,4 +151,4 @@ else
   sed -i "s/TABLE_COLOR/$TABLE_COLOR/g" observe/dashboard.json
 fi
 
-#python scripts/dashboard.py
+python scripts/dashboard.py

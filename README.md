@@ -42,7 +42,9 @@ Given that the observability agents (datadog is used by the lab) are managed by 
 
 The clusters monitors are the same for each cluster and deployed with the cluster, whereas the dashboard incorporates all clusters and is deployed by git push.  
 
-As with this repo/pipieline, the dashboard and monitors deployed by a pipeline are concerned with the services managed within the pipeline.  
+As with this repo/pipieline, the dashboard and monitors deployed by a pipeline are concerned with the services managed within the pipeline.
+
+_Note. While effective and simple, the dahsboard and monitor deployments would benefits from a clean, resusable abstraction._  
 
 ## upgrade How-tos
 
