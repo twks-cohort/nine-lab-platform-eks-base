@@ -126,7 +126,7 @@ jobs:
         default: /bin/bash -eo pipefail
     docker:
       - image: << pipeline.parameters.executor-image >>
-    shell: << parameters.shell-options >>
+    shell: << parameters.shell >>
     steps:
       - checkout
       - setup_remote_docker
@@ -158,7 +158,7 @@ jobs:
         default: /bin/bash -eo pipefail
     docker:
       - image: << pipeline.parameters.executor-image >>
-    shell: << parameters.shell-options >>
+    shell: << parameters.shell >>
     steps:
       - checkout
       - setup_remote_docker
@@ -182,7 +182,7 @@ jobs:
         default: /bin/bash -eo pipefail
     docker:
       - image: << pipeline.parameters.executor-image >>
-    shell: << parameters.shell-options >>
+    shell: << parameters.shell >>
     steps:
       - checkout
       - setup_remote_docker
@@ -204,7 +204,7 @@ jobs:
         default: /bin/bash -eo pipefail
     docker:
       - image: << pipeline.parameters.executor-image >>
-    shell: << parameters.shell-options >>
+    shell: << parameters.shell >>
     steps:
       - checkout
       - setup_remote_docker
@@ -274,7 +274,7 @@ workflows:
       - validate-eks:
           name: validate sandbox-us-east-2 eks cluster
           context: << pipeline.parameters.context >>
-          shell-options: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+          shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
           cluster: sandbox-us-east-2
           requires:
             - apply sandbox-us-east-2 changes
@@ -334,7 +334,7 @@ workflows:
       - validate-eks:
           name: validate prod-us-east-1 eks cluster
           context: << pipeline.parameters.context >>
-          shell-options: op run --env-file op.prod.env -- /bin/bash -eo pipefail
+          shell: op run --env-file op.prod.env -- /bin/bash -eo pipefail
           cluster: prod-us-east-1
           requires:
             - apply prod-us-east-1 changes
@@ -354,7 +354,7 @@ workflows:
       - update-monitors:
           name: update sandbox-us-east-2 monitors
           context: << pipeline.parameters.context >>
-          shell-options: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+          shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
           cluster: sandbox-us-east-2
           filters: *on-push-main
 
@@ -367,7 +367,7 @@ workflows:
       - update-monitors:
           name: update prod-us-east-1 monitors
           context: << pipeline.parameters.context >>
-          shell-options: op run --env-file op.prod.env -- /bin/bash -eo pipefail
+          shell: op run --env-file op.prod.env -- /bin/bash -eo pipefail
           cluster: prod-us-east-1
           requires:
             - approve prod-us-east-1 monitors
@@ -378,7 +378,7 @@ workflows:
       - update-dashboard:
           name: update dashboard
           context: << pipeline.parameters.context >>
-          shell-options: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+          shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
           filters: *on-push-main
 
   # perform the pipeline health checks and compare desired eks component verions with current release versions
@@ -393,16 +393,16 @@ workflows:
     jobs:
       - update-dashboard:
           name: update dashboard
-          shell-options: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+          shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
           context: << pipeline.parameters.context >>
       - validate-eks:
           name: validate sandbox-us-east-2 eks cluster
           context: << pipeline.parameters.context >>
-          shell-options: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+          shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
           cluster: sandbox-us-east-2
       # If continuous configuration checking required, insert night tf/plan and assess output
       - validate-eks:
           name: validate prod-us-east-1 eks cluster
           context: << pipeline.parameters.context >>
-          shell-options: op run --env-file op.prod.env -- /bin/bash -eo pipefail
+          shell: op run --env-file op.prod.env -- /bin/bash -eo pipefail
           cluster: prod-us-east-1
