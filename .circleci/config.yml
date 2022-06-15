@@ -209,7 +209,7 @@ jobs:
           name: install requirements
           command: pip install -r requirements.txt
       - run:
-          name: update datadog cluster monitors
+          name: update datadog eks-base monitors
           command: python scripts/deploy_monitors.py << parameters.cluster >> $(cat << parameters.cluster >>.auto.tfvars.json | jq -r .default_node_group_desired_size)
 
  # update multi-cluster dashboard. Only needs to deploy once for many envs.
@@ -232,7 +232,7 @@ jobs:
           name: install requirements
           command: pip install -r requirements.txt
       - run:
-          name: update datadog cluster monitors
+          name: update datadog eks-base dashboard
           command: bash scripts/deploy_dashboard.sh sandbox-us-east-2
 
 workflows:

@@ -48,6 +48,9 @@ do
   if [[ $CURRENT_AMI_VERSION == "null" ]]; then
     export CURRENT_AMI_VERSION="-"
   fi
+  if [[ $cluster == "sandbox-us-east-2" ]]; then
+    export VERSION_CHECK_AMI=$CURRENT_AMI_VERSION
+ fi
   export AMI_VERSIONS="$AMI_VERSIONS ${CURRENT_AMI_VERSION:-} |"
   echo "CURRENT_AMI_VERSION: $CURRENT_AMI_VERSION"
 
@@ -125,7 +128,7 @@ echo "check production current versions against latest"
 export TABLE_COLOR="green"
 export ALERT_TABLE_COLOR="pink"
 
-if [[ $CURRENT_AMI_VERSION != $LATEST_AMI_VERSION ]]; then
+if [[ $VERSION_CHECK_AMI != $LATEST_AMI_VERSION ]]; then
   version_alert
 fi
 if [[ $DESIRED_COREDNS_VERSION != $LATEST_COREDNS_VERSION ]]; then
