@@ -285,10 +285,12 @@ workflows:
       - terraform/plan:
           name: prod-us-east-1 change plan
           context: << pipeline.parameters.context >>
-          shell: op run --env-file op.prod.env -- /bin/bash -eo pipefail
+          # shell: op run --env-file op.prod.env -- /bin/bash -eo pipefail
           workspace: prod-us-east-1
           terraform-version: << pipeline.parameters.terraform-version >>
           before-terraform:
+            - op/env:
+                env-file: op.nonprod.env
             - set-environment:
                 cluster: prod-us-east-1
           filters: *on-tag-main
