@@ -46,7 +46,12 @@ commands:
       cluster:
         description: cluster name to use for configuration
         type: string
+      source-env:
+        description: .env file to source into BASH_ENV
+        type: string
     steps:
+      - op/env:
+          env-file: << parameters.source-env >>
       - run:
           name: set ~/.terraformrc
           command: op inject -i tpl/terraformrc.tpl -o ~/.terraformrc
@@ -124,6 +129,9 @@ jobs:
         description: shell options
         type: string
         default: /bin/bash -eo pipefail
+      source-env:
+        description: .env file to source into BASH_ENV
+        type: string
     docker:
       - image: << pipeline.parameters.executor-image >>
     shell: << parameters.shell >>
@@ -132,6 +140,7 @@ jobs:
       - setup_remote_docker
       - set-environment:
           cluster: << parameters.cluster >>
+          source-env: << parameters.source-env >>
       - set-kubeconfig:
           cluster: << parameters.cluster >>
       - run:
@@ -156,6 +165,9 @@ jobs:
         description: shell options
         type: string
         default: /bin/bash -eo pipefail
+      source-env:
+        description: .env file to source into BASH_ENV
+        type: string
     docker:
       - image: << pipeline.parameters.executor-image >>
     shell: << parameters.shell >>
@@ -164,6 +176,7 @@ jobs:
       - setup_remote_docker
       - set-environment:
           cluster: << parameters.cluster >>
+          source-env: << parameters.source-env >>
       - set-kubeconfig:
           cluster: << parameters.cluster >>
       - run:
@@ -180,6 +193,9 @@ jobs:
         description: shell options
         type: string
         default: /bin/bash -eo pipefail
+      source-env:
+        description: .env file to source into BASH_ENV
+        type: string
     docker:
       - image: << pipeline.parameters.executor-image >>
     shell: << parameters.shell >>
@@ -187,6 +203,7 @@ jobs:
       - checkout
       - setup_remote_docker
       - set-environment:
+          source-env: << parameters.source-env >>
           cluster: << parameters.cluster >>
       - run:
           name: install requirements
@@ -202,6 +219,9 @@ jobs:
         description: shell options
         type: string
         default: /bin/bash -eo pipefail
+      source-env:
+        description: .env file to source into BASH_ENV
+        type: string
     docker:
       - image: << pipeline.parameters.executor-image >>
     shell: << parameters.shell >>
@@ -210,6 +230,7 @@ jobs:
       - setup_remote_docker
       - set-environment:
           cluster: sandbox
+          source-env: << parameters.source-env >>
       - run:
           name: install requirements
           command: pip install -r requirements.txt
@@ -231,6 +252,7 @@ workflows:
           before-terraform:
             - set-environment:
                 cluster: sandbox-us-east-2
+                source-env: op.nonprod.env
           filters: *on-push-main
 
       - approve sandbox-us-east-2 changes:
@@ -248,6 +270,7 @@ workflows:
           before-terraform:
             - set-environment:
                 cluster: sandbox-us-east-2
+                source-env: op.nonprod.env
           after-terraform-init:
             - taint-node-group:
                 node-group: sandbox-us-east-2_group_a
@@ -275,6 +298,7 @@ workflows:
           name: validate sandbox-us-east-2 eks cluster
           context: << pipeline.parameters.context >>
           shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+          source-env: op.nonprod.env
           cluster: sandbox-us-east-2
           requires:
             - apply sandbox-us-east-2 changes
@@ -289,10 +313,9 @@ workflows:
           workspace: prod-us-east-1
           terraform-version: << pipeline.parameters.terraform-version >>
           before-terraform:
-            - op/env:
-                env-file: op.nonprod.env
             - set-environment:
                 cluster: prod-us-east-1
+                source-env: op.prod.env
           filters: *on-tag-main
 
       - approve prod-us-east-1 changes:
@@ -310,6 +333,7 @@ workflows:
           before-terraform:
             - set-environment:
                 cluster: prod-us-east-1
+                source-env: op.prod.env
           after-terraform-init:
             - taint-node-group:
                 node-group: prod-us-east-1-group_a
@@ -337,6 +361,7 @@ workflows:
           name: validate prod-us-east-1 eks cluster
           context: << pipeline.parameters.context >>
           shell: op run --env-file op.prod.env -- /bin/bash -eo pipefail
+          source-env: op.prod.env
           cluster: prod-us-east-1
           requires:
             - apply prod-us-east-1 changes
@@ -357,6 +382,7 @@ workflows:
           name: update sandbox-us-east-2 monitors
           context: << pipeline.parameters.context >>
           shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+          source-env: op.nonprod.env
           cluster: sandbox-us-east-2
           filters: *on-push-main
 
@@ -370,6 +396,7 @@ workflows:
           name: update prod-us-east-1 monitors
           context: << pipeline.parameters.context >>
           shell: op run --env-file op.prod.env -- /bin/bash -eo pipefail
+          source-env: op.prod.env
           cluster: prod-us-east-1
           requires:
             - approve prod-us-east-1 monitors
@@ -381,6 +408,7 @@ workflows:
           name: update dashboard
           context: << pipeline.parameters.context >>
           shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+          source-env: op.nonprod.env
           filters: *on-push-main
 
   # perform the pipeline health checks and compare desired eks component verions with current release versions
@@ -396,15 +424,18 @@ workflows:
       - update-dashboard:
           name: update dashboard
           shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+          source-env: op.nonprod.env
           context: << pipeline.parameters.context >>
       - validate-eks:
           name: validate sandbox-us-east-2 eks cluster
           context: << pipeline.parameters.context >>
           shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+          source-env: op.nonprod.env
           cluster: sandbox-us-east-2
       # If continuous configuration checking required, insert night tf/plan and assess output
       - validate-eks:
           name: validate prod-us-east-1 eks cluster
           context: << pipeline.parameters.context >>
           shell: op run --env-file op.prod.env -- /bin/bash -eo pipefail
+          source-env: op.prod.env
           cluster: prod-us-east-1
