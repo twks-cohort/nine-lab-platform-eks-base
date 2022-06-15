@@ -32,7 +32,7 @@
 
 **IMPORTANT: When creating a new cluster**
 
-We are using the IRSA created below for permissions. However, we have to deploy with the policy attached FIRST (when creating a fresh cluster) and then turn this off after the cluster/node group is created. Without this initial policy, the VPC CNI fails to assign IPs and nodes cannot join the cluster.  
+We are using the IRSA permissions. However, we have to deploy with the policy attached FIRST (when creating a fresh cluster) and then turn this off after the cluster/node group is created. Without this initial policy, the VPC CNI fails to assign IPs and nodes cannot join the cluster. This is docoumented in the current version of the eks terraform moduile. Hopefully this can be corrected in a future release.  
 
 See the comments around line 75 in `main.tf`  
 
