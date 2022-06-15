@@ -120,9 +120,13 @@ jobs:
       cluster:
         description: cluster being validated
         type: string
+      shell:
+        description: shell options
+        type: string
+        default: /bin/bash -eo pipefail
     docker:
       - image: << pipeline.parameters.executor-image >>
-    shell: << pipeline.parameters.shell-options >>
+    shell: << parameters.shell-options >>
     steps:
       - checkout
       - setup_remote_docker
