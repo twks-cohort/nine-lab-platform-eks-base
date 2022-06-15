@@ -273,7 +273,7 @@ workflows:
                 source-env: op.nonprod.env
           after-terraform-init:
             - taint-node-group:
-                node-group: sandbox-us-east-2_group_a
+                node-group: group-a
           after-terraform:
             - store-system-credentials:
                 cluster: sandbox-us-east-2
@@ -336,7 +336,7 @@ workflows:
                 source-env: op.prod.env
           after-terraform-init:
             - taint-node-group:
-                node-group: prod-us-east-1-group_a
+                node-group: group-a
           after-terraform:
             - store-system-credentials:
                 cluster: prod-us-east-1
