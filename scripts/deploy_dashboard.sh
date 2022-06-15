@@ -90,6 +90,7 @@ echo "generate markdown table with the available versions of the services manage
 export AVAILABLE_EKS_VERSIONS=$(aws eks describe-addon-versions | jq -r ".addons[] | .addonVersions[] | .compatibilities[] | .clusterVersion" | sort | uniq)
 export LATEST_EKS_VERSION=$(echo ${AVAILABLE_EKS_VERSIONS} | tail -n1)
 export EKS_VERSIONS="$EKS_VERSIONS $LATEST_EKS_VERSION |"
+echo "LATEST_EKS_VERSION: $LATEST_EKS_VERSION"
 
 # fetch the current ami release versions available. Use this for bottlerocket= /aws/service/bottlerocket/aws-k8s-$DESIRED_CLUSTER_VERSION/x86_64/latest/image_id
 export LATEST_AMI_VERSION=$(aws ssm get-parameter --name /aws/service/eks/optimized-ami/$DESIRED_CLUSTER_VERSION/amazon-linux-2/recommended/image_id --region $AWS_DEFAULT_REGION | jq -r '.Parameter.Value')
