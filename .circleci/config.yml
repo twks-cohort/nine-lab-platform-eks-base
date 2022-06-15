@@ -219,9 +219,6 @@ jobs:
         description: shell options
         type: string
         default: /bin/bash -eo pipefail
-      source-env:
-        description: .env file to source into BASH_ENV
-        type: string
     docker:
       - image: << pipeline.parameters.executor-image >>
     shell: << parameters.shell >>
@@ -229,8 +226,8 @@ jobs:
       - checkout
       - setup_remote_docker
       - set-environment:
+          source-env: op.nonprod.env
           cluster: sandbox-us-east-2
-          source-env: << parameters.source-env >>
       - run:
           name: install requirements
           command: pip install -r requirements.txt
@@ -246,7 +243,7 @@ workflows:
       - terraform/plan:
           name: sandbox-us-east-2 change plan
           context: << pipeline.parameters.context >>
-          shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+          # shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
           workspace: sandbox-us-east-2
           terraform-version: << pipeline.parameters.terraform-version >>
           before-terraform:
@@ -309,7 +306,6 @@ workflows:
       - terraform/plan:
           name: prod-us-east-1 change plan
           context: << pipeline.parameters.context >>
-          # shell: op run --env-file op.prod.env -- /bin/bash -eo pipefail
           workspace: prod-us-east-1
           terraform-version: << pipeline.parameters.terraform-version >>
           before-terraform:
@@ -407,8 +403,8 @@ workflows:
       - update-dashboard:
           name: update dashboard
           context: << pipeline.parameters.context >>
-          shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
-          source-env: op.nonprod.env
+          shell: op run --env-file op.prod.env -- /bin/bash -eo pipefail
+          source-env: op.prod.env
           filters: *on-push-main
 
   # perform the pipeline health checks and compare desired eks component verions with current release versions

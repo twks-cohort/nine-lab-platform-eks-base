@@ -10,13 +10,9 @@ function version_alert() {
 }
 
 export CLUSTER=$1
-export AWS_DEFAULT_REGION=$(cat ${CLUSTER}.auto.tfvars.json | jq -r .aws_region)
 export AWS_ASSUME_ROLE=$(cat ${CLUSTER}.auto.tfvars.json | jq -r .aws_assume_role)
+export AWS_DEFAULT_REGION=$(cat ${CLUSTER}.auto.tfvars.json | jq -r .aws_region)
 export AWS_ACCOUNT_ID=$(cat ${CLUSTER}.auto.tfvars.json | jq -r .aws_account_id)
-
-echo "debug:"
-echo "AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION"
-echo "AWS_ASSUME_ROLE=$AWS_ASSUME_ROLE"
 
 aws sts assume-role --output json --role-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/$AWS_ASSUME_ROLE --role-session-name lab-platform-eks-base > credentials
 
@@ -33,15 +29,15 @@ export KUBE_PROXY_VERSIONS="| kube-proxy |"
 export VPC_CNI_VERSIONS="| vpc-cni |"
 export EBS_CSI_VERSIONS="| ebs-csi |"
 
+echo "generate markdown table with the desired versions of the services managed by the lab-platform-eks-base pipeline for all clusters"
 declare -a clusters=(sandbox-us-east-2 prod-us-east-1)
 
-echo "generate markdown table with the desired versions of the services managed by the lab-platform-eks-base pipeline for all clusters"
 for cluster in "${clusters[@]}";
 do
   echo "cluster: $cluster"
 
   # append environment EKS version
-  export EKS_VERSION=$(cat environments/$cluster.auto.tfvars.json.tpl | jq -r .cluster_version)
+  export EKS_VERSION=$(cat environments/$cluster.auto.tfvars.json | jq -r .cluster_version)
   export DESIRED_CLUSTER_VERSION=$EKS_VERSION
   export EKS_VERSIONS="$EKS_VERSIONS $EKS_VERSION |"
   echo "DESIRED_CLUSTER_VERSION: $DESIRED_CLUSTER_VERSION"
@@ -53,22 +49,22 @@ do
   echo "CURRENT_AMI_VERSION: $CURRENT_AMI_VERSION"
 
   # append environment coreDNS version
-  export DESIRED_COREDNS_VERSION=$(cat environments/$cluster.auto.tfvars.json.tpl | jq -r .coredns_version)
+  export DESIRED_COREDNS_VERSION=$(cat environments/$cluster.auto.tfvars.json | jq -r .coredns_version)
   export COREDNS_VERSIONS="$COREDNS_VERSIONS $DESIRED_COREDNS_VERSION |"
   echo "DESIRED_COREDNS_VERSION: $DESIRED_COREDNS_VERSION"
 
   # append environment kube-proxy version
-  export DESIRED_KUBE_PROXY_VERSION=$(cat environments/$cluster.auto.tfvars.json.tpl | jq -r .kube_proxy_version)
+  export DESIRED_KUBE_PROXY_VERSION=$(cat environments/$cluster.auto.tfvars.json | jq -r .kube_proxy_version)
   export KUBE_PROXY_VERSIONS="$KUBE_PROXY_VERSIONS $DESIRED_KUBE_PROXY_VERSION |"
   echo "DESIRED_KUBE_PROXY_VERSION: $DESIRED_KUBE_PROXY_VERSION"
 
   # append environment VPC-CNI version
-  export DESIRED_VPC_CNI_VERSION=$(cat environments/$cluster.auto.tfvars.json.tpl | jq -r .vpc_cni_version)
+  export DESIRED_VPC_CNI_VERSION=$(cat environments/$cluster.auto.tfvars.json | jq -r .vpc_cni_version)
   export VPC_CNI_VERSIONS="$VPC_CNI_VERSIONS $DESIRED_VPC_CNI_VERSION |"
   echo "DESIRED_VPC_CNI_VERSION: $DESIRED_VPC_CNI_VERSION"
 
   # append environment EBS-CSI version
-  export DESIRED_EBS_CSI_VERSION=$(cat environments/$cluster.auto.tfvars.json.tpl | jq -r .aws_ebs_csi_version)
+  export DESIRED_EBS_CSI_VERSION=$(cat environments/$cluster.auto.tfvars.json | jq -r .aws_ebs_csi_version)
   export EBS_CSI_VERSIONS="$EBS_CSI_VERSIONS $DESIRED_EBS_CSI_VERSION |"
   echo "DESIRED_EBS_CSI_VERSION: $DESIRED_EBS_CSI_VERSION"
 
