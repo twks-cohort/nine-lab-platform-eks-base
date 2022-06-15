@@ -404,7 +404,6 @@ workflows:
           name: update dashboard
           context: << pipeline.parameters.context >>
           shell: op run --env-file op.prod.env -- /bin/bash -eo pipefail
-          source-env: op.prod.env
           filters: *on-push-main
 
   # perform the pipeline health checks and compare desired eks component verions with current release versions
