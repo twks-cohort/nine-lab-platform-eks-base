@@ -212,7 +212,7 @@ jobs:
           name: update datadog eks-base monitors
           command: python scripts/deploy_monitors.py << parameters.cluster >> $(cat << parameters.cluster >>.auto.tfvars.json | jq -r .default_node_group_desired_size)
 
- # update multi-cluster dashboard. Only needs to deploy once for many envs.
+  # update multi-cluster dashboard. Only needs to deploy once for many envs.
   update-dashboard:
     parameters:
       shell:
@@ -235,52 +235,83 @@ jobs:
           name: update datadog eks-base dashboard
           command: bash scripts/deploy_dashboard.sh sandbox-us-east-2
 
+  # replace the oldest 1/4 of the nodes in the cluster
+  replace-nodes:
+    parameters:
+      cluster:
+        description: cluster being validated
+        type: string
+      shell:
+        description: shell options
+        type: string
+        default: /bin/bash -eo pipefail
+      source-env:
+        description: .env file to source into BASH_ENV
+        type: string
+    docker:
+      - image: << pipeline.parameters.executor-image >>
+    shell: << parameters.shell >>
+    steps:
+      - checkout
+      - setup_remote_docker
+      - set-environment:
+          cluster: << parameters.cluster >>
+          source-env: << parameters.source-env >>
+      - set-kubeconfig:
+          cluster: << parameters.cluster >>
+      - run:
+          name: replace the oldest 1/4 of the nodes in the clister
+          command: bash scripts/replace_nodes.sh << parameters.cluster >>
+
 workflows:
   version: 2
 
   deploy eks-base to sandbox-us-east-2:
     jobs:
-      - terraform/plan:
-          name: sandbox-us-east-2 change plan
-          context: << pipeline.parameters.context >>
-          shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
-          workspace: sandbox-us-east-2
-          terraform-version: << pipeline.parameters.terraform-version >>
-          before-terraform:
-            - set-environment:
-                cluster: sandbox-us-east-2
-                source-env: op.nonprod.env
-          filters: *on-push-main
+      # - terraform/plan:
+      #     name: sandbox-us-east-2 change plan
+      #     context: << pipeline.parameters.context >>
+      #     shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+      #     workspace: sandbox-us-east-2
+      #     terraform-version: << pipeline.parameters.terraform-version >>
+      #     before-terraform:
+      #       - set-environment:
+      #           cluster: sandbox-us-east-2
+      #           source-env: op.nonprod.env
+      #     filters: *on-push-main
 
-      - approve sandbox-us-east-2 changes:
-          type: approval
-          requires:
-            - sandbox-us-east-2 change plan
-          filters: *on-push-main
+      # - approve sandbox-us-east-2 changes:
+      #     type: approval
+      #     requires:
+      #       - sandbox-us-east-2 change plan
+      #     filters: *on-push-main
 
-      - terraform/apply:
-          name: apply sandbox-us-east-2 changes
-          context: << pipeline.parameters.context >>
-          shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
-          workspace: sandbox-us-east-2
-          terraform-version: << pipeline.parameters.terraform-version >>
-          before-terraform:
-            - set-environment:
-                cluster: sandbox-us-east-2
-                source-env: op.nonprod.env
-          after-terraform-init:
-            - taint-node-group:
-                node-group: group-a
-          after-terraform:
-            - store-system-credentials:
-                cluster: sandbox-us-east-2
-            - do/circle-deploy
-            - do/slack-webhook:
-                message: lab-platform-eks-base sandbox-us-east-2 deployment
-                webhook-url: $LAB_EVENTS_CHANNEL_WEBHOOK
-          requires:
-            - approve sandbox-us-east-2 changes
-          filters: *on-push-main
+      # - terraform/apply:
+      #     name: apply sandbox-us-east-2 changes
+      #     context: << pipeline.parameters.context >>
+      #     shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+      #     workspace: sandbox-us-east-2
+      #     terraform-version: << pipeline.parameters.terraform-version >>
+      #     before-terraform:
+      #       - set-environment:
+      #           cluster: sandbox-us-east-2
+      #           source-env: op.nonprod.env
+      #     after-terraform-init:
+      #       - taint-node-group:
+      #           node-group: group-a
+      #     after-terraform:
+      #       - store-system-credentials:
+      #           cluster: sandbox-us-east-2
+      #       - run:
+      #           name: create lab-system namespace
+      #           command: kubectl apply -f lab-system-namespace.yaml
+      #       - do/circle-deploy
+      #       - do/slack-webhook:
+      #           message: lab-platform-eks-base sandbox-us-east-2 deployment
+      #           webhook-url: $LAB_EVENTS_CHANNEL_WEBHOOK
+      #     requires:
+      #       - approve sandbox-us-east-2 changes
+      #     filters: *on-push-main
 
       # See comments on this job above
       # - post-terraform-configuration:
@@ -344,15 +375,6 @@ workflows:
             - approve prod-us-east-1 changes
           filters: *on-tag-main
 
-      # See comments on this job above
-      # - post-terraform-configuration:
-      #     name: post-terraform-preview-configuration
-      #     context: << pipeline.parameters.context >>
-      #     cluster: preview
-      #     requires:
-      #       - apply-preview-changes
-      #     filters: *on-tag-main
-
       - validate-eks:
           name: validate prod-us-east-1 eks cluster
           context: << pipeline.parameters.context >>
@@ -414,11 +436,17 @@ workflows:
   #           branches:
   #             only:
   #               - main
-  #   jobs:
-  #     - eks-replace-nodes:
-  #         name: ldx-dev-replace-nodes
-  #         aws-account: ldx-dev
-  #         cluster-name: ldx-dev
+  test-replace:
+    jobs:
+      - approve node-replace-test:
+          type: approval
+          filters: *on-push-main
+      - replace-nodes:
+          cluster: sandbox-us-east-2
+          source-env: op.nonprod.env
+          requires:
+            - approve node-replace-test
+          filters: *on-push-main
   #     - eks-replace-nodes:
   #         name: ldx-nonprod-replace-nodes
   #         aws-account: ldx-dev
