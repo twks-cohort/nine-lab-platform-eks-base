@@ -3,31 +3,20 @@ require 'json'
 
 tfvars = JSON.parse(File.read('./' + ENV['TEST_ENV'] + '.auto.tfvars.json'))
 
-client = Aws::EC2::Resource.new(region: tfvars['aws_region'])
+# client = Aws::EC2::Resource.new(region: tfvars['aws_region'])
 
-ec2_instances = client.instances({
-    filters: [
-      {
-        name: "tag:eks:cluster-name",
-        values: ["#{tfvars['cluster_name']}"]
-      },
-      {
-        name: "instance-state-name",
-        values: ['running']
-      }
-    ]
-})
-
-describe eks(tfvars["cluster_name"]) do
-  it { should exist }
-  it { should be_active }
-  its(:version) { should eq tfvars['cluster_version'] }
-end
-
-describe eks_nodegroup(ENV['default_node_group_name']), cluster: 'ENV['TEST_ENV']' do
-  it { should exist }
-  it { should be_ready }
-end4
+# ec2_instances = client.instances({
+#     filters: [
+#       {
+#         name: "tag:eks:cluster-name",
+#         values: ["#{tfvars['cluster_name']}"]
+#       },
+#       {
+#         name: "instance-state-name",
+#         values: ['running']
+#       }
+#     ]
+# })
 
 # if using ON_DEMAND, single instance type
 # ec2_instances.each do |instance|
@@ -36,3 +25,9 @@ end4
 #     it { should include instance.instance_type }
 #   end
 # end
+
+describe eks(tfvars["cluster_name"]) do
+  it { should exist }
+  it { should be_active }
+  its(:version) { should eq tfvars['cluster_version'] }
+end

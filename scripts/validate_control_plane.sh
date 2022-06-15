@@ -15,3 +15,6 @@ export AWS_SESSION_TOKEN=$(cat credentials | jq -r ".Credentials.SessionToken")
 echo "validate eks control plane and managed node group"
 
 rspec
+
+echo "validating eks managed node group"
+bats test/platform_eks.bats
