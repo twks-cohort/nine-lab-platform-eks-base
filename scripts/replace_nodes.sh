@@ -2,8 +2,9 @@
 set -e
 
 CLUSTER=$1
-
-export AWS_DEFAULT_REGION=$(cat environments/${CLUSTER}.auto.tfvars.json.tpl | jq -r '.aws_region')
+export AWS_DEFAULT_REGION=$(cat ${CLUSTER}.auto.tfvars.json | jq -r .aws_region)
+export AWS_ASSUME_ROLE=$(cat ${CLUSTER}.auto.tfvars.json | jq -r .aws_assume_role)
+export AWS_ACCOUNT_ID=$(cat ${CLUSTER}.auto.tfvars.json | jq -r .aws_account_id)
 
 # Set start date/time of script for datadog call at end
 #STARTTIME=$(date +%s)
@@ -46,7 +47,16 @@ do
 
   # kubectl get pods --all-namespaces -o wide | grep "${$i}" | awk '{print $2 " --namespace=" $1}' | xargs kubectl delete pod
   kubectl delete node $i
+done || exit 1
 
+aws sts assume-role --output json --role-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/$AWS_ASSUME_ROLE --role-session-name lab-platform-eks-base > credentials
+
+export AWS_ACCESS_KEY_ID=$(cat credentials | jq -r ".Credentials.AccessKeyId")
+export AWS_SECRET_ACCESS_KEY=$(cat credentials | jq -r ".Credentials.SecretAccessKey")
+export AWS_SESSION_TOKEN=$(cat credentials | jq -r ".Credentials.SessionToken")
+
+for i in "${REPLACENODES[@]}"
+do
   INSTANCE_ID=$(aws ec2 describe-instances --filter Name=private-dns-name,Values=$i | jq -r '.Reservations[].Instances[] | .InstanceId')
   aws ec2 terminate-instances --instance-ids ${INSTANCE_ID}
 
@@ -60,6 +70,7 @@ do
     CURRENT_READY_NODE_COUNT=$(kubectl get nodes | awk '{ print $2 }' | grep -E '(^|\s)Ready($|\s)' | wc -l)
   done
 done || exit 1
+
 
 kubectl get nodes
 echo All planned nodes have been replaced successfully.
