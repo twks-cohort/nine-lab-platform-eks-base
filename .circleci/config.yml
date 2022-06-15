@@ -4,8 +4,8 @@ version: 2.1
 orbs:
   terraform: twdps/terraform@0.6.0
   kube: twdps/kube-ops@0.2.0
-  op: twdps/onepassword@0.1.0
-  do: twdps/pipeline-events@1.0.0
+  op: twdps/onepassword@1.0.0
+  do: twdps/pipeline-events@0.1.0
 
 
 # ==== global pipeline parameters
