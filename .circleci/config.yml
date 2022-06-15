@@ -24,14 +24,14 @@ parameters:
     type: string
     default: twdps/circleci-kube-ops:alpine-0.7.0
 
-# git push: deploy sandbox
+# ==== triggers
+
 on-push-main: &on-push-main
   branches:
     only: /main/
   tags:
     ignore: /.*/
 
-# git tag: release to prod cluster
 on-tag-main: &on-tag-main
   branches:
     ignore: /.*/
