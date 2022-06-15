@@ -266,8 +266,8 @@ jobs:
 workflows:
   version: 2
 
-  deploy eks-base to sandbox-us-east-2:
-    jobs:
+  # deploy eks-base to sandbox-us-east-2:
+  #   jobs:
       # - terraform/plan:
       #     name: sandbox-us-east-2 change plan
       #     context: << pipeline.parameters.context >>
