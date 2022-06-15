@@ -260,6 +260,9 @@ jobs:
       - set-kubeconfig:
           cluster: << parameters.cluster >>
       - do/circle-deploy
+      - do/slack-webhook:
+          message: lab-platform-eks-base nightly node replacement job running on << parameters.cluster >>
+          webhook-url: $LAB_EVENTS_CHANNEL_WEBHOOK
       - run:
           name: replace the oldest 1/4 of the nodes in the clister
           command: bash scripts/replace_nodes.sh << parameters.cluster >>
