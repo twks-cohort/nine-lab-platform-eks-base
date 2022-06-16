@@ -8,6 +8,13 @@ export DESIRED_COREDNS_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .coredns_
 export DESIRED_KUBE_PROXY_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .kube_proxy_version)
 export DESIRED_EBS_CSI_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .aws_ebs_csi_version)
 export DESIRED_EBS_CSI_VERSION=$(echo "${DESIRED_EBS_CSI_VERSION%%-*}")
+
+echo "debug:"
+echo "DESIRED_VPC_CNI_VERSION $DESIRED_VPC_CNI_VERSION"
+echo "DESIRED_COREDNS_VERSION $DESIRED_COREDNS_VERSION"
+echo "DESIRED_KUBE_PROXY_VERSION $DESIRED_KUBE_PROXY_VERSION"
+echo "DESIRED_EBS_CSI_VERSION $DESIRED_EBS_CSI_VERSION"
+
 # validate primary addons
 echo "validate addon service health"
 bats test/platform_eks_addons.bats
