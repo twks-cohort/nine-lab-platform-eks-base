@@ -305,13 +305,13 @@ workflows:
           after-terraform:
             - store-system-credentials:
                 cluster: sandbox-us-east-2
-            - set-kubeconfig:
-                cluster: sandbox-us-east-2
             - kube/packages:
                 kubectl-version: 1.23.5
             - run:
                 name: create lab-system namespace
-                command: kubectl apply -f lab-system-namespace.yaml
+                command: |
+                  export KUBECONFIG=kubeconfig_sandbox-us-east-2
+                  kubectl apply -f lab-system-namespace.yaml
             - do/circle-deploy
             - do/slack-webhook:
                 message: lab-platform-eks-base sandbox-us-east-2 deployment
@@ -366,13 +366,13 @@ workflows:
           after-terraform:
             - store-system-credentials:
                 cluster: prod-us-east-1
-            - set-kubeconfig:
-                cluster: prod-us-east-1
             - kube/packages:
                 kubectl-version: 1.23.5
             - run:
                 name: create lab-system namespace
-                command: kubectl apply -f lab-system-namespace.yaml
+                command: |
+                  export KUBECONFIG=kubeconfig_prod-us-east-1
+                  kubectl apply -f lab-system-namespace.yaml
             - do/circle-deploy
             - do/slack-webhook:
                 message: lab-platform-eks-base prod-us-east-1 release
