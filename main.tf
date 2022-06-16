@@ -1,40 +1,31 @@
-locals {
-  authentication_role = "arn:aws:iam::${var.aws_account_id}:role/${var.aws_assume_role}"
-}
+# locals {
+#   authentication_role = "arn:aws:iam::${var.aws_account_id}:role/${var.aws_assume_role}"
+# }
 
 provider "kubernetes" {
-  host                   = module.eks.cluster_endpoint
-  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    command     = "aws"
-    args        = ["eks", "get-token", "--cluster-name", module.eks.cluster_id, "--role", local.authentication_role]
-  }
+  host                   = data.aws_eks_cluster.cluster.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
+  token                  = data.aws_eks_cluster_auth.cluster.token
 }
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "18.23.0"
+  version = "17.24.0"
 
-  cluster_name      = var.cluster_name
-  cluster_version   = var.cluster_version
-  vpc_id            = data.aws_vpc.cluster_vpc.id
-  subnet_ids        = data.aws_subnets.private.ids
-  cluster_ip_family = "ipv4"
+  cluster_name    = var.cluster_name
+  cluster_version = var.cluster_version
+  vpc_id          = data.aws_vpc.cluster_vpc.id
+  subnets         = data.aws_subnets.private.ids
 
-  cluster_endpoint_public_access  = true
-  create_cloudwatch_log_group     = true
-  cloudwatch_log_group_retention_in_days = var.cluster_log_retention
-  cluster_enabled_log_types              = var.cluster_enabled_log_types
+  enable_irsa                                  = true
+  kubeconfig_api_version                       = "client.authentication.k8s.io/v1beta1"
+  kubeconfig_aws_authenticator_command         = "aws"
+  kubeconfig_aws_authenticator_command_args    = ["eks","get-token","--cluster-name",var.cluster_name]
+  kubeconfig_aws_authenticator_additional_args = ["--role", local.authentication_role]
+  kubeconfig_name                              = "twdps-lab-${var.cluster_name}"
 
-  manage_aws_auth_configmap     = true
-  # aws_auth_roles - other roles to map to clusterrolebindings
-  create_cluster_security_group = true
-  create_node_security_group    = true
-  create_iam_role               = true
-  enable_irsa                   = true
-  # openid_connect_audiences - might need to spike this
+  cluster_enabled_log_types     = var.cluster_enabled_log_types
+  cluster_log_retention_in_days = var.cluster_log_retention
   cluster_encryption_config     = [
     {
       provider_key_arn = aws_kms_key.cluster_encyption_key.arn
@@ -42,55 +33,21 @@ module "eks" {
     }
   ]
 
-  cluster_addons = {
-    coredns = {
-      addon_version     = var.coredns_version
-      resolve_conflicts = "OVERWRITE"
-    }
-    kube-proxy = {
-      addon_version    = var.kube_proxy_version
-      resolve_conflicts = "OVERWRITE"
-    }
-    vpc-cni = {
-      addon_version            = var.vpc_cni_version
-      resolve_conflicts        = "OVERWRITE"
-      service_account_role_arn = module.vpc_cni_irsa.iam_role_arn
-    }
-    aws-ebs-csi-driver = {
-      addon_version            = var.aws_ebs_csi_version
-      resolve_conflicts        = "OVERWRITE"
-      service_account_role_arn = module.ebs_csi_irsa.iam_role_arn
-    }
-  }
-
-  eks_managed_node_group_defaults = {
+  node_groups_defaults = {
     ami_type              = var.default_node_group_ami_type
-    instance_types        = var.default_node_group_instance_types
     platform              = var.default_node_group_platform
     disk_size             = var.default_node_group_disk_size
     force_update_version  = true
     enable_monitoring     = true
-
-    # We are using the IRSA created below for permissions
-    # However, we have to deploy with the policy attached FIRST (when creating a fresh cluster)
-    # and then turn this off after the cluster/node group is created. Without this initial policy,
-    # the VPC CNI fails to assign IPs and nodes cannot join the cluster
-    # See https://github.com/aws/containers-roadmap/issues/1666 for more context
-    # iam_role_attach_cni_policy = true
   }
 
-  eks_managed_node_groups = {
+  node_groups = {
 
     "${var.default_node_group_name}" = {
-      # By default, the module creates a launch template to ensure tags are propagated to instances, etc.,
-      # so we need to disable it to use the default template provided by the AWS EKS managed node group service
-      create_launch_template = false
-      launch_template_name   = ""
-
       capacity_type     = var.default_node_group_capacity_type
-      desired_size      = var.default_node_group_desired_size
-      max_size          = var.default_node_group_max_size
-      min_size          = var.default_node_group_min_size
+      desired_capacity  = var.default_node_group_desired_size
+      max_capacity      = var.default_node_group_max_size
+      min_capacity      = var.default_node_group_min_size
       instance_types    = var.default_node_group_instance_types
       key_name          = ""
       k8s_labels = {
@@ -99,68 +56,23 @@ module "eks" {
     }
   }
 
-  # uncomment and use with the dpsctl integration
-  # cluster_identity_providers [
-  #   {
-  #     client_id                     = var.oidc_client_id
-  #     groups_claim                  = var.oidc_groups_claim
-  #     identity_provider_config_name = var.oidc_identity_provider_config_name
-  #     issuer_url                    = var.oidc_issuer_url
-  #     # groups_prefix
-  #     # required_claims
-  #     # username_claim
-  #     # username_prefix
-  #   }
-  # ]
-
 }
 
-module "vpc_cni_irsa" {
-  source                = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version               = "~> 5.1.0"
+# resource "aws_eks_identity_provider_config" "auth0_oidc_config" {
+#   cluster_name = var.cluster_name
 
-  role_name             = "vpc_cni"
-  attach_vpc_cni_policy = true
-  vpc_cni_enable_ipv4   = true
+#   oidc {
+#     client_id                     = var.oidc_client_id
+#     groups_claim                  = var.oidc_groups_claim
+#     identity_provider_config_name = var.oidc_identity_provider_config_name
+#     issuer_url                    = var.oidc_issuer_url
+#   }
 
-  oidc_providers = {
-    main = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["kube-system:aws-node"]
-    }
-  }
-}
-
-module "ebs_csi_irsa" {
-  source                = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version               = "~> 5.1.0"
-
-  role_name             = "${var.cluster_name}-ebs-csi-controller-sa"
-  attach_ebs_csi_policy = true
-
-  oidc_providers = {
-    main = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["kube-system:ebs-csi-controller-sa"]
-    }
-  }
-}
+#   depends_on = [module.eks]
+# }
 
 resource "aws_kms_key" "cluster_encyption_key" {
   description             = "Encryption key for kubernetes-secrets envelope encryption"
   enable_key_rotation     = true
   deletion_window_in_days = 7
-}
-
-data "template_file" "kubeconfig" {
-  template = file("tpl/kubeconfig.yaml.tpl")
-
-  vars = {
-    cluster_endpoint                    = module.eks.cluster_endpoint
-    cluster_certificate_authority_data  = module.eks.cluster_certificate_authority_data
-    kubeconfig_name                     = "kubeconfig_${var.cluster_name}"
-    cluster_name                        = var.cluster_name
-    aws_account_id                      = var.aws_account_id
-    aws_assume_role                     = var.aws_assume_role
-  }
 }

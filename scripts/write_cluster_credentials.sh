@@ -10,4 +10,8 @@ export AWS_ACCESS_KEY_ID=$(cat credentials | jq -r ".Credentials.AccessKeyId")
 export AWS_SECRET_ACCESS_KEY=$(cat credentials | jq -r ".Credentials.SecretAccessKey")
 export AWS_SESSION_TOKEN=$(cat credentials | jq -r ".Credentials.SessionToken")
 
-terraform output kubeconfig | grep -v "EOT" | opw write platform-${CLUSTER} kubeconfig -
+# terraform-aws-eks module v17 method
+cat kubeconfig_$CLUSTER | grep -v "EOT" | opw write platform-${CLUSTER} kubeconfig -
+
+# terraform-aws-eks module v18 method
+# terraform output kubeconfig | grep -v "EOT" | opw write platform-${CLUSTER} kubeconfig -
