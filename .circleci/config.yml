@@ -79,7 +79,7 @@ commands:
     steps:
       - run:
           name: set terraform taint on managed node group to cause new node template with latest ami version
-          command: terraform taint "module.eks.module.node_groups.aws_eks_node_group.workers[\"<< parameters.node-group >>\"]"
+          command: echo 'taint' #terraform taint "module.eks.module.node_groups.aws_eks_node_group.workers[\"<< parameters.node-group >>\"]"
           # eks module 18 version: terraform taint "module.eks.module.eks_managed_node_group[\"<< parameters.node-group >>\"].aws_eks_node_group.this[0]"
           # eks module 17 version: terraform taint "module.eks.module.node_groups.aws_eks_node_group.workers[\"<< parameters.node-group >>\"]"
 
