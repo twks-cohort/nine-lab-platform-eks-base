@@ -1,7 +1,7 @@
 {
 	"name": "lab-{{ cluster }} ebs-csi-controller alert",
 	"type": "query alert",
-	"query": "max(last_10m):sum:kubernetes_state.pdb.pods_healthy{cluster:{{ cluster }},poddisruptionbudget:ebs-csi-controller-pod-disruption-budget} < 1",
+	"query": "max(last_10m):sum:kubernetes_state.container.ready{cluster:sandbox-us-east-2,container:csi-provisioner} < 1",
 	"message": "@slack-DPS-lab-{{ cluster }}-alerts",
 	"tags": [
 		"cluster:{{ cluster }}",

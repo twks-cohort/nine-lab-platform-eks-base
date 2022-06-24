@@ -7,7 +7,7 @@
     "cluster_version": "1.22",
     "cluster_enabled_log_types": ["api", "audit", "authenticator", "controllerManager", "scheduler"],
     "cluster_log_retention": "30",
-    "vpc_cni_version": "v1.11.0-eksbuild.1",
+    "vpc_cni_version": "v1.11.2-eksbuild.1",
     "coredns_version": "v1.8.7-eksbuild.1",
     "kube_proxy_version": "v1.22.6-eksbuild.1",
     "aws_ebs_csi_version": "v1.6.2-eksbuild.0",

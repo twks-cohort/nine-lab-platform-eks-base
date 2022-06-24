@@ -1,3 +1,4 @@
+
 {
   "title": "EMPC lab-platform-eks-base",
   "description": "[lab-platform-eks-base](https://github.com/ThoughtWorks-DPS/lab-platform-eks-base)",
@@ -68,6 +69,7 @@
       }
     },
     {
+      "id": 3447117041122545,
       "definition": {
         "type": "note",
         "content": "Dependencies",
@@ -88,6 +90,7 @@
       }
     },
     {
+      "id": 2926903367505711,
       "definition": {
         "title": "Services",
         "title_size": "16",
@@ -235,16 +238,16 @@
         "title_size": "13",
         "title_align": "left",
         "type": "manage_status",
-        "summary_type": "monitors",
         "display_format": "countsAndList",
         "color_preference": "text",
         "hide_zero_counts": true,
-        "show_last_triggered": false,
-        "show_priority": false,
         "query": "tag:pipeline:lab-platform-eks-base",
         "sort": "status,asc",
         "count": 50,
-        "start": 0
+        "start": 0,
+        "summary_type": "monitors",
+        "show_priority": false,
+        "show_last_triggered": false
       },
       "layout": {
         "x": 0,
@@ -267,7 +270,6 @@
           "value",
           "sum"
         ],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -399,7 +401,6 @@
           "value",
           "sum"
         ],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -467,7 +468,6 @@
           "value",
           "sum"
         ],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -555,7 +555,6 @@
           "value",
           "sum"
         ],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -623,7 +622,6 @@
           "value",
           "sum"
         ],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -711,7 +709,6 @@
           "value",
           "sum"
         ],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -763,7 +760,6 @@
           "value",
           "sum"
         ],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -815,8 +811,8 @@
                 "conditional_formats": [
                   {
                     "palette": "white_on_yellow",
-                    "comparator": ">",
-                    "value": 0.8
+                    "value": 0.8,
+                    "comparator": ">"
                   }
                 ],
                 "limit": {
@@ -860,7 +856,6 @@
           "value",
           "sum"
         ],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -936,7 +931,6 @@
           "value",
           "sum"
         ],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -1042,7 +1036,6 @@
         "title_size": "16",
         "title_align": "left",
         "show_legend": false,
-        "time": {},
         "type": "heatmap",
         "events": [
           {
@@ -1079,7 +1072,6 @@
           "value",
           "sum"
         ],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -1146,7 +1138,6 @@
           "value",
           "sum"
         ],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -1213,7 +1204,6 @@
           "value",
           "sum"
         ],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -1274,7 +1264,6 @@
           "value",
           "sum"
         ],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -1327,7 +1316,10 @@
       "name": "cluster",
       "default": "sandbox-us-east-2",
       "prefix": "cluster",
-      "available_values": []
+      "available_values": [
+        "sandbox-us-east-2",
+        "prod-us-east-1"
+      ]
     },
     {
       "name": "node",
@@ -1339,6 +1331,5 @@
   "layout_type": "ordered",
   "is_read_only": false,
   "notify_list": [],
-  "reflow_type": "fixed",
-  "id": "u7z-5p7-cfs"
+  "reflow_type": "fixed"
 }
