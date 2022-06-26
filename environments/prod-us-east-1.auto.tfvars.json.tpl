@@ -11,7 +11,7 @@
     "coredns_version": "v1.8.7-eksbuild.1",
     "kube_proxy_version": "v1.22.6-eksbuild.1",
     "aws_ebs_csi_version": "v1.6.2-eksbuild.0",
-    "alert-channel": "prod",
+    "alert_channel": "prod",
 
     "default_node_group_name": "group-a",
     "default_node_group_ami_type": "AL2_x86_64",
