@@ -5,12 +5,13 @@ from xmlrpc.server import CGIXMLRPCRequestHandler
 
 import requests
 
-base_url = "https://api.datadoghq.com/api/v1/{resource}"
+
 headers = {
     "DD-API-KEY": os.getenv("DATADOG_API_KEY"),
     "DD-APPLICATION-KEY": os.getenv("DATADOG_APP_KEY")
 }
-dashboard_url = base_url.format(resource="dashboard")
+
+dashboard_url = "https://api.datadoghq.com/api/v1/dashboard"
 dashboard_json = json.load(open("observe/dashboard.json"))
 
 def upsert_dashboard(dashboard_url, headers, dashboard_json):
@@ -22,7 +23,7 @@ def upsert_dashboard(dashboard_url, headers, dashboard_json):
         if dashboard["title"] == dashboard_json["title"]:
             return update_dashboard(dashboard["id"], dashboard_json)
 
-   #  create_dashboard(dashboard_json)
+   #  create_dashboard(dashboard_json) = not a likely situation given how dashboards are created
 
 
 def update_dashboard(dashboard_id, dashboard_json):

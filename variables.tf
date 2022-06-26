@@ -15,6 +15,7 @@ variable "vpc_cni_version" {}
 variable "coredns_version" {}
 variable "kube_proxy_version" {}
 variable "aws_ebs_csi_version" {}
+variable "alert_channel" {}
 
 variable "default_node_group_name" {}
 variable "default_node_group_ami_type" {}
