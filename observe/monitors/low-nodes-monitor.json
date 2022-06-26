@@ -1,7 +1,7 @@
 {
   "name": "lab-{{ cluster }} low nodes available alert",
 	"type": "query alert",
-	"query": "max(last_30m):sum:kubernetes_state.node.count{cluster:{{ cluster }}} < 3",
+	"query": "max(last_30m):sum:kubernetes_state.node.count{cluster:{{ cluster }}} < {{ num_nodes }}",
 	"message": "@slack-DPS-lab-{{ alert_channel }}-alerts",
 	"tags": [
 		"cluster:{{ cluster }}",

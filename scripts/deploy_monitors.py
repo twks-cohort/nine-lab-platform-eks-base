@@ -54,7 +54,7 @@ def env_monitor_file_path(monitor_file):
 
 
 def get_monitor(monitor_string, cluster, num_nodes):
-    monitor_string = monitor_string.replace("{{ cluster }}", cluster).replace("{{ num_nodes }}", num_nodes).replace("{{ channel }}", alert_channel)
+    monitor_string = monitor_string.replace("{{ cluster }}", cluster).replace("{{ num_nodes }}", num_nodes).replace("{{ alert_channel }}", alert_channel)
     monitor_json = json.loads(monitor_string)
     return monitor_json
 
