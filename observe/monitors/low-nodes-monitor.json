@@ -1,7 +1,7 @@
 {
-	"name": "lab-{{ cluster }} aws-node alert",
+  "name": "lab-{{ cluster }} low nodes available alert",
 	"type": "query alert",
-	"query": "max(last_10m):sum:kubernetes_state.container.ready{cluster:{{ cluster }},container:aws-node} < {{ num_nodes }}",
+	"query": "max(last_30m):sum:kubernetes_state.node.count{cluster:{{ cluster }}} < 3",
 	"message": "@slack-DPS-lab-{{ alert_channel }}-alerts",
 	"tags": [
 		"cluster:{{ cluster }}",
@@ -15,11 +15,10 @@
 		"require_full_window": false,
 		"notify_no_data": false,
 		"renotify_interval": 0,
-		"locked": false,
 		"silenced": {},
 		"include_tags": true,
-		"new_host_delay": 300,
 		"escalation_message": ""
 	},
-	"priority": null
+	"priority": null,
+	"restricted_roles": null
 }

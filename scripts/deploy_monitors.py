@@ -26,6 +26,7 @@ monitors_dir = "observe/monitors"
 monitors_files = [os.path.join(monitors_dir, file) for file in os.listdir(monitors_dir) if file.endswith(".json")]
 
 num_nodes = sys.argv[2]
+alert_channel = sys.argv[3]
 
 def upsert_all_monitors(cluster, monitor_url, headers, monitors_files):
     response = requests.get(monitor_url, headers=headers)
@@ -53,7 +54,7 @@ def env_monitor_file_path(monitor_file):
 
 
 def get_monitor(monitor_string, cluster, num_nodes):
-    monitor_string = monitor_string.replace("{{ cluster }}", cluster).replace("{{ num_nodes }}", num_nodes)
+    monitor_string = monitor_string.replace("{{ cluster }}", cluster).replace("{{ num_nodes }}", num_nodes).replace("{{ channel }}", alert_channel)
     monitor_json = json.loads(monitor_string)
     return monitor_json
 

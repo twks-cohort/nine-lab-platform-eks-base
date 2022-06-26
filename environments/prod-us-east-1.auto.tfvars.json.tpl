@@ -20,5 +20,6 @@
     "default_node_group_desired_size": "3",
     "default_node_group_disk_size": "50",
     "default_node_group_capacity_type": "SPOT",
-    "default_node_group_instance_types": ["t2.2xlarge","t3.2xlarge","t3a.2xlarge","m5n.2xlarge","m5.2xlarge","m4.2xlarge"]
+    "default_node_group_instance_types": ["t2.2xlarge","t3.2xlarge","t3a.2xlarge","m5n.2xlarge","m5.2xlarge","m4.2xlarge"],
+    "alert-channel": "prod"
 }
