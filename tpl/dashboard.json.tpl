@@ -69,7 +69,6 @@
       }
     },
     {
-      "id": 3447117041122545,
       "definition": {
         "type": "note",
         "content": "Dependencies",
@@ -90,7 +89,6 @@
       }
     },
     {
-      "id": 2926903367505711,
       "definition": {
         "title": "Services",
         "title_size": "16",
