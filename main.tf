@@ -54,18 +54,18 @@ module "eks" {
 
 }
 
-# resource "aws_eks_identity_provider_config" "auth0_oidc_config" {
-#   cluster_name = var.cluster_name
+resource "aws_eks_identity_provider_config" "auth0_oidc_config" {
+  cluster_name = var.cluster_name
 
-#   oidc {
-#     client_id                     = var.oidc_client_id
-#     groups_claim                  = var.oidc_groups_claim
-#     identity_provider_config_name = var.oidc_identity_provider_config_name
-#     issuer_url                    = var.oidc_issuer_url
-#   }
+  oidc {
+    client_id                     = var.oidc_client_id
+    groups_claim                  = var.oidc_groups_claim
+    identity_provider_config_name = var.oidc_identity_provider_config_name
+    issuer_url                    = var.oidc_issuer_url
+  }
 
-#   depends_on = [module.eks]
-# }
+  depends_on = [module.eks]
+}
 
 resource "aws_kms_key" "cluster_encyption_key" {
   description             = "Encryption key for kubernetes-secrets envelope encryption"

@@ -27,7 +27,7 @@ variable "default_node_group_disk_size" {}
 variable "default_node_group_capacity_type" {}
 variable "default_node_group_instance_types" {}
 
-# variable "oidc_client_id" {}
-# variable "oidc_groups_claim" {}
-# variable "oidc_identity_provider_config_name" {}
-# variable "oidc_issuer_url" {}
+variable "oidc_client_id" {}
+variable "oidc_groups_claim" {}
+variable "oidc_identity_provider_config_name" {}
+variable "oidc_issuer_url" {}
