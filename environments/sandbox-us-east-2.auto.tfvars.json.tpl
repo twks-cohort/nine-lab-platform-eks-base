@@ -23,7 +23,7 @@
     "default_node_group_capacity_type": "SPOT",
     "default_node_group_instance_types": ["t2.2xlarge","t3.2xlarge","t3a.2xlarge","m5n.2xlarge","m5.2xlarge","m4.2xlarge"],
 
-    "oidc_client_id": {{ op://empc-lab/svc-auth0/dev-twdpsio-dev-dpsctl-client-id }},
+    "oidc_client_id": "{{ op://empc-lab/svc-auth0/dev-twdpsio-dev-dpsctl-client-id }}",
     "oidc_groups_claim": "https://github.org/ThoughtWorks-DPS/teams",
     "oidc_identity_provider_config_name": "Auth0",
     "oidc_issuer_url": "https://dev-twdpsio.us.auth0.com/"
