@@ -17,8 +17,8 @@ cat kubeconfig_$CLUSTER | opw write platform-${CLUSTER} kubeconfig -
 # terraform output kubeconfig | grep -v "EOT" | opw write platform-${CLUSTER} kubeconfig -
 
 # write cluster url and pubic certificate to 1password
-terraform output cluster_endpoint | opw write platform-${CLUSTER} cluster-endpoint -
-terraform output cluster_certificate_authority_data | opw write platform-${CLUSTER} base64-certificate-authority-data -
+terraform output cluster_endpoint | sed 's/"//g' | opw write platform-${CLUSTER} cluster-endpoint -
+terraform output cluster_certificate_authority_data | sed 's/"//g' | opw write platform-${CLUSTER} base64-certificate-authority-data -
 
 
 # platform-sandbox-us-east-2
