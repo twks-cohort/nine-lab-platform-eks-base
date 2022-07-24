@@ -15,3 +15,13 @@ cat kubeconfig_$CLUSTER | opw write platform-${CLUSTER} kubeconfig -
 
 # terraform-aws-eks module v18 method
 # terraform output kubeconfig | grep -v "EOT" | opw write platform-${CLUSTER} kubeconfig -
+
+# write cluster url and pubic certificate to 1password
+terraform output cluster_endpoint | opw write platform-${CLUSTER} cluster-endpoint -
+cluster_certificate_authority_data | opw write platform-${CLUSTER} base64-certificate-authority-data -
+
+
+# platform-sandbox-us-east-2
+# platform-prod-us-east-1
+# terraform output DPSNonprodServiceAccount_encrypted_aws_secret_access_key | sed 's/"//g' | base64 -d | gpg -dq --passphrase ${GPG_KEY_PASSPHRASE} |  opw write aws-dps-2 DPSNonprodServiceAccount-aws-secret-access-key -
+# terraform output DPSNonprodServiceAccount_aws_access_key_id | tr -d \\n | sed 's/"//g' | opw write aws-dps-2 DPSNonprodServiceAccount-aws-access-key-id -

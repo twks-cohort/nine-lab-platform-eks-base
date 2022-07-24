@@ -28,4 +28,3 @@
     "oidc_identity_provider_config_name": "Auth0",
     "oidc_issuer_url": "https://twdpsio.us.auth0.com/"
 }
-}
