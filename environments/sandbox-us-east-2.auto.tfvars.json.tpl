@@ -4,7 +4,7 @@
     "aws_account_id": "{{ op://empc-lab/aws-dps-2/aws-account-id }}",
 
     "cluster_name": "sandbox-us-east-2",
-    "cluster_version": "1.22",
+    "cluster_version": "1.23",
     "cluster_enabled_log_types": ["api", "audit", "authenticator", "controllerManager", "scheduler"],
     "cluster_log_retention": "30",
     "vpc_cni_version": "v1.11.2-eksbuild.1",

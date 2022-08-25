@@ -83,7 +83,7 @@ _Note._ Must upgrade to each major version as release; don't skip over a version
 ## Maintainers
 
 - the datadog monitor and dashboard update scripts are simplistic and there is obviously refactoring needed to turn that into a standard piece of code with functionality accessed via an orb or something similar
-- the validate test confirms the actual version running matches the desired version. The Dashboard dependency check is a comparison between desired version and latest.
+- `validate` confirms the actual version running matches the desired version. The Dashboard dependency check is a comparison between desired version and latest.
 
 **Deleting ns stuck in terminating**  
 

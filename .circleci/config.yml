@@ -3,7 +3,7 @@ version: 2.1
 
 orbs:
   terraform: twdps/terraform@0.6.0
-  kube: twdps/kube-ops@0.2.0
+  kube: twdps/kube-ops@0.3.0
   op: twdps/onepassword@1.0.0
   do: twdps/pipeline-events@0.1.0
 
@@ -21,7 +21,7 @@ parameters:
   executor-image:
     description: image to use for terraform runs
     type: string
-    default: twdps/circleci-kube-ops:alpine-0.7.0
+    default: twdps/circleci-kube-ops:alpine-0.8.0
 
 # ==== triggers
 
@@ -143,12 +143,12 @@ jobs:
       - set-kubeconfig:
           cluster: << parameters.cluster >>
       - run:
-          name: test eks control plane
+          name: smoketest eks control plane
           environment:
             TEST_ENV: << parameters.cluster >>
           command: bash scripts/validate_control_plane.sh << parameters.cluster >>
       - run:
-          name: test eks addons
+          name: smoketest eks addons
           command: bash scripts/validate_addons.sh << parameters.cluster >>
       - kube/cis-benchmarks:
           benchmark: eks
@@ -179,7 +179,7 @@ jobs:
       - set-kubeconfig:
           cluster: << parameters.cluster >>
       - run:
-          name: test addon and managed node group ami versions
+          name: validate addon and managed node group ami versions
           command: bash scripts/check_eks_and_addon_versions.sh << parameters.cluster >>
 
  # update cluster specific monitors
