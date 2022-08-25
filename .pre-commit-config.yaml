@@ -12,6 +12,7 @@ repos:
         args: [--allow-multiple-documents]
       - id: forbid-new-submodules
       - id: detect-private-key
+      - id: detect-aws-credentials
       - id: end-of-file-fixer
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
