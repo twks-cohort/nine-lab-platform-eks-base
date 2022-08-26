@@ -9,7 +9,8 @@
     "cluster_log_retention": "30",
     "vpc_cni_version": "v1.11.3-eksbuild.1",
     "coredns_version": "v1.8.7-eksbuild.2",
-    "kube_proxy_version": "v1.23.7-minimal-eksbuild.1",
+    "kube_proxy_version": "v1.23.7-eksbuild.1",
+    "kube_proxy_version_test": "v1.23.7-minimal-eksbuild.1",
     "aws_ebs_csi_version": "v1.10.0-eksbuild.1",
     "alert_channel": "prod",
 
