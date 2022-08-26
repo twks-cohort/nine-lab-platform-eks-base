@@ -72,6 +72,7 @@ Ex:
 }
 ```
 
+
 **WARM_IP_TARGET**  
 
 Commented section manages the WARM_IP_TARGET setting. This effects the number of IP's the aws_vpc_cni on the node will reserve to assign to pods. A higher number results is fewer available ips in the subnet for use by the ASG but a generally faster pod allocation. This recently became a '1' by default.  
