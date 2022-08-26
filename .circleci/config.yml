@@ -306,6 +306,7 @@ workflows:
             - store-system-credentials:
                 cluster: sandbox-us-east-2
             - kube/packages:
+                use-sudo: true
                 kubectl-version: 1.23.5
             - run:
                 name: create lab-system namespace
