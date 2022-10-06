@@ -17,7 +17,7 @@ module "eks" {
   kubeconfig_api_version                       = "client.authentication.k8s.io/v1beta1"
   kubeconfig_aws_authenticator_command         = "aws"
   kubeconfig_aws_authenticator_command_args    = ["eks","get-token","--cluster-name",var.cluster_name]
-  kubeconfig_aws_authenticator_additional_args = ["--role", local.authentication_role]
+  kubeconfig_aws_authenticator_additional_args = ["--role", local.authentication_role, "--region=${var.aws_region}"]
   kubeconfig_name                              = "twdps-lab-${var.cluster_name}"
 
   cluster_enabled_log_types     = var.cluster_enabled_log_types
