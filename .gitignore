@@ -1,4 +1,4 @@
-kubeconfig*
+kubeconfig_*
 .venv
 .terraform/
 terrform.*
