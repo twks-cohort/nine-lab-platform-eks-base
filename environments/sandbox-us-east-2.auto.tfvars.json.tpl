@@ -10,7 +10,7 @@
     "vpc_cni_version": "v1.11.4-eksbuild.1",
     "coredns_version": "v1.8.7-eksbuild.2",
     "kube_proxy_version": "v1.23.8-eksbuild.2",
-    "kube_proxy_version_test": "v1.23.7-minimal-eksbuild.1",
+    "kube_proxy_version_test": "v1.23.8-minimal-eksbuild.2",
     "aws_ebs_csi_version": "v1.11.4-eksbuild.1",
     "alert_channel": "sandbox",
 
