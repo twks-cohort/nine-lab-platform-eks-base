@@ -19,6 +19,8 @@
 </div>
 <br />
 
+This `base` pipeline is limited to all and only those components of EKS that will be fully managed by AWS. Deployments, version changes, and removal of the associated resource belong to AWS in the shared-responsibility model of IaaS vendor managed services. The pipeline owner directs only 'when' such changes occur by specifying version changes in the environment configuration or other similar practices of notifying AWS of a change to be made.  
+
 ## current configuration
 
 * OIDC for service accounts (irsa) enabled and used by resulting admin kubeconfig, and for assumable roles
