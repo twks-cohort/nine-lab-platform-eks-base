@@ -1,5 +1,5 @@
 terraform {
-  required_version = "~> 1.2"
+  required_version = "~> 1.3"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -8,9 +8,9 @@ terraform {
 
   backend "remote" {
     hostname     = "app.terraform.io"
-    organization = "twdps"
+    organization = "twks-cohort"
     workspaces {
-      prefix = "lab-platform-eks-base-"
+      prefix = "nine-lab-platform-eks-base-"
     }
   }
 }
@@ -19,14 +19,14 @@ provider "aws" {
   region = var.aws_region
   assume_role {
     role_arn     = local.authentication_role
-    session_name = "lab-platform-eks-base"
+    session_name = "nine-lab-platform-eks-base"
   }
 
   default_tags {
     tags = {
       env      = var.cluster_name
       cluster  = var.cluster_name
-      pipeline = "lab-platform-eks-base"
+      pipeline = "nine-lab-platform-eks-base"
     }
   }
 }

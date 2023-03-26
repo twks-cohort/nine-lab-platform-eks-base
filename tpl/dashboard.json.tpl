@@ -1,7 +1,7 @@
 
 {
-  "title": "EMPC lab-platform-eks-base",
-  "description": "[lab-platform-eks-base](https://github.com/ThoughtWorks-DPS/lab-platform-eks-base)",
+  "title": "EMPC nine-lab-platform-eks-base",
+  "description": "[nine-lab-platform-eks-base](https://github.com/ThoughtWorks-DPS/nine-lab-platform-eks-base)",
   "widgets": [
     {
       "definition": {
@@ -239,7 +239,7 @@
         "display_format": "countsAndList",
         "color_preference": "text",
         "hide_zero_counts": true,
-        "query": "tag:pipeline:lab-platform-eks-base",
+        "query": "tag:pipeline:nine-lab-platform-eks-base",
         "sort": "status,asc",
         "count": 50,
         "start": 0,

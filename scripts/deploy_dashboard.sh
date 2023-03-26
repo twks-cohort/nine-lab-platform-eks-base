@@ -15,7 +15,7 @@ export AWS_ASSUME_ROLE=$(cat ${CLUSTER}.auto.tfvars.json | jq -r .aws_assume_rol
 export AWS_DEFAULT_REGION=$(cat ${CLUSTER}.auto.tfvars.json | jq -r .aws_region)
 export AWS_ACCOUNT_ID=$(cat ${CLUSTER}.auto.tfvars.json | jq -r .aws_account_id)
 
-aws sts assume-role --output json --role-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/$AWS_ASSUME_ROLE --role-session-name lab-platform-eks-base > credentials
+aws sts assume-role --output json --role-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/$AWS_ASSUME_ROLE --role-session-name nine-lab-platform-eks-base > credentials
 
 export AWS_ACCESS_KEY_ID=$(cat credentials | jq -r ".Credentials.AccessKeyId")
 export AWS_SECRET_ACCESS_KEY=$(cat credentials | jq -r ".Credentials.SecretAccessKey")
@@ -30,7 +30,7 @@ export KUBE_PROXY_VERSIONS="| kube-proxy |"
 export VPC_CNI_VERSIONS="| vpc-cni |"
 export EBS_CSI_VERSIONS="| ebs-csi |"
 
-echo "generate markdown table with the desired versions of the services managed by the lab-platform-eks-base pipeline for all clusters"
+echo "generate markdown table with the desired versions of the services managed by the nine-lab-platform-eks-base pipeline for all clusters"
 declare -a clusters=(sandbox-us-east-2 prod-us-east-1)
 
 for cluster in "${clusters[@]}";
@@ -89,7 +89,7 @@ declare KUBE_PROXY_VERSIONS="|"
 declare VPC_CNI_VERSIONS="|"
 declare EBS_CSI_VERSIONS="|"
 
-echo "generate markdown table with the available versions of the services managed by the lab-platform-eks-base pipeline for all clusters"
+echo "generate markdown table with the available versions of the services managed by the nine-lab-platform-eks-base pipeline for all clusters"
 
 export LATEST_EKS_VERSION=$(aws eks describe-addon-versions | jq -r ".addons[] | .addonVersions[] | .compatibilities[] | .clusterVersion" | sort | uniq | tail -n1)
 export EKS_VERSIONS="$EKS_VERSIONS $LATEST_EKS_VERSION |"

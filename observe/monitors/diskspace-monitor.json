@@ -5,7 +5,7 @@
 	"message": "@slack-DPS-lab-{{ alert_channel }}-alerts",
 	"tags": [
 		"cluster:{{ cluster }}",
-		"pipeline:lab-platform-eks-base"
+		"pipeline:nine-lab-platform-eks-base"
 	],
 	"options": {
 		"thresholds": {
