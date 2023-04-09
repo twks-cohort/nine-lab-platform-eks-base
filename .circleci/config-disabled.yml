@@ -228,7 +228,7 @@ jobs:
   #         name: install requirements
   #         command: pip install -r requirements.txt
 
-  # replace the oldest 1/4 of the nodes in the cluster
+  ## replace the oldest 1/4 of the nodes in the cluster
   replace-nodes:
     parameters:
       cluster:
