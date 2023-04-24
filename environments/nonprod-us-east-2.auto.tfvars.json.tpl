@@ -25,7 +25,7 @@
     "default_node_group_instance_types": ["t2.2xlarge","t3.2xlarge","t3a.2xlarge","m5n.2xlarge","m5.2xlarge","m4.2xlarge"],
 
     "oidc_client_id": "{{ op://cohorts/nine-svc-auth0/twdpsio-dpsctl-client-id }}",
-    "oidc_groups_claim": "https://github.com/twks-cohort/teams/team_nine",
+    "oidc_groups_claim": "https://github.com/twks-cohort/teams",
     "oidc_identity_provider_config_name": "Auth0",
     "oidc_issuer_url": "https://dev-gknslj28dzr7os2y.us.auth0.com/"
 }
